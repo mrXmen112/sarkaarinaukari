@@ -1,0 +1,15 @@
+"use client";
+
+import { createBrowserClient } from "@supabase/ssr";
+
+import { env } from "@/lib/env";
+import type { Database } from "@/types/database";
+
+/**
+ * Supabase client for Client Components.
+ * `createBrowserClient` is a singleton by default, so calling this repeatedly
+ * is cheap and safe.
+ */
+export function createClient() {
+  return createBrowserClient<Database>(env.supabaseUrl, env.supabaseAnonKey);
+}

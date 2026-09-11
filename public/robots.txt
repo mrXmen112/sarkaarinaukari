@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /profile/
+Disallow: /login
+Disallow: /auth/
+
+Sitemap: https://sarkaarinaukari.online/sitemap.xml
