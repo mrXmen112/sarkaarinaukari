@@ -5,4 +5,4 @@ Disallow: /profile/
 Disallow: /login
 Disallow: /auth/
 
-Sitemap: https://sarkaarinaukari.online/sitemap.xml
+Sitemap: https://sarkaarinaukri.online/sitemap.xml

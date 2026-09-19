@@ -4,12 +4,12 @@
  */
 
 export const SITE = {
-  name: "SarkaariNaukari.online",
+  name: "Sarkaarinaukri.online",
   shortName: "SarkaariNaukari",
   tagline: "Sarkari Naukri, Admit Card, Result & Yojana Information Portal",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://sarkaarinaukari.online",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://sarkaarinaukri.online",
   locale: "en_IN",
-  contactEmail: "contact@sarkaarinaukari.online",
+  contactEmail: "contact@sarkaarinaukri.online",
 } as const;
 
 /**
@@ -17,7 +17,7 @@ export const SITE = {
  * Do not reword without checking the compliance requirement.
  */
 export const DISCLAIMER =
-  "SarkaariNaukari.online is an independent, privately-run information portal. " +
+  "Sarkaarinaukri.online is an independent, privately-run information portal. " +
   "We are not affiliated with, endorsed by, or officially connected to the " +
   "Government of India or the Government of Bihar. All information is compiled " +
   "from publicly available official sources; please verify details on the " +
