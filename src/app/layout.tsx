@@ -82,6 +82,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script id="monetag-ad-script" strategy="afterInteractive">
           {`(function(s){s.dataset.zone='11839114',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
         </Script>
+        <Script id="monetag-popunder-script" strategy="afterInteractive">
+          {`(function(s){s.dataset.zone='11839131',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
+        </Script>
       </body>
     </html>
   );
