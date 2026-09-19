@@ -5,6 +5,7 @@ import { JobTable } from "@/components/jobs/JobTable";
 import { NoticeBar } from "@/components/layout/NoticeBar";
 import { PageContainer, Panel } from "@/components/layout/PageContainer";
 import { RecentlyClosedSection } from "@/components/jobs/RecentlyClosedSection";
+import { BrokenLinkReport } from "@/components/jobs/BrokenLinkReport";
 import { isSupabaseConfigured } from "@/lib/env";
 import { getClosingJobs, getLatestJobs, getRecentlyClosedJobs } from "@/lib/queries";
 import { QUICK_LINKS } from "@/lib/site";
@@ -112,6 +113,7 @@ export default async function HomePage() {
         </section>
 
         <RecentlyClosedSection jobs={recentlyClosed} />
+        <BrokenLinkReport jobs={latest} />
       </PageContainer>
     </>
   );

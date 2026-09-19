@@ -9,6 +9,8 @@ import { JsonLd } from "@/components/ui/JsonLd";
 import { PageContainer, Panel } from "@/components/layout/PageContainer";
 import { JobActions } from "@/components/jobs/JobActions";
 import { JobTable } from "@/components/jobs/JobTable";
+import { ApplyButton } from "@/components/jobs/ApplyButton";
+import { validateOfficialLink, hasBrokenLink } from "@/lib/url";
 import { formatDate } from "@/lib/date";
 import { categoryLabel as fmtCategoryLabel, formatIndianNumber, formatRupees, truncate } from "@/lib/utils";
 import {
@@ -192,15 +194,13 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       <Panel title="How to Apply Online" className="mb-4">
         <Steps items={job.how_to_apply ?? []} />
         <div className="mt-3">
-          <Link
-            href={job.official_link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="gov-btn"
-          >
-            Apply Online (Official Website)
-          </Link>
+          <ApplyButton href={job.official_link} title={job.title} />
         </div>
+        {hasBrokenLink(job) ? (
+          <p className="mt-2 text-xs text-alert">
+            ⚠️ Official apply link could not be verified. Please check the official website directly.
+          </p>
+        ) : null}
       </Panel>
 
       {/* Section 9 — Important Links */}
@@ -236,6 +236,9 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
               className="flex items-center gap-2 py-2.5 text-sm font-semibold text-navy no-underline hover:text-alert hover:underline"
             >
               <GlobeGlyph /> Official Website
+              {hasBrokenLink(job) ? (
+                <span className="rounded-sm bg-alert-bg px-1.5 py-0.5 text-[0.625rem] font-bold text-alert">⚠ Verify</span>
+              ) : null}
             </Link>
           </li>
         </ul>
