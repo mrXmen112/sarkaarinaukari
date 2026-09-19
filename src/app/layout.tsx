@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Noto_Sans, PT_Serif } from "next/font/google";
 
 import { Footer } from "@/components/layout/Footer";
@@ -78,6 +79,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </div>
 
         <Footer />
+        <Script id="monetag-ad-script" strategy="afterInteractive">
+          {`(function(s){s.dataset.zone='11839114',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
+        </Script>
       </body>
     </html>
   );
