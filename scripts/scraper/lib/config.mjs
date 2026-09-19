@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
  */
 
 export const USER_AGENT =
-  "SarkaariNaukriBot/1.0 (+https://sarkaarinaukari.online/contact; data-collection for public job listings)";
+  "SarkaariNaukriBot/1.0 (+https://sarkaarinaukri.online/contact; data-collection for public job listings)";
 
 /** Minimum delay between two requests to the SAME domain (Section 6.4). */
 export const MIN_DELAY_MS = 4000;

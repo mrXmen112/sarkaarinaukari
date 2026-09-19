@@ -22,7 +22,7 @@ const ptSerif = PT_Serif({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE.url),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://sarkaarinaukri.online"),
   title: {
     default: `${SITE.name} — Sarkari Naukri, Admit Card, Result 2026`,
     template: `%s | ${SITE.shortName}`,
