@@ -39,6 +39,7 @@ export const metadata: Metadata = {
     "sarkari yojana",
   ],
   robots: { index: true, follow: true },
+  other: { monetag: "0b94690020c4d73b3027549ddfa9878e" },
   openGraph: {
     type: "website",
     locale: SITE.locale,
