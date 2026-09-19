@@ -166,6 +166,7 @@ export const JOB_STATUSES: { label: string; value: string }[] = [
   { label: "Active", value: "active" },
   { label: "Upcoming", value: "upcoming" },
   { label: "Closed", value: "closed" },
+  { label: "Recently Closed", value: "recently_closed" },
 ];
 
 /** Revalidation windows (seconds) — see Section 5, ISR requirement. */

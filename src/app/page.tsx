@@ -4,8 +4,9 @@ import type { Metadata } from "next";
 import { JobTable } from "@/components/jobs/JobTable";
 import { NoticeBar } from "@/components/layout/NoticeBar";
 import { PageContainer, Panel } from "@/components/layout/PageContainer";
+import { RecentlyClosedSection } from "@/components/jobs/RecentlyClosedSection";
 import { isSupabaseConfigured } from "@/lib/env";
-import { getClosingJobs, getLatestJobs } from "@/lib/queries";
+import { getClosingJobs, getLatestJobs, getRecentlyClosedJobs } from "@/lib/queries";
 import { QUICK_LINKS } from "@/lib/site";
 
 export const revalidate = 1800; // 30 min — listings change often
@@ -22,9 +23,10 @@ export const metadata: Metadata = {
  * configured; a clear setup panel otherwise so the page never breaks.
  */
 export default async function HomePage() {
-  const [latest, closing] = await Promise.all([
+  const [latest, closing, recentlyClosed] = await Promise.all([
     getLatestJobs(8),
     getClosingJobs(6),
+    getRecentlyClosedJobs(6),
   ]);
 
   const notices = closing.map((job) => ({
@@ -108,6 +110,8 @@ export default async function HomePage() {
             />
           </div>
         </section>
+
+        <RecentlyClosedSection jobs={recentlyClosed} />
       </PageContainer>
     </>
   );

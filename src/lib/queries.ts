@@ -48,7 +48,7 @@ export type JobListFilters = {
   state?: string;
   /** Stable recruiting-body key, e.g. "bihar-police" (Bihar Hub chips). */
   department?: string;
-  status?: string; // "active" | "upcoming" | "closed" | "all"
+  status?: string; // "active" | "upcoming" | "closed" | "recently_closed" | "all"
   qualification?: string;
   sort?: "newest" | "closing";
   page?: number;
@@ -83,7 +83,17 @@ export async function listJobs({
     .eq("is_published", true);
 
   if (status && status !== "all") {
-    query = query.eq("status", status as JobStatus);
+    if (status === "recently_closed") {
+      query = query
+        .eq("status", "active")
+        .lt("application_end", isoDatePlusDays(0))
+        .gte("application_end", isoDatePlusDays(-30));
+    } else {
+      query = query.eq("status", status as JobStatus);
+    }
+  }
+  if (status === "active") {
+    query = query.gte("application_end", isoDatePlusDays(0));
   }
   if (categorySlug) {
     const cat = cats.find((c) => c.slug === categorySlug);
@@ -180,7 +190,7 @@ export async function getRelatedJobs(
   return related.slice(0, limit);
 }
 
-/** Newest active jobs — homepage table. */
+/** Newest active (non-expired) jobs — homepage table. */
 export async function getLatestJobs(limit = 8): Promise<JobWithCategory[]> {
   return guard(async () => {
     const { data } = await createStaticClient()
@@ -188,13 +198,14 @@ export async function getLatestJobs(limit = 8): Promise<JobWithCategory[]> {
       .select(JOB_SELECT)
       .eq("is_published", true)
       .eq("status", "active")
+      .gte("application_end", isoDatePlusDays(0))
       .order("created_at", { ascending: false })
       .limit(limit);
     return (data ?? []) as JobWithCategory[];
   });
 }
 
-/** Closing-soonest active jobs — used by the NoticeBar countdown strip. */
+/** Closing-soonest active (non-expired) jobs — used by the NoticeBar countdown strip. */
 export async function getClosingJobs(limit = 8): Promise<JobWithCategory[]> {
   return guard(async () => {
     const { data } = await createStaticClient()
@@ -204,6 +215,22 @@ export async function getClosingJobs(limit = 8): Promise<JobWithCategory[]> {
       .eq("status", "active")
       .gte("application_end", isoDatePlusDays(-1))
       .order("application_end", { ascending: true })
+      .limit(limit);
+    return (data ?? []) as JobWithCategory[];
+  });
+}
+
+/** Recently expired jobs — shown in a separate "Recently Closed" section (last 30 days). */
+export async function getRecentlyClosedJobs(limit = 8): Promise<JobWithCategory[]> {
+  return guard(async () => {
+    const { data } = await createStaticClient()
+      .from("jobs")
+      .select(JOB_SELECT)
+      .eq("is_published", true)
+      .eq("status", "active")
+      .lt("application_end", isoDatePlusDays(0))
+      .gte("application_end", isoDatePlusDays(-30))
+      .order("application_end", { ascending: false })
       .limit(limit);
     return (data ?? []) as JobWithCategory[];
   });
