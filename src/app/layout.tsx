@@ -85,6 +85,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script id="monetag-popunder-script" strategy="afterInteractive">
           {`(function(s){s.dataset.zone='11839131',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
         </Script>
+        <Script
+          id="monetag-push-script"
+          src="https://5gvci.com/act/files/tag.min.js?z=11839138"
+          data-cfasync="false"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
