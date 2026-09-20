@@ -94,6 +94,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Script id="monetag-vignette-script" strategy="afterInteractive">
           {`(function(s){s.dataset.zone='11845231',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
         </Script>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-FZ8FR3C82D"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-FZ8FR3C82D');
+          `}
+        </Script>
       </body>
     </html>
   );
