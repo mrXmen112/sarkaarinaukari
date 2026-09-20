@@ -5,7 +5,7 @@
 
 export const SITE = {
   name: "Sarkaarinaukri.online",
-  shortName: "SarkaariNaukari",
+  shortName: "SarkaariNaukri",
   tagline: "Sarkari Naukri, Admit Card, Result & Yojana Information Portal",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://sarkaarinaukri.online",
   locale: "en_IN",

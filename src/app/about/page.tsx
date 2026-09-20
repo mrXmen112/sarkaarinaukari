@@ -7,9 +7,9 @@ import { articleSchema, breadcrumbSchema } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "About SarkaariNaukari.online — Sarkari Naukri & Yojana Portal",
+  title: "About SarkaariNaukri.online — Sarkari Naukri & Yojana Portal",
   description:
-    "SarkaariNaukari.online is a one-stop Indian government job portal — latest sarkari naukri notifications, admit cards, results, answer keys and sarkari yojana. Learn about our mission, editorial standards and how we verify every post.",
+    "SarkaariNaukri.online is a one-stop Indian government job portal — latest sarkari naukri notifications, admit cards, results, answer keys and sarkari yojana. Learn about our mission, editorial standards and how we verify every post.",
   alternates: { canonical: "/about" },
 };
 
@@ -21,7 +21,7 @@ export default function AboutPage() {
       />
       <JsonLd
         data={articleSchema({
-          headline: "About SarkaariNaukari.online",
+          headline: "About SarkaariNaukri.online",
           description:
             "How we publish verified government job notifications, admit cards, results and yojana on a single portal.",
           url: `${SITE.url}/about`,
@@ -33,12 +33,12 @@ export default function AboutPage() {
       />
 
       <header className="mb-4 border-b-2 border-navy pb-3">
-        <h1 className="text-2xl md:text-3xl">About SarkaariNaukari.online</h1>
+        <h1 className="text-2xl md:text-3xl">About SarkaariNaukri.online</h1>
       </header>
 
       <Panel title="Our Mission" className="mb-4">
         <div className="whitespace-pre-line text-sm leading-relaxed">
-          {`SarkaariNaukari.online brings every central & state government exam update to one place — job notifications, admit cards, results, answer keys, syllabus and sarkari yojana — so you never miss an important date.
+          {`SarkaariNaukri.online brings every central & state government exam update to one place — job notifications, admit cards, results, answer keys, syllabus and sarkari yojana — so you never miss an important date.
 
 We focus on Bihar & Jharkhand government jobs (BPSC, BSSC, Bihar Police, TRE) alongside all-India vacancies from SSC, IBPS and RRB, organised into exam-wise guides and syllabus.`}
         </div>

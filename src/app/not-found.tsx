@@ -5,7 +5,7 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PageContainer, PageHeader } from "@/components/layout/PageContainer";
 
 export const metadata: Metadata = {
-  title: "Page Not Found — SarkaariNaukari.online",
+  title: "Page Not Found — SarkaariNaukri.online",
   description:
     "The page you are looking for does not exist or has been moved. Return to the homepage or browse the latest government job notifications.",
 };

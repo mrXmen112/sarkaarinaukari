@@ -1,5 +1,5 @@
 /**
- * Database types for the SarkaariNaukari Supabase schema.
+ * Database types for the SarkaariNaukri Supabase schema.
  *
  * Hand-maintained to match `supabase/migrations/0001_initial_schema.sql`.
  * Once the Supabase project exists you can regenerate with:

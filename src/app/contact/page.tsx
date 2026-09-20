@@ -10,9 +10,9 @@ import { articleSchema, breadcrumbSchema } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Contact Us — SarkaariNaukari.online",
+  title: "Contact Us — SarkaariNaukri.online",
   description:
-    "Get in touch with the SarkaariNaukari.online team. Report corrections, ask about a notification, or send feedback — we reply to every message.",
+    "Get in touch with the SarkaariNaukri.online team. Report corrections, ask about a notification, or send feedback — we reply to every message.",
   alternates: { canonical: "/contact" },
 };
 
@@ -24,9 +24,9 @@ export default function ContactPage() {
       />
       <JsonLd
         data={articleSchema({
-          headline: "Contact SarkaariNaukari.online",
+          headline: "Contact SarkaariNaukri.online",
           description:
-            "How to reach the SarkaariNaukari.online team with questions, corrections and feedback.",
+            "How to reach the SarkaariNaukri.online team with questions, corrections and feedback.",
           url: `${SITE.url}/contact`,
         })}
       />

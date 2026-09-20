@@ -7,9 +7,9 @@ import { articleSchema, breadcrumbSchema } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Disclaimer — SarkaariNaukari.online",
+  title: "Disclaimer — SarkaariNaukri.online",
   description:
-    "Read the disclaimer for SarkaariNaukari.online — an unofficial information portal. We are not an official government website.",
+    "Read the disclaimer for SarkaariNaukri.online — an unofficial information portal. We are not an official government website.",
   alternates: { canonical: "/disclaimer" },
 };
 
@@ -23,7 +23,7 @@ export default function DisclaimerPage() {
         data={articleSchema({
           headline: "Disclaimer",
           description:
-            "Important disclaimer — SarkaariNaukari.online is an unofficial information aggregator, not a government body.",
+            "Important disclaimer — SarkaariNaukri.online is an unofficial information aggregator, not a government body.",
           url: `${SITE.url}/disclaimer`,
         })}
       />
@@ -38,7 +38,7 @@ export default function DisclaimerPage() {
 
       <Panel title="Unofficial Information Portal" className="mb-4">
         <div className="whitespace-pre-line text-sm leading-relaxed">
-          {`SarkaariNaukari.online is an independent, unofficial website that aggregates publicly available information about government jobs, examinations, schemes and yojana in India. We are not affiliated with, endorsed by, or connected to any government department, commission, ministry or public authority.`}
+          {`SarkaariNaukri.online is an independent, unofficial website that aggregates publicly available information about government jobs, examinations, schemes and yojana in India. We are not affiliated with, endorsed by, or connected to any government department, commission, ministry or public authority.`}
         </div>
       </Panel>
 

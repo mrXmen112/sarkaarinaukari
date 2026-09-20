@@ -7,9 +7,9 @@ import { articleSchema, breadcrumbSchema } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Terms of Use — SarkaariNaukari.online",
+  title: "Terms of Use — SarkaariNaukri.online",
   description:
-    "Terms governing your use of SarkaariNaukari.online — acceptable use, accuracy of information, liability and more. Read our terms of use.",
+    "Terms governing your use of SarkaariNaukri.online — acceptable use, accuracy of information, liability and more. Read our terms of use.",
   alternates: { canonical: "/terms" },
 };
 
@@ -23,7 +23,7 @@ export default function TermsPage() {
         data={articleSchema({
           headline: "Terms of Use",
           description:
-            "The rules for using SarkaariNaukari.online and its content.",
+            "The rules for using SarkaariNaukri.online and its content.",
           url: `${SITE.url}/terms`,
         })}
       />

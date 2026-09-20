@@ -14,7 +14,7 @@ import type { Job, Quiz } from "@/types/database";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "My Dashboard — SarkaariNaukari.online",
+  title: "My Dashboard — SarkaariNaukri.online",
   description:
     "Manage your profile, track applied and saved government jobs, and review your quiz scores.",
   alternates: { canonical: "/profile" },

@@ -7,9 +7,9 @@ import { articleSchema, breadcrumbSchema } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — SarkaariNaukari.online",
+  title: "Privacy Policy — SarkaariNaukri.online",
   description:
-    "How SarkaariNaukari.online collects, uses and protects your data — cookies, analytics, third-party links and your rights. Read our privacy policy.",
+    "How SarkaariNaukri.online collects, uses and protects your data — cookies, analytics, third-party links and your rights. Read our privacy policy.",
   alternates: { canonical: "/privacy" },
 };
 
@@ -23,7 +23,7 @@ export default function PrivacyPage() {
         data={articleSchema({
           headline: "Privacy Policy",
           description:
-            "Data handling, cookies and analytics practices of SarkaariNaukari.online.",
+            "Data handling, cookies and analytics practices of SarkaariNaukri.online.",
           url: `${SITE.url}/privacy`,
         })}
       />

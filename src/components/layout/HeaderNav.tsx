@@ -42,7 +42,7 @@ export function HeaderNav({
         >
           <Image
             src="/logo-full.svg"
-            alt="SarkaariNaukari logo"
+            alt="SarkaariNaukri logo"
             width={160}
             height={40}
             className="shrink-0 h-auto w-auto"

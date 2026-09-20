@@ -7,9 +7,9 @@ import { AuthForm } from "@/components/auth/AuthForm";
 import { breadcrumbSchema } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Login — SarkaariNaukari.online",
+  title: "Login — SarkaariNaukri.online",
   description:
-    "Sign in to track your applied and saved government jobs, save quiz scores and manage your SarkaariNaukari.online profile.",
+    "Sign in to track your applied and saved government jobs, save quiz scores and manage your SarkaariNaukri.online profile.",
   alternates: { canonical: "/login" },
 };
 

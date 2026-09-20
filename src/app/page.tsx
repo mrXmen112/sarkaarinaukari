@@ -15,7 +15,7 @@ export const revalidate = 1800; // 30 min — listings change often
 export const metadata: Metadata = {
   title: "Latest Sarkari Naukri 2026 — Govt Jobs, Admit Card, Result & Yojana",
   description:
-    "SarkaariNaukari.online: latest central & state government job notifications, Bihar jobs (BPSC, BSSC, Bihar Police, TRE), admit cards, results, answer keys, syllabus and Sarkari Yojana updates.",
+    "SarkaariNaukri.online: latest central & state government job notifications, Bihar jobs (BPSC, BSSC, Bihar Police, TRE), admit cards, results, answer keys, syllabus and Sarkari Yojana updates.",
   alternates: { canonical: "/" },
 };
 
@@ -44,7 +44,7 @@ export default async function HomePage() {
         <section className="mb-5">
           <h1>Latest Sarkari Naukri 2026 — Government Job Updates</h1>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-ink-muted">
-            Welcome to SarkaariNaukari.online, an independent information portal
+            Welcome to SarkaariNaukri.online, an independent information portal
             for central and state government job notifications across India,
             with dedicated coverage of Bihar government jobs (BPSC, BSSC, Bihar
             Police, Bihar TRE teacher recruitment and more). Find active

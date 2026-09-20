@@ -17,7 +17,7 @@ export function SiteLogo({
       viewBox="0 0 48 48"
       fill="none"
       role="img"
-      aria-label="SarkaariNaukari.online logo"
+      aria-label="SarkaariNaukri.online logo"
       className={className}
     >
       {/* Document body */}

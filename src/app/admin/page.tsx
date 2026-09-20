@@ -8,7 +8,7 @@ import { formatDate } from "@/lib/date";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Admin — SarkaariNaukari.online",
+  title: "Admin — SarkaariNaukri.online",
 };
 
 export default async function AdminDashboard() {
