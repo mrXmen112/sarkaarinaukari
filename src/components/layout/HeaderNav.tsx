@@ -1,10 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { SiteLogo } from "@/components/layout/SiteLogo";
 import type { NavItem } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
@@ -40,15 +40,16 @@ export function HeaderNav({
           href="/"
           className="flex min-w-0 items-center gap-2.5 no-underline hover:no-underline"
         >
-          <SiteLogo size={38} className="shrink-0" />
-          <span className="min-w-0">
-            <span className="block truncate font-serif text-lg leading-tight font-bold text-white sm:text-xl">
-              Sarkaari<span className="text-saffron">Naukari</span>
-              <span className="text-navy-200">.online</span>
-            </span>
-            <span className="hidden truncate text-xs text-navy-100 sm:block">
-              {tagline}
-            </span>
+          <Image
+            src="/logo-full.svg"
+            alt="SarkaariNaukari logo"
+            width={160}
+            height={40}
+            className="shrink-0 h-auto w-auto"
+            style={{ maxWidth: "160px", maxHeight: "40px" }}
+          />
+          <span className="hidden sm:block text-xs text-navy-100">
+            {tagline}
           </span>
         </Link>
 

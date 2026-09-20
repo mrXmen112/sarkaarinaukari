@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 100">
+  <defs>
+    <linearGradient id="iconGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B3D6E"/>
+      <stop offset="100%" stop-color="#134E8C"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF9933"/>
+      <stop offset="100%" stop-color="#F5871F"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="10" width="80" height="80" rx="18" fill="url(#iconGrad)"/>
+  <rect x="30" y="26" width="36" height="48" rx="4" fill="#FFFFFF" opacity="0.95"/>
+  <rect x="37" y="36" width="22" height="3.5" rx="1.75" fill="#0B3D6E" opacity="0.55"/>
+  <rect x="37" y="45" width="22" height="3.5" rx="1.75" fill="#0B3D6E" opacity="0.55"/>
+  <rect x="37" y="54" width="14" height="3.5" rx="1.75" fill="#0B3D6E" opacity="0.55"/>
+  <circle cx="66" cy="66" r="15" fill="url(#accentGrad)" stroke="#FFFFFF" stroke-width="3"/>
+  <path d="M59 66.5 L64 71.5 L74 60.5" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <text x="104" y="52" font-family="Poppins, Arial, sans-serif" font-size="30" font-weight="700" fill="#0B3D6E">Sarkaari</text>
+  <text x="228" y="52" font-family="Poppins, Arial, sans-serif" font-size="30" font-weight="700" fill="#F5871F">Naukri</text>
+  <text x="106" y="72" font-family="Arial, sans-serif" font-size="13" font-weight="500" fill="#4A5568" letter-spacing="0.5">Naukri · Result · Yojana Updates</text>
+</svg>

@@ -40,6 +40,11 @@ export const metadata: Metadata = {
     "sarkari yojana",
   ],
   robots: { index: true, follow: true },
+  icons: {
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
   other: { monetag: "0b94690020c4d73b3027549ddfa9878e" },
   openGraph: {
     type: "website",
