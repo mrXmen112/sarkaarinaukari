@@ -10,11 +10,10 @@ import {
   getAllYojanaSlugs,
   getYojanaBySlug,
 } from "@/lib/queries";
-import {
-  articleSchema,
-  breadcrumbSchema,
-} from "@/lib/seo";
+import { articleSchema, breadcrumbSchema } from "@/lib/seo";
 import { SITE } from "@/lib/site";
+import { FAQSection } from "@/components/ui/FAQSection";
+import { ShareButtons } from "@/components/ui/ShareButtons";
 import { formatDate } from "@/lib/date";
 import { truncate } from "@/lib/utils";
 
@@ -61,6 +60,25 @@ export default async function YojanaDetailPage({
 
   const url = `${SITE.url}/yojana/${yojana.slug}`;
 
+  const yojanaFAQs = [
+    {
+      question: `${yojana.title} ka eligibility kya hai?`,
+      answer: yojana.eligibility ?? "Eligibility criteria are as per the official scheme notification.",
+    },
+    {
+      question: "Scheme ke benefits kya hain?",
+      answer: yojana.benefits_summary ?? yojana.benefits ?? "Benefits are as per the official scheme notification.",
+    },
+    {
+      question: "Kaise apply karein?",
+      answer: yojana.how_to_apply ?? "Apply through the official government portal or the nearest designated office.",
+    },
+    {
+      question: "Official link kya hai?",
+      answer: yojana.official_link ? `Visit ${yojana.official_link} for official details and application.` : "Please check the official government website for updates.",
+    },
+  ];
+
   return (
     <PageContainer>
       <JsonLd
@@ -85,6 +103,8 @@ export default async function YojanaDetailPage({
           { label: yojana.title },
         ]}
       />
+
+      <ShareButtons title={yojana.title} url={url} />
 
       <header className="mb-4 border-b-2 border-navy pb-3">
         <h1 className="text-2xl md:text-3xl">{yojana.title}</h1>
@@ -158,6 +178,13 @@ export default async function YojanaDetailPage({
           ) : null}
         </ul>
       </Panel>
+
+      <FAQSection
+        title="Frequently Asked Questions"
+        faqs={yojanaFAQs}
+        url={url}
+        headline={yojana.title}
+      />
     </PageContainer>
   );
 }

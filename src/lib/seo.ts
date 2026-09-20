@@ -122,6 +122,44 @@ export function jobPostingSchema(job: JobWithCategory, url: string) {
 }
 
 /**
+ * Generate FAQs from job data for schema.org FAQPage.
+ */
+export function jobFAQSchema(job: JobWithCategory, url: string) {
+  const faqs = [
+    {
+      question: `Is ${job.title} ke liye age limit kya hai?`,
+      answer: job.eligibility_age_min != null && job.eligibility_age_max != null
+        ? `${job.eligibility_age_min} – ${job.eligibility_age_max} years. Age relaxation is available for SC/ST, OBC, EWS, and PwBD categories as per government norms.`
+        : "Age limit is as per the official notification. Please check the official advertisement for category-wise age relaxation.",
+    },
+    {
+      question: "Application fee kitni hai?",
+      answer: job.application_fee && Object.keys(job.application_fee).length > 0
+        ? `Application fee category-wise: ${Object.entries(job.application_fee).map(([k, v]) => `${k}: Rs ${v}`).join(", ")}. SC/ST/PwBD candidates are usually exempt.`
+        : "Application fee is as per the official notification. Category-wise details are available in the official advertisement.",
+    },
+    {
+      question: `Apply karne ki last date kab hai?`,
+      answer: `Last date to apply for ${job.title} is ${new Date(job.application_end).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}. Apply before the deadline on the official website.`,
+    },
+    {
+      question: "Selection process kya hai?",
+      answer: job.selection_process && job.selection_process.length > 0
+        ? `Selection process: ${job.selection_process.join(" → ")}. Final selection is based on merit and document verification.`
+        : "Selection process is as per the official notification. Please verify stages in the official advertisement.",
+    },
+    {
+      question: "Eligibility criteria kya hai?",
+      answer: job.eligibility_education
+        ? `Eligibility: ${job.eligibility_education}. Age and category requirements are mentioned in the official notification.`
+        : "Eligibility criteria are as per the official notification. Please check the official advertisement for detailed requirements.",
+    },
+  ];
+
+  return faqSchema({ faqs, url, headline: job.title });
+}
+
+/**
  * FAQPage (Section 5) — used on exam detail pages. One Question + Answer
  * entity per FAQ; builds an expandable rich-result in Google Search.
  */

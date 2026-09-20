@@ -13,12 +13,10 @@ import {
   getExamBySlug,
   listJobsBySyllabus,
 } from "@/lib/queries";
-import {
-  articleSchema,
-  breadcrumbSchema,
-  faqSchema,
-} from "@/lib/seo";
+import { articleSchema, breadcrumbSchema, faqSchema } from "@/lib/seo";
 import { SITE } from "@/lib/site";
+import { FAQSection } from "@/components/ui/FAQSection";
+import { ShareButtons } from "@/components/ui/ShareButtons";
 import { truncate } from "@/lib/utils";
 import type { ExamPatternStage } from "@/types/database";
 
@@ -71,6 +69,29 @@ export default async function ExamDetailPage({
     answer: f.answer,
   }));
 
+  // Add dynamic FAQs if not enough from DB
+  if (faqs.length < 3) {
+    const extraFAQs = [
+      {
+        question: `${exam.name} ke liye eligibility criteria kya hai?`,
+        answer: exam.eligibility ?? "Eligibility criteria are as per the official notification.",
+      },
+      {
+        question: "Exam pattern kya hai?",
+        answer: exam.exam_pattern && exam.exam_pattern.length > 0
+          ? `${exam.exam_pattern.length} stage(s): ${exam.exam_pattern.map((s) => s.stage).join(", ")}.`
+          : "Exam pattern is as per the official notification.",
+      },
+      {
+        question: `Apply karne ki last date kab hai?`,
+        answer: `Please check the official notification for application dates. Visit the conducting body's website for the latest updates.`,
+      },
+    ];
+    for (const f of extraFAQs) {
+      if (!faqs.some((x) => x.question === f.question)) faqs.push(f);
+    }
+  }
+
   const url = `${SITE.url}/exams/${exam.slug}`;
 
   return (
@@ -96,6 +117,8 @@ export default async function ExamDetailPage({
       <Breadcrumbs
         items={[{ label: "Exams", href: "/exams" }, { label: exam.name }]}
       />
+
+      <ShareButtons title={exam.name} url={url} />
 
       <header className="mb-4 border-b-2 border-rule pb-3">
         <h1 className="text-2xl md:text-3xl">{exam.name}</h1>
@@ -238,6 +261,13 @@ export default async function ExamDetailPage({
           { name: "Exams", path: "/exams" },
           { name: exam.name, path: `/exams/${exam.slug}` },
         ])}
+      />
+
+      <FAQSection
+        title="Frequently Asked Questions"
+        faqs={faqs}
+        url={url}
+        headline={exam.name}
       />
     </PageContainer>
   );

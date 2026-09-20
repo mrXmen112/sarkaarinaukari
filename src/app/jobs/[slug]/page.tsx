@@ -19,8 +19,10 @@ import {
   getRelatedJobs,
   stateLabel,
 } from "@/lib/queries";
-import { breadcrumbSchema, jobPostingSchema } from "@/lib/seo";
+import { breadcrumbSchema, jobPostingSchema, jobFAQSchema } from "@/lib/seo";
 import { SITE } from "@/lib/site";
+import { FAQSection } from "@/components/ui/FAQSection";
+import { ShareButtons } from "@/components/ui/ShareButtons";
 
 export const revalidate = 10800; // 3 hours — job detail pages
 
@@ -86,6 +88,9 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
     <PageContainer>
       <JsonLd data={jobPostingSchema(job, url)} />
       <JsonLd
+        data={jobFAQSchema(job, url)}
+      />
+      <JsonLd
         data={breadcrumbSchema(breadcrumbs.filter((b) => b.name !== job.title))}
       />
 
@@ -95,6 +100,8 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
           { label: job.title },
         ]}
       />
+
+      <ShareButtons title={job.title} url={url} />
 
       {/* Section 1 — Title + Last Date countdown (top-right) */}
       <header className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b-2 border-navy pb-3">
@@ -244,7 +251,44 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
         </ul>
       </Panel>
 
-      {/* Section 10 — Related jobs (internal linking for SEO) */}
+      {/* Section 10 — FAQ */}
+      <FAQSection
+        title="Frequently Asked Questions"
+        faqs={[
+          {
+            question: `Is ${job.title} ke liye age limit kya hai?`,
+            answer: job.eligibility_age_min != null && job.eligibility_age_max != null
+              ? `${job.eligibility_age_min} – ${job.eligibility_age_max} years. Age relaxation is available for SC/ST, OBC, EWS, and PwBD categories as per government norms.`
+              : "Age limit is as per the official notification. Please check the official advertisement for category-wise age relaxation.",
+          },
+          {
+            question: "Application fee kitni hai?",
+            answer: job.application_fee && Object.keys(job.application_fee).length > 0
+              ? `Application fee category-wise: ${Object.entries(job.application_fee).map(([k, v]) => `${k}: Rs ${v}`).join(", ")}. SC/ST/PwBD candidates are usually exempt.`
+              : "Application fee is as per the official notification. Category-wise details are available in the official advertisement.",
+          },
+          {
+            question: `Apply karne ki last date kab hai?`,
+            answer: `Last date to apply for ${job.title} is ${new Date(job.application_end).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}. Apply before the deadline on the official website.`,
+          },
+          {
+            question: "Selection process kya hai?",
+            answer: job.selection_process && job.selection_process.length > 0
+              ? `Selection process: ${job.selection_process.join(" → ")}. Final selection is based on merit and document verification.`
+              : "Selection process is as per the official notification. Please verify stages in the official advertisement.",
+          },
+          {
+            question: "Eligibility criteria kya hai?",
+            answer: job.eligibility_education
+              ? `Eligibility: ${job.eligibility_education}. Age and category requirements are mentioned in the official notification.`
+              : "Eligibility criteria are as per the official notification. Please check the official advertisement for detailed requirements.",
+          },
+        ]}
+        url={url}
+        headline={job.title}
+      />
+
+      {/* Section 11 — Related jobs (internal linking for SEO) */}
       {related.length > 0 ? (
         <section aria-labelledby="related-jobs" className="gov-panel">
           <div className="gov-panel-title" id="related-jobs">
