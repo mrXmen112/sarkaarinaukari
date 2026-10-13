@@ -3,6 +3,7 @@ import Link from "next/link";
 import { DetailTable } from "@/components/ui/DataTable";
 import { formatDate } from "@/lib/date";
 import type { JobTimeline } from "@/lib/queries";
+import { T } from "@/components/i18n/T";
 
 /**
  * Recruitment Timeline (Phase 1): the full lifecycle of a vacancy —
@@ -101,7 +102,7 @@ export function RecruitmentTimeline({
   return (
     <section aria-labelledby="recruitment-timeline" className="gov-panel mb-4">
       <div className="gov-panel-title" id="recruitment-timeline">
-        Recruitment Timeline
+        <T k="recruitmentTimeline" />
       </div>
       <div className="p-3">
         <DetailTable caption="Recruitment timeline for this vacancy" rows={rows} />

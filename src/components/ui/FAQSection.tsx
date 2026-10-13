@@ -8,7 +8,8 @@ interface FAQItem {
 }
 
 interface FAQSectionProps {
-  title: string;
+  /** Panel title; may be a bilingual <T> node. */
+  title: React.ReactNode;
   faqs: FAQItem[];
   url: string;
   headline: string;

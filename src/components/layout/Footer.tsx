@@ -19,7 +19,10 @@ export function Footer() {
               id={`footcol-${col.heading}`}
               className="mb-2 border-b border-navy-400 pb-1.5 font-serif text-sm font-bold text-white"
             >
-              {col.heading}
+              <span className="lang-en">{col.heading}</span>
+              {col.headingHi ? (
+                <span className="lang-hi">{col.headingHi}</span>
+              ) : null}
             </h2>
             <ul className="space-y-1.5">
               {col.items.map((item) => (
@@ -28,7 +31,10 @@ export function Footer() {
                     href={item.href}
                     className="text-sm text-navy-100 no-underline hover:text-saffron hover:underline"
                   >
-                    {item.label}
+                    <span className="lang-en">{item.label}</span>
+                    {item.labelHi ? (
+                      <span className="lang-hi">{item.labelHi}</span>
+                    ) : null}
                   </Link>
                 </li>
               ))}
@@ -51,20 +57,25 @@ export function Footer() {
       <div className="border-t border-navy-400 bg-navy-900">
         <div className="mx-auto flex max-w-6xl flex-col gap-1.5 px-3 py-3 text-xs text-navy-200 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            &copy; {year} {SITE.name}. All rights reserved.
+            &copy; {year} {SITE.name}. <span className="lang-en">All rights reserved.</span>
+            <span className="lang-hi">सर्वाधिकार सुरक्षित।</span>
           </p>
           <p className="flex flex-wrap gap-x-3 gap-y-1">
             <Link href="/privacy" className="text-navy-200 no-underline hover:underline">
-              Privacy
+              <span className="lang-en">Privacy</span>
+              <span className="lang-hi">गोपनीयता</span>
             </Link>
             <Link href="/terms" className="text-navy-200 no-underline hover:underline">
-              Terms
+              <span className="lang-en">Terms</span>
+              <span className="lang-hi">शर्तें</span>
             </Link>
             <Link href="/disclaimer" className="text-navy-200 no-underline hover:underline">
-              Disclaimer
+              <span className="lang-en">Disclaimer</span>
+              <span className="lang-hi">अस्वीकरण</span>
             </Link>
             <Link href="/contact" className="text-navy-200 no-underline hover:underline">
-              Contact
+              <span className="lang-en">Contact</span>
+              <span className="lang-hi">संपर्क</span>
             </Link>
           </p>
         </div>

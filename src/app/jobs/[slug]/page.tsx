@@ -11,6 +11,7 @@ import { JobActions } from "@/components/jobs/JobActions";
 import { JobTable } from "@/components/jobs/JobTable";
 import { ApplyButton } from "@/components/jobs/ApplyButton";
 import { RecruitmentTimeline } from "@/components/jobs/RecruitmentTimeline";
+import { T } from "@/components/i18n/T";
 import { hasBrokenLink } from "@/lib/url";
 import { formatDate } from "@/lib/date";
 import { categoryLabel as fmtCategoryLabel, formatIndianNumber, formatRupees, truncate } from "@/lib/utils";
@@ -140,7 +141,12 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
           <h1 className="text-2xl md:text-3xl">{job.title}</h1>
           {job.status === "closed" ? (
             <p className="mt-1.5 inline-block rounded-sm bg-alert-bg px-2 py-0.5 text-xs font-bold text-alert">
-              This vacancy has closed — next notification may be forthcoming.
+              <span className="lang-en">
+                This vacancy has closed — next notification may be forthcoming.
+              </span>
+              <span className="lang-hi">
+                यह भर्ती बंद हो चुकी है — अगली सूचना जल्द आ सकती है।
+              </span>
             </p>
           ) : null}
           <div className="mt-2">
@@ -153,7 +159,7 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       </header>
 
       {/* Section 2 — Overview */}
-      <Panel title="Post Overview" className="mb-4">
+      <Panel title={<T k="postOverview" />} className="mb-4">
         <DetailTable
           caption="Post overview details"
           rows={[
@@ -166,17 +172,17 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
                 (job.state ? stateLabel(job.state) : "—"),
             },
             {
-              label: "Total Vacancy",
+              label: <T k="totalVacancy" />,
               value: formatIndianNumber(job.vacancy_total),
             },
             {
               label: "Application Dates",
               value: `${formatDate(job.application_start)} to <strong>${formatDate(job.application_end)}</strong>`,
             },
-            { label: "Exam Date", value: job.exam_date ? formatDate(job.exam_date) : "To be announced" },
-            { label: "Pay Scale", value: job.pay_scale ?? "—" },
+            { label: <T k="examDate" />, value: job.exam_date ? formatDate(job.exam_date) : "To be announced" },
+            { label: <T k="payScale" />, value: job.pay_scale ?? "—" },
             {
-              label: "Last Updated",
+              label: <T k="lastUpdated" />,
               value: formatDate(job.updated_at ?? job.created_at),
             },
           ]}
@@ -192,38 +198,38 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
           <DetailTable
             caption="Quick summary of this vacancy"
             rows={[
-              { label: "Post", value: job.title },
+              { label: <T k="post" />, value: job.title },
               {
-                label: "Total Vacancy",
+                label: <T k="totalVacancy" />,
                 value: job.vacancy_total
                   ? formatIndianNumber(job.vacancy_total)
-                  : "Not notified",
+                  : <T k="notNotified" />,
               },
               {
-                label: "Last Date",
+                label: <T k="lastDate" />,
                 value: `${formatDate(job.application_end)}${
                   job.status === "closed" ? " (closed)" : ""
                 }`,
               },
               {
-                label: "Application Fee",
+                label: <T k="applicationFeeLabel" />,
                 value:
                   job.application_fee &&
                   Object.keys(job.application_fee).length > 0
                     ? `${fmtCategoryLabel("general")}: ${formatRupees(
                         (job.application_fee as Record<string, number>).general,
                       )}`
-                    : "Not notified",
+                    : <T k="notNotified" />,
               },
               {
-                label: "Apply Mode",
+                label: <T k="applyMode" />,
                 value: "Online — official website only",
               },
               {
-                label: "Age Limit",
+                label: <T k="ageLimit" />,
                 value:
                   job.eligibility_age_min == null && job.eligibility_age_max == null
-                    ? "As per notification"
+                    ? <T k="asPerNotification" />
                     : `${job.eligibility_age_min ?? "—"}–${job.eligibility_age_max ?? "—"} years`,
               },
             ]}
@@ -231,11 +237,11 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
           <div className="mt-3 flex flex-wrap items-center gap-3">
             {job.status === "closed" ? (
               <span className="inline-block rounded-sm bg-alert-bg px-3 py-2 text-sm font-bold text-alert">
-                Applications closed
+                <T k="applicationsClosed" />
               </span>
             ) : job.link_flagged ? (
               <span className="inline-block rounded-sm border border-alert px-3 py-2 text-sm font-bold text-alert">
-                Apply link under verification
+                <T k="applyLinkUnderVerification" />
               </span>
             ) : (
               <ApplyButton href={job.official_link} title={job.title} />
@@ -248,7 +254,7 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       <RecruitmentTimeline job={job} timeline={timeline} />
 
       {/* Section 3 — Eligibility */}
-      <Panel title="Eligibility Criteria" className="mb-4">
+      <Panel title={<T k="eligibilityCriteria" />} className="mb-4">
         <div className="space-y-3 text-sm">
           <p>
             <span className="font-semibold text-navy">Education: </span>
@@ -271,7 +277,7 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
 
       {/* Section 4 — Application Fee */}
       {job.application_fee && Object.keys(job.application_fee).length > 0 ? (
-        <Panel title="Application Fee" className="mb-4">
+        <Panel title={<T k="applicationFee" />} className="mb-4">
           <CategoryValueTable
             caption="Category-wise application fee"
             data={job.application_fee}
@@ -292,13 +298,13 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       ) : null}
 
       {/* Section 6 — Selection Process */}
-      <Panel title="Selection Process" className="mb-4">
+      <Panel title={<T k="selectionProcess" />} className="mb-4">
         <Steps items={job.selection_process ?? []} note="Post-wise process may differ — verify in the official notification." />
       </Panel>
 
       {/* Section 6b — Documents required (Phase 4D). Generic guidance only:
           what any government application needs, clearly labelled as such. */}
-      <Panel title="Documents Required" className="mb-4">
+      <Panel title={<T k="documentsRequired" />} className="mb-4">
         <ul className="list-disc space-y-1 pl-5 text-sm text-ink-muted">
           <li>Recent passport-size photographs (number as per the notification)</li>
           <li>Signature / thumb impression on white background, as specified</li>
@@ -324,7 +330,7 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       </Panel>
 
       {/* Section 6c — Salary details: only what the notification states. */}
-      <Panel title="Salary / Pay Details" className="mb-4">
+      <Panel title={<T k="salaryDetails" />} className="mb-4">
         {job.pay_scale ? (
           <p className="text-sm text-ink">
             <strong className="text-navy">Pay scale:</strong> {job.pay_scale}
@@ -339,12 +345,11 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       </Panel>
 
       {/* Section 8 — How to Apply */}
-      <Panel title="How to Apply Online" className="mb-4">
+      <Panel title={<T k="howToApply" />} className="mb-4">
         <Steps items={job.how_to_apply ?? []} />
         {job.status === "closed" ? null : job.link_flagged ? (
-          <p className="mt-3 rounded-sm bg-alert-bg px-2.5 py-2 text-sm font-semibold text-alert">
-            Apply link under verification — please open the official website
-            directly until we confirm it.
+<p className="mt-3 rounded-sm bg-alert-bg px-2.5 py-2 text-sm font-semibold text-alert">
+            <T k="applyLinkUnderVerification" />
           </p>
         ) : (
           <div className="mt-3">
@@ -359,7 +364,7 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       </Panel>
 
       {/* Section 9 — Important Links */}
-      <Panel title="Important Links" className="mb-4">
+      <Panel title={<T k="importantLinks" />} className="mb-4">
         <ul className="divide-y divide-rule">
           {job.notification_pdf_link ? (
             <li>

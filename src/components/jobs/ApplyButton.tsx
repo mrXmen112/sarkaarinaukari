@@ -1,3 +1,5 @@
+import { T } from "@/components/i18n/T";
+
 interface ApplyButtonProps {
   href: string;
   title: string;
@@ -17,7 +19,7 @@ export function ApplyButton({ href, title }: ApplyButtonProps) {
       className="gov-btn whitespace-nowrap"
       aria-label={`Apply online for ${title} on the official website (opens in a new tab)`}
     >
-      Apply Online (Official Website)
+      <T k="applyOnline" />
     </a>
   );
 }

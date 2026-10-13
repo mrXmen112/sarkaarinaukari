@@ -4,6 +4,7 @@ import { CountdownBadge } from "@/components/ui/CountdownBadge";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { stateLabel } from "@/lib/queries";
 import { formatIndianNumber } from "@/lib/utils";
+import { T } from "@/components/i18n/T";
 import type { JobWithCategory } from "@/types/database";
 
 /** "New" for jobs published in the last 3 days, "Updated" for recent edits. */
@@ -14,7 +15,7 @@ function freshnessBadge(job: JobWithCategory): React.ReactNode {
   if (Number.isFinite(created) && now - created <= 3 * 24 * 60 * 60 * 1000) {
     return (
       <span className="rounded-sm bg-ingreen px-1.5 py-0.5 text-[0.625rem] font-bold text-white">
-        NEW
+        <T k="new" />
       </span>
     );
   }
@@ -26,7 +27,7 @@ function freshnessBadge(job: JobWithCategory): React.ReactNode {
   ) {
     return (
       <span className="rounded-sm bg-saffron px-1.5 py-0.5 text-[0.625rem] font-bold text-navy">
-        UPDATED
+        <T k="updated" />
       </span>
     );
   }
@@ -59,7 +60,7 @@ export function JobTable({
   const columns: Column<JobWithCategory>[] = [
     {
       key: "title",
-      header: "Post Name",
+      header: <T k="postName" />,
       cell: (job) => (
         <div>
           <Link
@@ -83,7 +84,7 @@ export function JobTable({
     },
     {
       key: "department",
-      header: "Department",
+      header: <T k="department" />,
       hideBelow: "sm",
       cell: (job) => (
         <span className="text-ink-muted">{job.department ?? "—"}</span>
@@ -92,7 +93,7 @@ export function JobTable({
     },
     {
       key: "vacancy",
-      header: "Vacancy",
+      header: <T k="vacancy" />,
       hideBelow: "md",
       cell: (job) => (
         <span className="font-semibold tabular-nums">
@@ -103,12 +104,12 @@ export function JobTable({
     ...extraColumns,
     {
       key: "last-date",
-      header: "Last Date",
+      header: <T k="lastDate" />,
       cell: (job) => <CountdownBadge date={job.application_end} compact />,
     },
     {
       key: "apply",
-      header: "Apply",
+      header: <T k="applyCol" />,
       // Phase 4E: verified + open jobs link straight to the official apply URL;
       // everything else falls back to the detail page, and closed jobs show
       // a disabled "Closed" label instead of a dead button.
@@ -119,7 +120,7 @@ export function JobTable({
         if (closed) {
           return (
             <span className="inline-block whitespace-nowrap rounded-sm bg-alert-bg px-2.5 py-1.5 text-xs font-bold text-alert">
-              Closed
+              <T k="closed" />
             </span>
           );
         }
@@ -130,7 +131,7 @@ export function JobTable({
               className="gov-btn whitespace-nowrap"
               aria-label={`View details for ${job.title} — apply link under verification`}
             >
-              View
+              <T k="view" />
             </Link>
           );
         }
@@ -142,7 +143,7 @@ export function JobTable({
             className="gov-btn whitespace-nowrap"
             aria-label={`Apply online for ${job.title} on the official website (opens in a new tab)`}
           >
-            Apply
+            <T k="apply" />
           </a>
         );
       },

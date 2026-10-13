@@ -7,6 +7,7 @@ import { JsonLd } from "@/components/ui/JsonLd";
 import { Pagination } from "@/components/ui/Pagination";
 import { PageContainer, PageHeader } from "@/components/layout/PageContainer";
 import { JobTable } from "@/components/jobs/JobTable";
+import { T } from "@/components/i18n/T";
 import { SearchBox } from "@/components/ui/SearchBox";
 import { listCategories, listJobs, stateLabel } from "@/lib/queries";
 import {
@@ -98,35 +99,35 @@ export default async function JobsPage({
         filters={[
           {
             name: "category",
-            label: "Category",
+            label: <T k="category" />,
             value: category,
             options: categories.map((c) => ({ label: c.name, value: c.slug })),
             allLabel: "All Categories",
           },
           {
             name: "state",
-            label: "State",
+            label: <T k="state" />,
             value: state,
             options: STATES,
             allLabel: "All India",
           },
           {
             name: "status",
-            label: "Status",
+            label: <T k="status" />,
             value: status === "active" ? undefined : status,
             options: JOB_STATUSES,
             allLabel: "Active",
           },
           {
             name: "qualification",
-            label: "Qualification",
+            label: <T k="qualification" />,
             value: qualification,
             options: QUALIFICATIONS,
             allLabel: "Any Qualification",
           },
           {
             name: "sort",
-            label: "Sort By",
+            label: <T k="sortBy" />,
             value: sort,
             options: SORTS,
             allLabel: "Newest first",
@@ -166,7 +167,7 @@ export default async function JobsPage({
           id="browse-qualification"
           className="mb-2 font-serif text-base font-bold text-navy"
         >
-          Browse Jobs by Qualification
+          <T k="browseByQualification" />
         </h2>
         <ul className="flex flex-wrap gap-2">
           {QUALIFICATION_PAGES.map((landing) => (
@@ -187,7 +188,7 @@ export default async function JobsPage({
           id="browse-department"
           className="mb-2 font-serif text-base font-bold text-navy"
         >
-          Browse Jobs by Department
+          <T k="browseByDepartment" />
         </h2>
         <ul className="flex flex-wrap gap-2">
           {CATEGORY_PAGES.map((landing) => (

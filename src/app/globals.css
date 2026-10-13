@@ -313,3 +313,23 @@
     background: #fff;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Bilingual UI (Phase 4F)
+   Both languages ship in the static HTML; the inline script in <body> sets
+   data-lang from the lang cookie before paint, and these rules show exactly
+   one. Default (no data-lang, or data-lang="en") shows English.
+
+   Specificity is kept flat and ordered: default hide -> hi-mode show.
+   --------------------------------------------------------------------------- */
+span.lang-hi {
+  display: none;
+}
+
+[data-lang="hi"] span.lang-hi {
+  display: inline;
+}
+
+[data-lang="hi"] span.lang-en {
+  display: none;
+}

@@ -1,3 +1,5 @@
+import { T } from "@/components/i18n/T";
+
 interface ShareButtonsProps {
   title: string;
   url: string;
@@ -13,7 +15,7 @@ export function ShareButtons({ title, url }: ShareButtonsProps) {
 
   return (
     <section className="mb-4" aria-label="Share this page">
-      <h3 className="mb-2 text-sm font-semibold text-navy">Share this page</h3>
+      <h3 className="mb-2 text-sm font-semibold text-navy"><T k="shareThisPage" /></h3>
       <div className="flex gap-3">
         <a
           href={whatsappUrl}

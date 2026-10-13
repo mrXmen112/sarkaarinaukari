@@ -25,16 +25,16 @@ export const DISCLAIMER =
 
 export type NavItem = { label: string; href: string };
 
-/** Primary header navigation. */
-export const PRIMARY_NAV: NavItem[] = [
-  { label: "Home", href: "/" },
-  { label: "Latest Jobs", href: "/jobs" },
-  { label: "Bihar Jobs", href: "/bihar" },
-  { label: "Admit Card", href: "/admit-card" },
-  { label: "Result", href: "/result" },
-  { label: "Answer Key", href: "/answer-key" },
-  { label: "Yojana", href: "/yojana" },
-  { label: "Exams", href: "/exams" },
+/** Primary header navigation. `labelHi` renders in the Hindi UI (Phase 4F). */
+export const PRIMARY_NAV: (NavItem & { labelHi?: string })[] = [
+  { label: "Home", labelHi: "होम", href: "/" },
+  { label: "Latest Jobs", labelHi: "नवीनतम जॉब", href: "/jobs" },
+  { label: "Bihar Jobs", labelHi: "बिहार जॉब", href: "/bihar" },
+  { label: "Admit Card", labelHi: "एडमिट कार्ड", href: "/admit-card" },
+  { label: "Result", labelHi: "रिजल्ट", href: "/result" },
+  { label: "Answer Key", labelHi: "आंसर की", href: "/answer-key" },
+  { label: "Yojana", labelHi: "योजना", href: "/yojana" },
+  { label: "Exams", labelHi: "परीक्षा", href: "/exams" },
 ];
 
 /** Homepage quick-links grid (Section 1). */
@@ -49,45 +49,76 @@ export const QUICK_LINKS: { label: string; href: string; hint: string }[] = [
   { label: "Competitive Exams", href: "/exams", hint: "Prep & strategy" },
 ];
 
-/** Footer link columns. */
-export const FOOTER_NAV: { heading: string; items: NavItem[] }[] = [
+/** Footer link columns. `labelHi`/`headingHi` render in the Hindi UI. */
+export const FOOTER_NAV: {
+  heading: string;
+  headingHi?: string;
+  items: (NavItem & { labelHi?: string })[];
+}[] = [
   {
     heading: "Jobs",
+    headingHi: "जॉब",
     items: [
-      { label: "All Jobs", href: "/jobs" },
-      { label: "Central Government", href: "/jobs?category=central" },
-      { label: "State Government", href: "/jobs?category=state" },
-      { label: "Bihar Jobs", href: "/bihar" },
+      { label: "All Jobs", labelHi: "सभी जॉब", href: "/jobs" },
+      {
+        label: "Central Government",
+        labelHi: "केंद्र सरकार",
+        href: "/jobs?category=central",
+      },
+      {
+        label: "State Government",
+        labelHi: "राज्य सरकार",
+        href: "/jobs?category=state",
+      },
+      { label: "Bihar Jobs", labelHi: "बिहार जॉब", href: "/bihar" },
+      { label: "10th Pass Jobs", labelHi: "10th पास जॉब", href: "/jobs/10th-pass" },
+      { label: "12th Pass Jobs", labelHi: "12th पास जॉब", href: "/jobs/12th-pass" },
+      { label: "Graduate Jobs", labelHi: "ग्रेजुएट जॉब", href: "/jobs/graduate" },
     ],
   },
   {
     heading: "Exam Updates",
+    headingHi: "परीक्षा अपडेट",
     items: [
-      { label: "Admit Card", href: "/admit-card" },
-      { label: "Result", href: "/result" },
-      { label: "Class 10 Result", href: "/result/10th" },
-      { label: "Class 12 Result", href: "/result/12th" },
-      { label: "Answer Key", href: "/answer-key" },
-      { label: "Current Affairs", href: "/current-affairs" },
+      { label: "Admit Card", labelHi: "एडमिट कार्ड", href: "/admit-card" },
+      { label: "Result", labelHi: "रिजल्ट", href: "/result" },
+      { label: "Class 10 Result", labelHi: "कक्षा 10 रिजल्ट", href: "/result/10th" },
+      { label: "Class 12 Result", labelHi: "कक्षा 12 रिजल्ट", href: "/result/12th" },
+      { label: "Answer Key", labelHi: "आंसर की", href: "/answer-key" },
+      {
+        label: "Current Affairs",
+        labelHi: "करेंट अफेयर्स",
+        href: "/current-affairs",
+      },
     ],
   },
   {
     heading: "Preparation",
+    headingHi: "तैयारी",
     items: [
-      { label: "Competitive Exams", href: "/exams" },
-      { label: "Quiz & Mock Tests", href: "/quiz" },
-      { label: "Sarkari Yojana", href: "/yojana" },
-      { label: "My Dashboard", href: "/profile" },
+      {
+        label: "Competitive Exams",
+        labelHi: "प्रतियोगी परीक्षा",
+        href: "/exams",
+      },
+      {
+        label: "Quiz & Mock Tests",
+        labelHi: "क्विज़ और मॉक टेस्ट",
+        href: "/quiz",
+      },
+      { label: "Sarkari Yojana", labelHi: "सरकारी योजना", href: "/yojana" },
+      { label: "My Dashboard", labelHi: "मेरा डैशबोर्ड", href: "/profile" },
     ],
   },
   {
     heading: "Information",
+    headingHi: "जानकारी",
     items: [
-      { label: "About Us", href: "/about" },
-      { label: "Contact", href: "/contact" },
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms of Use", href: "/terms" },
-      { label: "Disclaimer", href: "/disclaimer" },
+      { label: "About Us", labelHi: "हमारे बारे में", href: "/about" },
+      { label: "Contact", labelHi: "संपर्क", href: "/contact" },
+      { label: "Privacy Policy", labelHi: "गोपनीयता नीति", href: "/privacy" },
+      { label: "Terms of Use", labelHi: "उपयोग की शर्तें", href: "/terms" },
+      { label: "Disclaimer", labelHi: "अस्वीकरण", href: "/disclaimer" },
     ],
   },
 ];

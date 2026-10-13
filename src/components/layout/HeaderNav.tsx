@@ -7,6 +7,10 @@ import { useEffect, useState } from "react";
 
 import type { NavItem } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { T } from "@/components/i18n/T";
+
+/** Nav item with the optional Hindi label used by the bilingual UI. */
+type BilingualNavItem = NavItem & { labelHi?: string };
 
 /**
  * Brand row + primary navigation.
@@ -18,7 +22,7 @@ export function HeaderNav({
   items,
   tagline,
 }: {
-  items: NavItem[];
+  items: BilingualNavItem[];
   tagline: string;
 }) {
   const pathname = usePathname();
@@ -101,7 +105,10 @@ export function HeaderNav({
                   isActive(item.href) && "bg-navy-800 md:border-saffron md:bg-navy-700",
                 )}
               >
-                {item.label}
+                <span className="lang-en">{item.label}</span>
+                {item.labelHi ? (
+                  <span className="lang-hi">{item.labelHi}</span>
+                ) : null}
               </Link>
             </li>
           ))}
@@ -110,7 +117,7 @@ export function HeaderNav({
               href="/login"
               className="block px-3.5 py-2.5 text-sm font-semibold text-saffron no-underline hover:bg-navy-700 hover:no-underline"
             >
-              Login / Register
+              <T k="loginRegister" />
             </Link>
           </li>
         </ul>

@@ -1,6 +1,8 @@
 import Link from "next/link";
 
 import { HeaderNav } from "@/components/layout/HeaderNav";
+import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
+import { T } from "@/components/i18n/T";
 import { PRIMARY_NAV, SITE } from "@/lib/site";
 
 /**
@@ -14,14 +16,17 @@ export function Header() {
       <div className="border-b border-navy-400 bg-navy-800">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-3 py-1 text-xs text-navy-100">
           <p className="truncate">
-            An independent job information portal &middot; Not a government website
+            <T k="independentPortal" />
           </p>
-          <Link
-            href="/login"
-            className="hidden shrink-0 font-semibold text-white no-underline hover:underline sm:block"
-          >
-            Login / Register
-          </Link>
+          <div className="flex shrink-0 items-center gap-3">
+            <Link
+              href="/login"
+              className="hidden font-semibold text-white no-underline hover:underline sm:block"
+            >
+              <T k="loginRegister" />
+            </Link>
+            <LanguageSwitcher />
+          </div>
         </div>
       </div>
 

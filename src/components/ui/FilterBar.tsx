@@ -5,7 +5,8 @@ import { buildQuery } from "@/lib/utils";
 export type FilterDef = {
   /** Query-string key, e.g. "state". */
   name: string;
-  label: string;
+  /** Rendered above the select; may be a bilingual <T> node. */
+  label: React.ReactNode;
   /** Currently selected value ("" or missing = all). */
   value?: string;
   options: { label: string; value: string }[];
@@ -26,13 +27,14 @@ export function FilterBar({
   action,
   filters,
   carryParams = {},
-  submitLabel = "Search",
+  submitLabel,
 }: {
   action: string;
   filters: FilterDef[];
   /** Extra query params to preserve, e.g. { sort: "closing" }. */
   carryParams?: Record<string, string | undefined>;
-  submitLabel?: string;
+  /** Rendered as the submit button text; may be a bilingual <T> node. */
+  submitLabel?: React.ReactNode;
 }) {
   const carried = Object.entries(carryParams).filter(
     ([name]) => !filters.some((f) => f.name === name),

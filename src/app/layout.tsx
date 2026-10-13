@@ -76,10 +76,21 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en-IN"
-      className={`${notoSans.variable} ${ptSerif.variable} h-full antialiased`}
-    >
+        lang="en-IN"
+        className={`${notoSans.variable} ${ptSerif.variable} h-full antialiased`}
+      >
       <body className="flex min-h-full flex-col">
+        {/* Set the UI language before first paint (cookie -> data-lang), so the
+            bilingual labels never flash the wrong language. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var l=(document.cookie.match(/(?:^|; )lang=([^;]+)/)||[])[1];" +
+              "if(l!=='hi'&&l!=='en'){l='en'}" +
+              "document.documentElement.setAttribute('lang',l==='hi'?'hi-IN':'en-IN');" +
+              "document.documentElement.setAttribute('data-lang',l)}catch(e){}",
+          }}
+        />
         {/* Skip link — first focusable element on every page */}
         <a
           href="#main-content"

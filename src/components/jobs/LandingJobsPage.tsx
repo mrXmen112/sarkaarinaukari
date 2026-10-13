@@ -10,6 +10,7 @@ import { listJobs } from "@/lib/queries";
 import { breadcrumbSchema, faqSchema } from "@/lib/seo";
 import { PAGE_SIZE, SITE } from "@/lib/site";
 import type { LandingPage } from "@/lib/landingPages";
+import { T } from "@/components/i18n/T";
 
 /**
  * Shared renderer for every Phase 3 landing page (qualification, state,
@@ -85,7 +86,7 @@ export async function LandingJobsPage({
 
       <section aria-labelledby="vacancies" className="gov-panel mb-6">
         <div className="gov-panel-title" id="vacancies">
-          Current Vacancies
+          <T k="currentVacancies" />
         </div>
         <div className="p-3">
           <JobTable
@@ -107,7 +108,7 @@ export async function LandingJobsPage({
       {showClosed ? (
         <section aria-labelledby="recently-closed" className="gov-panel mb-6 mt-4">
           <div className="gov-panel-title" id="recently-closed">
-            Recently Closed (Applications Ended)
+            <T k="recentlyClosed" />
           </div>
           <div className="p-3">
             <JobTable
@@ -124,7 +125,7 @@ export async function LandingJobsPage({
       ) : null}
 
       <FAQSection
-        title="Frequently Asked Questions"
+        title={<T k="frequentlyAsked" />}
         faqs={config.faqs}
         url={url}
         headline={config.h1}
@@ -135,7 +136,7 @@ export async function LandingJobsPage({
           id="related-pages"
           className="mb-2 font-serif text-base font-bold text-navy"
         >
-          Related Pages
+          <T k="relatedPages" />
         </h2>
         <ul className="flex flex-wrap gap-2">
           {config.neighbours.map((item) => (

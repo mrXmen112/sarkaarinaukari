@@ -164,7 +164,17 @@ Notes:
 | NEW / UPDATED badges in job tables | **DONE** |
 | Closing-soon ticker on the homepage | **DONE** (earlier) |
 | Save job / mark applied | **DONE** (earlier) |
-| Hindi/English UI toggle | **NOT DONE** — needs a i18n pass across ~60 pages; UI labels are still English-only apart from the homepage Hindi intro. Would be a large, separate change. |
+| **Hindi / English UI toggle** — server-rendered bilingual chrome, cookie-persisted, zero layout shift | **DONE** |
+
+#### How the language toggle works
+- Both languages are rendered into the **static HTML** (`span.lang-en` + `span.lang-hi`); a 3-line inline script in `<body>` reads the `lang` cookie and sets `documentElement[data-lang]` **before first paint**, so there is no flash and no layout shift.
+- CSS shows exactly one language. The switcher (top bar, next to Login) flips the attribute and writes the cookie; the next page load reads it again.
+- **Pages stay static and ISR keeps working.** Reading the cookie server-side would have forced every page into dynamic rendering — this approach avoids that entirely.
+- **Only our own chrome is translated** — nav, buttons, table headers, panel titles, form labels, badges. Job titles, departments, eligibility text and every other official content stays in the language the notification used. Translating an official post name would misstate what the board published; Hinglish stays in the data (as aspirants search).
+- Covered today: header + mobile nav, footer (all four columns incl. new result links), job table (all 5 columns, NEW/UPDATED/Closed/Apply), filters, search box, pagination chrome, every job-detail panel title and label, job timeline, share buttons, landing pages, FAQ sections, 404 page.
+- **Not translated by design:** landing-page intro paragraphs and FAQ answers (long-form SEO copy, written once in English), and all official content.
+
+**Note on SEO:** because both languages share one URL (cookie-based), there is deliberately **no hreflang tag** — hreflang requires separate indexable URLs, which we do not have. The English page is canonical. If you later want `/hi/…` URLs for Hindi SEO, that is a separate, larger change and I would do it path-based with hreflang.
 
 ### YOU DO — Phase 4
 1. Add a weekly cron for the board link checker (e.g. in the Supabase pg_cron schedule from Phase 1, or Vercel cron):

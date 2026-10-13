@@ -48,8 +48,8 @@ export function PageHeader({
   meta,
   actions,
 }: {
-  title: string;
-  subtitle?: string;
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
   /** Small line beneath the title, e.g. "Showing 1–25 of 340". */
   meta?: React.ReactNode;
   actions?: React.ReactNode;
@@ -81,7 +81,8 @@ export function Panel({
   id,
   className,
 }: {
-  title: string;
+  /** Panel caption; may be a bilingual <T> node. */
+  title: React.ReactNode;
   children: React.ReactNode;
   /** Optional link rendered on the right of the caption bar. */
   action?: React.ReactNode;
