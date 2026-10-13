@@ -44,13 +44,20 @@ export function HeaderNav({
           href="/"
           className="flex min-w-0 items-center gap-2.5 no-underline hover:no-underline"
         >
+          {/*
+            `unoptimized` is required: the Next image optimizer rejects SVG
+            (400 "not a valid image") unless `dangerouslyAllowSVG` is enabled,
+            and we don't want to loosen that security setting for one logo.
+            Width/height match the SVG viewBox ratio of 420x100 exactly, so the
+            wordmark is not distorted.
+          */}
           <Image
             src="/logo-full.svg"
             alt="SarkaariNaukri logo"
-            width={160}
+            width={168}
             height={40}
-            className="shrink-0 h-auto w-auto"
-            style={{ maxWidth: "160px", maxHeight: "40px" }}
+            unoptimized
+            className="shrink-0"
           />
           <span className="hidden sm:block text-xs text-navy-100">
             {tagline}
