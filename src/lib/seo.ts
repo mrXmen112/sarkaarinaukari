@@ -35,7 +35,19 @@ export function organizationSchema() {
     description:
       "Sarkari Naukri, Admit Card, Result & Yojana information portal — an independent government-job listings website.",
     email: SITE.contactEmail,
-    sameAs: [],
+    sameAs: (process.env.SITE_SAME_AS ?? "")
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean),
+    knowsAbout: [
+      "Sarkari Naukri",
+      "Government Jobs",
+      "Bihar Public Service Commission",
+      "Staff Selection Commission",
+      "Admit Card",
+      "Sarkari Result",
+      "Sarkari Yojana",
+    ],
   };
 }
 

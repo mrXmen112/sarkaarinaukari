@@ -11,7 +11,11 @@ import { JobActions } from "@/components/jobs/JobActions";
 import { JobTable } from "@/components/jobs/JobTable";
 import { ApplyButton } from "@/components/jobs/ApplyButton";
 import { RecruitmentTimeline } from "@/components/jobs/RecruitmentTimeline";
+import { AdSlot } from "@/components/ads/AdSlot";
 import { T } from "@/components/i18n/T";
+
+/** AdSense slot id for the in-content unit on job detail pages. */
+const JOB_PAGE_IN_CONTENT_SLOT = process.env.NEXT_PUBLIC_ADSENSE_SLOT_JOB ?? "";
 import { hasBrokenLink } from "@/lib/url";
 import { formatDate } from "@/lib/date";
 import { categoryLabel as fmtCategoryLabel, formatIndianNumber, formatRupees, truncate } from "@/lib/utils";
@@ -253,6 +257,10 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       {/* Recruitment lifecycle — notification through result (Phase 1) */}
       <RecruitmentTimeline job={job} timeline={timeline} />
 
+      {/* In-content ad: placed after the summary block and before eligibility, so
+          it never sits between a post name and its Apply button. */}
+      <AdSlot slot={JOB_PAGE_IN_CONTENT_SLOT} />
+
       {/* Section 3 — Eligibility */}
       <Panel title={<T k="eligibilityCriteria" />} className="mb-4">
         <div className="space-y-3 text-sm">
@@ -342,6 +350,55 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
             allowances, DA and deductions, so we never estimate it.
           </p>
         )}
+      </Panel>
+
+      {/* Trust block — provenance on every job page (Phase 5) */}
+      <Panel title="Source & Verification" className="mb-4">
+        <DetailTable
+          caption="Where this information came from and when it was last checked"
+          rows={[
+            {
+              label: "Official Source",
+              value: job.source_url ? (
+                <a
+                  href={job.source_url}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                  className="font-semibold text-navy underline decoration-navy/30 underline-offset-2 hover:decoration-navy break-all"
+                >
+                  {job.source_url}
+                </a>
+              ) : (
+                "Not recorded"
+              ),
+            },
+            {
+              label: "Last Verified",
+              value: job.link_last_checked_at
+                ? `${formatDate(job.link_last_checked_at)}${
+                    job.link_flagged
+                      ? " — apply link flagged for manual check"
+                      : " — official link reachable"
+                    }`
+                : "Not checked yet",
+            },
+            {
+              label: "Page Last Updated",
+              value: formatDate(job.updated_at ?? job.created_at),
+            },
+            {
+              label: "Data Policy",
+              value: (
+                <Link
+                  href="/editorial-policy"
+                  className="font-semibold text-navy underline decoration-navy/30 underline-offset-2 hover:decoration-navy"
+                >
+                  How we verify every vacancy
+                </Link>
+              ),
+            },
+          ]}
+        />
       </Panel>
 
       {/* Section 8 — How to Apply */}

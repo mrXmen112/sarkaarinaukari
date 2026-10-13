@@ -119,6 +119,11 @@ export const FOOTER_NAV: {
       { label: "Privacy Policy", labelHi: "गोपनीयता नीति", href: "/privacy" },
       { label: "Terms of Use", labelHi: "उपयोग की शर्तें", href: "/terms" },
       { label: "Disclaimer", labelHi: "अस्वीकरण", href: "/disclaimer" },
+      {
+        label: "Editorial & Data Policy",
+        labelHi: "संपादकीय नीति",
+        href: "/editorial-policy",
+      },
     ],
   },
 ];

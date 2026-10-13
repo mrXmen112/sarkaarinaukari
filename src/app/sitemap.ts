@@ -36,6 +36,7 @@ export default async function sitemap(props: {
       { url: `${base}/privacy`, changeFrequency: "monthly", priority: 0.5 },
       { url: `${base}/terms`, changeFrequency: "monthly", priority: 0.5 },
       { url: `${base}/disclaimer`, changeFrequency: "monthly", priority: 0.5 },
+      { url: `${base}/editorial-policy`, changeFrequency: "monthly", priority: 0.5 },
       // Phase 4C — board result hubs (guides + official redirects)
       { url: `${base}/result/10th`, changeFrequency: "weekly", priority: 0.7 },
       { url: `${base}/result/12th`, changeFrequency: "weekly", priority: 0.7 },

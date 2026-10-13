@@ -182,5 +182,24 @@ Notes:
    — and I can add the matching `/api/cron/board-links` route on request.
 2. Add real official previous-year paper URLs in the admin (`/admin/exams/{id}/edit`) as the conducting bodies release them.
 
-## Phase 5+ — ready when you are
-Phase 5 trust & quality: an editorial / data-verification policy page, "source link + last verified" on every job, and an AdSense-ready layout audit. Then Phase 6 PNG icon assets.
+## Phase 5 — Trust & quality
+
+| Item | Status |
+|---|---|
+| `/editorial-policy` — how data is collected, verified, linked-checked, corrected and how long pages live | **DONE** (in footer + sitemap) |
+| Every job page shows **Official Source** link (all 124 jobs already had a source URL) | **DONE** |
+| Every job page shows **Last Verified** date + whether the link is reachable or flagged | **DONE** |
+| Page "Last Updated" date | **DONE** |
+| Trust block links back to the data policy | **DONE** |
+| Not-affiliated disclaimer kept on every page | **DONE** (existing) |
+| AdSense-ready layout: `AdSlot` component with reserved height (no CLS), visible "Advertisement" label, never between a post and its Apply button, **disabled until approved** | **DONE** (inactive; needs `NEXT_PUBLIC_ADSENSE_CLIENT`) |
+| No ad slots on About / Contact / Privacy / Terms / Disclaimer / Editorial Policy / Login / Profile | **DONE** (enforced by `adsAllowedOnPath`) |
+| Organization schema: `knowsAbout`, configurable `sameAs` via `SITE_SAME_AS` | **DONE** |
+
+### YOU DO — Phase 5 / AdSense
+1. Apply for AdSense. Once approved, set in Vercel env: `NEXT_PUBLIC_ADSENSE_CLIENT`, `NEXT_PUBLIC_ADSENSE_SLOT_JOB`, `NEXT_PUBLIC_ADSENSE_SLOT_LIST`. The slots appear automatically (space is already reserved, so nothing shifts).
+2. Optionally add your social profiles to `SITE_SAME_AS` for `sameAs` in schema.
+3. Ensure the Monetag zones you already run stay compliant and do not overlap the new in-content slot.
+
+## Phase 6 — ready when you are
+Branding assets: drop the PNG icon set (icon-192/512, apple-touch-icon, favicon.ico) into `/public` and wire them via `src/app/layout.tsx` + `manifest.webmanifest`, or I can generate them from your `icon.svg`. Then a final pass: Lighthouse on a job page and the homepage, and confirm Core Web Vitals in Search Console.
