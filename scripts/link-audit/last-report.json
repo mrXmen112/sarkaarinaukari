@@ -1,0 +1,1104 @@
+{
+  "at": "2026-10-13T00:20:29.827Z",
+  "applied": true,
+  "total": 124,
+  "deadPdfLinks": [
+    {
+      "slug": "bihar-home-guard-2026",
+      "title": "Bihar Home Guard 2026",
+      "url": "https://homeguard.bihar.gov.in/Advt/HomeGuard-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-police-clerk-2026",
+      "title": "Bihar Police Clerk / Typist 2026",
+      "url": "https://csb.bihar.gov.in/Advt/Clerk-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "psssb-clerk-2026",
+      "title": "Punjab PSSSB Clerk & Steno 2026",
+      "url": "https://psssb.gov.in/Advt/Clerk-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "drdo-ceptam-2026",
+      "title": "DRDO CEPTAM STA/ECRC 2026",
+      "url": "https://drdo.gov.in/Advt/CEPTAM-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "rpf-constable-2026",
+      "title": "RPF Constable 2026",
+      "url": "https://cr.railway.gov.in/Advt/RPF-Constable-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-excise-constable-2026",
+      "title": "Bihar Excise Constable 2026",
+      "url": "https://excise.bih.nic.in/Advt/Constable-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-fireman-2026",
+      "title": "Bihar Fireman (Fire Fighter) 2026",
+      "url": "https://csb.bihar.gov.in/Advt/Fireman-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-jail-sepoy-2026",
+      "title": "Bihar Jail Sepoy (Warder) 2026",
+      "url": "https://csb.bihar.gov.in/Advt/JailSepoy-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-jal-nigam-je-2026",
+      "title": "Bihar Jal Nigam Junior Engineer 2026",
+      "url": "https://jalparishad.bih.nic.in/Advt/JE-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-cho-2026",
+      "title": "Bihar Community Health Officer (CHO) 2026",
+      "url": "https://biharhealth.gov.in/Advt/CHO-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-deled-2026",
+      "title": "Bihar DElEd 4th Semester Entrance 2026",
+      "url": "https://biharedznc.in/Advt/DElEd-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-sap-2026",
+      "title": "Bihar Special Auxiliary Police (SAP) 2026",
+      "url": "https://csb.bihar.gov.in/Advt/SAP-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-prohibition-constable-2026",
+      "title": "Bihar Prohibition Constable 2026",
+      "url": "https://excise.bih.nic.in/Advt/Prohibition-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-district-court-group-d-2026",
+      "title": "Bihar District Courts Group D 2026",
+      "url": "https://courts.bihar.gov.in/Advt/GroupD-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "uttar-bihar-gramin-bank-2026",
+      "title": "Uttar Bihar Gramin Bank (Officer/Clerk) 2026",
+      "url": "https://uppbgbonline.in/Advt/UBGB-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "dakshin-bihar-gramin-bank-2026",
+      "title": "Dakshin Bihar Gramin Bank (Officer/Clerk) 2026",
+      "url": "https://dbgbonline.in/Advt/DBGB-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-state-cooperative-bank-2026",
+      "title": "Bihar State Cooperative Bank (Officer & Clerk) 2026",
+      "url": "https://biharstatecooperativebank.com/Advt/BSCB-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-health-worker-2026",
+      "title": "Bihar Health Worker (Male & Female) 2026",
+      "url": "https://biharhealth.gov.in/Advt/HealthWorker-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-gram-rozgar-sevak-2026",
+      "title": "Bihar Gram Rojgar Sevak 2026",
+      "url": "https://rdd.bihar.gov.in/Advt/GRS-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-panchayat-secretary-2026",
+      "title": "Bihar Panchayat Secretary (Sachiv) 2026",
+      "url": "https://prd.bih.gov.in/Advt/PanchayatSec-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "india-post-pa-sa-2026",
+      "title": "India Post PA/SA (Postal Assistant) 2026",
+      "url": "https://indiapost.gov.in/Advt/PA-SA-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "india-post-mts-2026",
+      "title": "India Post Multi Tasking Staff 2026",
+      "url": "https://indiapost.gov.in/Advt/MTS-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "india-post-postman-2026",
+      "title": "India Post Postman (GDS-Departmental) 2026",
+      "url": "https://indiapost.gov.in/Advt/Postman-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "india-post-gds-2026",
+      "title": "India Post GDS (Gramin Dak Sevak) 2026",
+      "url": "https://indiapostgdsonline.gov.in/Advt/GDS-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "cisf-constable-2026",
+      "title": "CISF Constable (GD) 2026",
+      "url": "https://cisfrectt.cisofia.gov.in/Advt/Constable-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "crpf-constable-2026",
+      "title": "CRPF Constable (GD) 2026",
+      "url": "https://recruitment.ourcarp.in/Advt/Constable-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "ssb-constable-2026",
+      "title": "SSB Constable (GD) 2026",
+      "url": "https://ssbrectt.ssb.gov.in/Advt/Constable-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "lic-assistant-2026",
+      "title": "LIC Assistant (AAO) Prelims 2026",
+      "url": "https://licindia.in/careers/Assistant-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "sbi-so-2026",
+      "title": "SBI Specialist Officer 2026",
+      "url": "https://sbi.co.in/careers/SO-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "rpf-si-2026",
+      "title": "RPF SI (Sub Inspector) 2026",
+      "url": "https://cr.railway.gov.in/Advt/RPF-SI-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "hssc-group-d-2026",
+      "title": "HSSC Group D Reward 2026",
+      "url": "https://hssc.gov.in/Advt/GroupD-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "bihar-high-court-clerk-2026",
+      "title": "Patna High Court Clerk 2026",
+      "url": "https://patnahighcourt.gov.in/Advt/Clerk-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "lic-aao-2026",
+      "title": "LIC AAO (Assistant Administrative Officer) 2026",
+      "url": "https://licindia.in/careers/AAO-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "sbi-po-2026",
+      "title": "SBI Probationary Officer 2026",
+      "url": "https://sbi.co.in/careers/PO-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "sbi-clerk-2026",
+      "title": "SBI Clerk (Junior Associate) 2026",
+      "url": "https://sbi.co.in/careers/Clerk-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "rbi-grade-b-2026",
+      "title": "RBI Grade B Officer 2026",
+      "url": "https://rbi.org.in/careers/GradeB-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "rbi-assistant-2026",
+      "title": "RBI Assistant 2026",
+      "url": "https://rbi.org.in/careers/Assistant-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "rrb-ntpc-2026",
+      "title": "RRB NTPC (Graduate & Under-Graduate) 2026",
+      "url": "https://ncr.indianrailways.gov.in/uploads/files/RRB-NTPC-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "rrb-alp-2026",
+      "title": "RRB Assistant Loco Pilot 2026",
+      "url": "https://ncr.indianrailways.gov.in/uploads/files/RRB-ALP-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "rrb-je-2026",
+      "title": "RRB Junior Engineer 2026",
+      "url": "https://ncr.indianrailways.gov.in/uploads/files/RRB-JE-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "rrb-technician-2026",
+      "title": "RRB Technician Grade III 2026",
+      "url": "https://ncr.indianrailways.gov.in/uploads/files/RRB-Technician-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "uppsc-ro-aro-2026",
+      "title": "UPPSC Review Officer & Assistant RO 2026",
+      "url": "https://uppsc.up.nic.in/RO-ARO-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "uppsc-pcs-2026",
+      "title": "UPPSC PCS (Combined State) 2026",
+      "url": "https://uppsc.up.nic.in/PCS-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "wbcs-2026",
+      "title": "West Bengal Civil Service (WBCS) 2026",
+      "url": "https://pscwb.gov.in/WBCS-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-police-si-2026",
+      "title": "Bihar Police Sub Inspector 2026",
+      "url": "https://csb.bihar.gov.in/Advt/SI-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "gpsc-class1-2-2026",
+      "title": "GPSC Class I and II 2026",
+      "url": "https://gpsc.gujarat.gov.in/Class12-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "tnpsc-group2-2026",
+      "title": "TNPSC Group 2/2A Combined Civil Services 2026",
+      "url": "https://tnpsc.gov.in/Group2-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "hpsc-hcs-2026",
+      "title": "Haryana Civil Services (HCS) 2026",
+      "url": "https://hpsc.gov.in/HCS-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "jpsc-cces-2026",
+      "title": "JPSC Combined Civil Services 2026",
+      "url": "https://jpsc.gov.in/CCE-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "dsssb-teaching-2026",
+      "title": "DSSSB Teaching Recruitment 2026",
+      "url": "https://dsssb.delhi.gov.in/Teaching-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "ukpsc-pcs-2026",
+      "title": "UKPSC Combined State (PCS) 2026",
+      "url": "https://ukpsc.net/PCS-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "rajasthan-police-constable-2026",
+      "title": "Rajasthan Police Constable 2026",
+      "url": "https://police.rajasthan.gov.in/Advt/Constable-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "mp-police-constable-2026",
+      "title": "MP Police Constable 2026",
+      "url": "https://mppeb.mp.gov.in/Advt/Police-Constable-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "rpsc-ras-2026",
+      "title": "RPSC RAS (Rajasthan Administrative Services) 2026",
+      "url": "https://rpsc.rajasthan.gov.in/RAS-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "nabard-grade-a-2026",
+      "title": "NABARD Grade A (Assistant Manager) 2026",
+      "url": "https://nabard.org/careers/GradeA-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "up-police-si-2026",
+      "title": "UP Police Sub Inspector 2026",
+      "url": "https://uppbpb.gov.in/Advt/SI-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "up-police-constable-2026",
+      "title": "UP Police Constable Recruitment 2026",
+      "url": "https://uppbpb.gov.in/Advt/UP-Police-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "rrb-group-d-2026",
+      "title": "RRB Group D (Level 1) 2026",
+      "url": "https://ncr.indianrailways.gov.in/uploads/files/RRB-GroupD-2026.pdf",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "bihar-gram-kachahari-2026",
+      "title": "Bihar Gram Kachahari Clerk & Guard 2026",
+      "url": "https://panchayat.bihar.gov.in/Advt/GramKachahari-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "delhi-police-constable-2026",
+      "title": "Delhi Police Constable (Executive) 2026",
+      "url": "https://csd.delhipolice.gov.in/Advt/Constable-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-police-constable-2026",
+      "title": "Bihar Police Constable Recruitment 2026",
+      "url": "https://csb.bihar.gov.in/Advt/Bihar-Police-Constable-2026.pdf",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    }
+  ],
+  "deadOfficialLinks": [
+    {
+      "slug": "bihar-home-guard-2026",
+      "title": "Bihar Home Guard 2026",
+      "url": "https://homeguard.bihar.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-police-clerk-2026",
+      "title": "Bihar Police Clerk / Typist 2026",
+      "url": "https://csb.bihar.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "psssb-clerk-2026",
+      "title": "Punjab PSSSB Clerk & Steno 2026",
+      "url": "https://psssb.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "rpf-constable-2026",
+      "title": "RPF Constable 2026",
+      "url": "https://railways.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-excise-constable-2026",
+      "title": "Bihar Excise Constable 2026",
+      "url": "https://excise.bih.nic.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-fireman-2026",
+      "title": "Bihar Fireman (Fire Fighter) 2026",
+      "url": "https://csb.bihar.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-jail-sepoy-2026",
+      "title": "Bihar Jail Sepoy (Warder) 2026",
+      "url": "https://csb.bihar.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-jal-nigam-je-2026",
+      "title": "Bihar Jal Nigam Junior Engineer 2026",
+      "url": "https://jalparishad.bih.nic.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-cho-2026",
+      "title": "Bihar Community Health Officer (CHO) 2026",
+      "url": "https://biharhealth.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-deled-2026",
+      "title": "Bihar DElEd 4th Semester Entrance 2026",
+      "url": "https://biharedznc.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-sap-2026",
+      "title": "Bihar Special Auxiliary Police (SAP) 2026",
+      "url": "https://csb.bihar.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-prohibition-constable-2026",
+      "title": "Bihar Prohibition Constable 2026",
+      "url": "https://excise.bih.nic.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-district-court-group-d-2026",
+      "title": "Bihar District Courts Group D 2026",
+      "url": "https://courts.bihar.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "uttar-bihar-gramin-bank-2026",
+      "title": "Uttar Bihar Gramin Bank (Officer/Clerk) 2026",
+      "url": "https://uppbgbonline.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "dakshin-bihar-gramin-bank-2026",
+      "title": "Dakshin Bihar Gramin Bank (Officer/Clerk) 2026",
+      "url": "https://dbgbonline.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-state-cooperative-bank-2026",
+      "title": "Bihar State Cooperative Bank (Officer & Clerk) 2026",
+      "url": "https://biharstatecooperativebank.com/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-health-worker-2026",
+      "title": "Bihar Health Worker (Male & Female) 2026",
+      "url": "https://biharhealth.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-gram-rozgar-sevak-2026",
+      "title": "Bihar Gram Rojgar Sevak 2026",
+      "url": "https://rdd.bihar.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-panchayat-secretary-2026",
+      "title": "Bihar Panchayat Secretary (Sachiv) 2026",
+      "url": "https://prd.bih.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "sbi-so-2026",
+      "title": "SBI Specialist Officer 2026",
+      "url": "https://sbi.co.in/",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "rpf-si-2026",
+      "title": "RPF SI (Sub Inspector) 2026",
+      "url": "https://railways.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-high-court-clerk-2026",
+      "title": "Patna High Court Clerk 2026",
+      "url": "https://patnahighcourt.gov.in/",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "sbi-po-2026",
+      "title": "SBI Probationary Officer 2026",
+      "url": "https://sbi.co.in/",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "sbi-clerk-2026",
+      "title": "SBI Clerk (Junior Associate) 2026",
+      "url": "https://sbi.co.in/",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "rrb-ntpc-2026",
+      "title": "RRB NTPC (Graduate & Under-Graduate) 2026",
+      "url": "https://railways.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "rrb-alp-2026",
+      "title": "RRB Assistant Loco Pilot 2026",
+      "url": "https://railways.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "rrb-je-2026",
+      "title": "RRB Junior Engineer 2026",
+      "url": "https://railways.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "rrb-technician-2026",
+      "title": "RRB Technician Grade III 2026",
+      "url": "https://railways.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "uppsc-ro-aro-2026",
+      "title": "UPPSC Review Officer & Assistant RO 2026",
+      "url": "https://uppsc.up.nic.in/",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "uppsc-pcs-2026",
+      "title": "UPPSC PCS (Combined State) 2026",
+      "url": "https://uppsc.up.nic.in/",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "wbcs-2026",
+      "title": "West Bengal Civil Service (WBCS) 2026",
+      "url": "https://pscwb.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-police-si-2026",
+      "title": "Bihar Police Sub Inspector 2026",
+      "url": "https://csb.bihar.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "tnpsc-group2-2026",
+      "title": "TNPSC Group 2/2A Combined Civil Services 2026",
+      "url": "https://tnpsc.gov.in/",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "ukpsc-pcs-2026",
+      "title": "UKPSC Combined State (PCS) 2026",
+      "url": "https://ukpsc.net/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "mp-police-constable-2026",
+      "title": "MP Police Constable 2026",
+      "url": "https://mppeb.mp.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "rpsc-ras-2026",
+      "title": "RPSC RAS (Rajasthan Administrative Services) 2026",
+      "url": "https://rpsc.rajasthan.gov.in/",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "nabard-grade-a-2026",
+      "title": "NABARD Grade A (Assistant Manager) 2026",
+      "url": "https://nabard.org/",
+      "reason": "HTTP 404"
+    },
+    {
+      "slug": "rrb-group-d-2026",
+      "title": "RRB Group D (Level 1) 2026",
+      "url": "https://railways.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-gram-kachahari-2026",
+      "title": "Bihar Gram Kachahari Clerk & Guard 2026",
+      "url": "https://panchayat.bihar.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "delhi-police-constable-2026",
+      "title": "Delhi Police Constable (Executive) 2026",
+      "url": "https://csd.delhipolice.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    },
+    {
+      "slug": "bihar-police-constable-2026",
+      "title": "Bihar Police Constable Recruitment 2026",
+      "url": "https://csb.bihar.gov.in/",
+      "reason": "domain does not resolve (DNS NXDOMAIN)"
+    }
+  ],
+  "unverifiable": [
+    {
+      "slug": "bihar-livestock-2026",
+      "field": "official_link",
+      "url": "https://bpsc.bih.nic.in/",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bihar-livestock-2026",
+      "field": "notification_pdf_link",
+      "url": "https://bpsc.bih.nic.in/Advt/LDO-2026.pdf",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bihar-tre-5-2026",
+      "field": "official_link",
+      "url": "https://education.bihar.gov.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "bihar-tre-5-2026",
+      "field": "notification_pdf_link",
+      "url": "https://education.bihar.gov.in/Advt/TRE-5-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "iaf-agniveer-vayu-2026",
+      "field": "official_link",
+      "url": "https://agnipathvayu.cdac.in/",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "iaf-agniveer-vayu-2026",
+      "field": "notification_pdf_link",
+      "url": "https://agnipathvayu.cdac.in/Advt/Vayu-2026.pdf",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "bpsc-css-2026",
+      "field": "official_link",
+      "url": "https://bpsc.bih.nic.in/",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bpsc-css-2026",
+      "field": "notification_pdf_link",
+      "url": "https://bpsc.bih.nic.in/Advt/CSS-2026.pdf",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bpsc-ae-2026",
+      "field": "official_link",
+      "url": "https://bpsc.bih.nic.in/",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bpsc-ae-2026",
+      "field": "notification_pdf_link",
+      "url": "https://bpsc.bih.nic.in/Advt/AE-2026.pdf",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bssc-inter-level-ii-2026",
+      "field": "official_link",
+      "url": "https://bssc.bih.nic.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "bssc-inter-level-ii-2026",
+      "field": "notification_pdf_link",
+      "url": "https://bssc.bih.nic.in/Advt/Inter-Level-II-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "bssc-stenographer-2026",
+      "field": "official_link",
+      "url": "https://bssc.bih.nic.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "bssc-stenographer-2026",
+      "field": "notification_pdf_link",
+      "url": "https://bssc.bih.nic.in/Advt/Steno-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "bihar-agriculture-field-officer-2026",
+      "field": "official_link",
+      "url": "https://bpsc.bih.nic.in/",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bihar-agriculture-field-officer-2026",
+      "field": "notification_pdf_link",
+      "url": "https://bpsc.bih.nic.in/Advt/AFO-2026.pdf",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bihar-angwanwadi-2026",
+      "field": "official_link",
+      "url": "https://icds.bih.nic.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "bihar-angwanwadi-2026",
+      "field": "notification_pdf_link",
+      "url": "https://icds.bih.nic.in/Advt/Anganwadi-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "bihar-vidhan-sabha-2026",
+      "field": "official_link",
+      "url": "https://vidhansabha.bih.nic.in/",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bihar-vidhan-sabha-2026",
+      "field": "notification_pdf_link",
+      "url": "https://vidhansabha.bih.nic.in/Advt/VS-2026.pdf",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bihar-amin-2026",
+      "field": "official_link",
+      "url": "https://lrc.bih.nic.in/",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bihar-amin-2026",
+      "field": "notification_pdf_link",
+      "url": "https://lrc.bih.nic.in/Advt/Amin-2026.pdf",
+      "reason": "timeout"
+    },
+    {
+      "slug": "indian-navy-agniveer-ssr-2026",
+      "field": "official_link",
+      "url": "https://joinindiannavy.gov.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "indian-navy-agniveer-ssr-2026",
+      "field": "notification_pdf_link",
+      "url": "https://joinindiannavy.gov.in/Advt/SSR-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "indian-navy-tradesman-mate-2026",
+      "field": "official_link",
+      "url": "https://joinindiannavy.gov.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "indian-navy-tradesman-mate-2026",
+      "field": "notification_pdf_link",
+      "url": "https://joinindiannavy.gov.in/Advt/TradesmanMate-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "bsf-constable-2026",
+      "field": "official_link",
+      "url": "https://bsf.nic.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "bsf-constable-2026",
+      "field": "notification_pdf_link",
+      "url": "https://bsf.nic.in/Advt/Constable-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "itbp-constable-2026",
+      "field": "official_link",
+      "url": "https://itbpolice.nic.in/",
+      "reason": "timeout"
+    },
+    {
+      "slug": "itbp-constable-2026",
+      "field": "notification_pdf_link",
+      "url": "https://itbpolice.nic.in/Advt/Constable-2026.pdf",
+      "reason": "timeout"
+    },
+    {
+      "slug": "ibps-so-2026",
+      "field": "official_link",
+      "url": "https://www.ibps.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "ibps-so-2026",
+      "field": "notification_pdf_link",
+      "url": "https://www.ibps.in/wp-content/uploads/IBPS-SO-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "upsssc-various-2026",
+      "field": "official_link",
+      "url": "https://upsssc.gov.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "upsssc-various-2026",
+      "field": "notification_pdf_link",
+      "url": "https://upsssc.gov.in/Advt/Various-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "isro-technical-assistant-2026",
+      "field": "official_link",
+      "url": "https://isro.gov.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "isro-technical-assistant-2026",
+      "field": "notification_pdf_link",
+      "url": "https://isro.gov.in/Advt/TA-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "rsmssb-group-d-2026",
+      "field": "official_link",
+      "url": "https://rsmssb.rajasthan.gov.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "rsmssb-group-d-2026",
+      "field": "notification_pdf_link",
+      "url": "https://rsmssb.rajasthan.gov.in/Advt/GroupD-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "bpsc-bao-2026",
+      "field": "official_link",
+      "url": "https://bpsc.bih.nic.in/",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bpsc-bao-2026",
+      "field": "notification_pdf_link",
+      "url": "https://bpsc.bih.nic.in/Advt/BAO-2026.pdf",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bpsc-headmaster-2026",
+      "field": "official_link",
+      "url": "https://bpsc.bih.nic.in/",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bpsc-headmaster-2026",
+      "field": "notification_pdf_link",
+      "url": "https://bpsc.bih.nic.in/Advt/HT-2026.pdf",
+      "reason": "timeout"
+    },
+    {
+      "slug": "upsc-capf-2026",
+      "field": "official_link",
+      "url": "https://upsc.gov.in/",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "upsc-capf-2026",
+      "field": "notification_pdf_link",
+      "url": "https://upsc.gov.in/CAPF-AC-2026.pdf",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "ibps-clerk-2026",
+      "field": "official_link",
+      "url": "https://www.ibps.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "ibps-clerk-2026",
+      "field": "notification_pdf_link",
+      "url": "https://www.ibps.in/wp-content/uploads/IBPS-Clerk-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "afcat-2026",
+      "field": "official_link",
+      "url": "https://afcat.cdac.in/",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "afcat-2026",
+      "field": "notification_pdf_link",
+      "url": "https://afcat.cdac.in/AFCAT-II-2026.pdf",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "upsc-cds-2026",
+      "field": "official_link",
+      "url": "https://upsc.gov.in/",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "upsc-cds-2026",
+      "field": "notification_pdf_link",
+      "url": "https://upsc.gov.in/CDS-II-2026.pdf",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "upsc-nda-2026",
+      "field": "official_link",
+      "url": "https://upsc.gov.in/",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "upsc-nda-2026",
+      "field": "notification_pdf_link",
+      "url": "https://upsc.gov.in/NDA-II-2026.pdf",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "mppsc-state-services-2026",
+      "field": "official_link",
+      "url": "https://mppsc.mp.gov.in/",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "mppsc-state-services-2026",
+      "field": "notification_pdf_link",
+      "url": "https://mppsc.mp.gov.in/SSE-2026.pdf",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "epfo-ssa-2026",
+      "field": "official_link",
+      "url": "https://epfindia.gov.in/",
+      "reason": "timeout"
+    },
+    {
+      "slug": "epfo-ssa-2026",
+      "field": "notification_pdf_link",
+      "url": "https://epfindia.gov.in/careers/SSA-2026.pdf",
+      "reason": "timeout"
+    },
+    {
+      "slug": "sebi-grade-a-2026",
+      "field": "official_link",
+      "url": "https://sebi.gov.in/",
+      "reason": "blocked HTTP 505"
+    },
+    {
+      "slug": "sebi-grade-a-2026",
+      "field": "notification_pdf_link",
+      "url": "https://sebi.gov.in/careers/GradeA-2026.pdf",
+      "reason": "blocked HTTP 505"
+    },
+    {
+      "slug": "bssc-graduate-level-2026",
+      "field": "official_link",
+      "url": "https://bssc.bih.nic.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "bssc-graduate-level-2026",
+      "field": "notification_pdf_link",
+      "url": "https://bssc.bih.nic.in/Advt/Graduate-Level-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "kpsc-kas-2026",
+      "field": "official_link",
+      "url": "https://kpsc.kar.nic.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "kpsc-kas-2026",
+      "field": "notification_pdf_link",
+      "url": "https://kpsc.kar.nic.in/KAS-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "nvs-teaching-2026",
+      "field": "official_link",
+      "url": "https://navodaya.gov.in/",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "nvs-teaching-2026",
+      "field": "notification_pdf_link",
+      "url": "https://navodaya.gov.in/recruitment/Teaching-2026.pdf",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "kvs-teaching-2026",
+      "field": "official_link",
+      "url": "https://kvs.ac.in/",
+      "reason": "timeout"
+    },
+    {
+      "slug": "kvs-teaching-2026",
+      "field": "notification_pdf_link",
+      "url": "https://kvs.ac.in/recruitment/Teaching-2026.pdf",
+      "reason": "timeout"
+    },
+    {
+      "slug": "ibps-rrb-2026",
+      "field": "official_link",
+      "url": "https://www.ibps.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "ibps-rrb-2026",
+      "field": "notification_pdf_link",
+      "url": "https://www.ibps.in/wp-content/uploads/IBPS-RRB-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "ibps-po-17",
+      "field": "official_link",
+      "url": "https://www.ibps.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "ibps-po-17",
+      "field": "notification_pdf_link",
+      "url": "https://www.ibps.in/wp-content/uploads/IBPS-PO-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "upsc-cse-2027",
+      "field": "official_link",
+      "url": "https://upsc.gov.in/",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "upsc-cse-2027",
+      "field": "notification_pdf_link",
+      "url": "https://upsc.gov.in/sites/default/files/CSE-2027-Notification.pdf",
+      "reason": "blocked HTTP 403"
+    },
+    {
+      "slug": "bpsc-70th-ccae",
+      "field": "official_link",
+      "url": "https://bpsc.bih.nic.in/",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bpsc-70th-ccae",
+      "field": "notification_pdf_link",
+      "url": "https://bpsc.bih.nic.in/PDF/Advt-70th-CCE-2026.pdf",
+      "reason": "timeout"
+    },
+    {
+      "slug": "bssc-inter-level-2026",
+      "field": "official_link",
+      "url": "https://bssc.bih.nic.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "bssc-inter-level-2026",
+      "field": "notification_pdf_link",
+      "url": "https://bssc.bih.nic.in/Advt/Inter-Level-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "bihar-tre-4",
+      "field": "official_link",
+      "url": "https://bssc.bih.nic.in/",
+      "reason": "network error"
+    },
+    {
+      "slug": "bihar-tre-4",
+      "field": "notification_pdf_link",
+      "url": "https://bssc.bih.nic.in/Advt/TRE-4.0-2026.pdf",
+      "reason": "network error"
+    },
+    {
+      "slug": "bihar-staff-nurse-2026",
+      "field": "official_link",
+      "url": "https://statehealthsocietybihar.org/",
+      "reason": "network error"
+    },
+    {
+      "slug": "bihar-staff-nurse-2026",
+      "field": "notification_pdf_link",
+      "url": "https://statehealthsocietybihar.org/Advt/Nurse-2026.pdf",
+      "reason": "network error"
+    }
+  ],
+  "ok": 66
+}

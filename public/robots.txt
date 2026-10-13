@@ -4,5 +4,13 @@ Disallow: /admin/
 Disallow: /profile/
 Disallow: /login
 Disallow: /auth/
+Disallow: /api/
+# Filtered / search URLs with query params should not be crawled
+Disallow: /*?*category=
+Disallow: /*?*state=
+Disallow: /*?*status=
+Disallow: /*?*qualification=
+Disallow: /*?*department=
+Disallow: /*?*page=
 
-Sitemap: https://sarkaarinaukri.online/sitemap.xml
+Sitemap: https://www.sarkaarinaukri.online/sitemap.xml

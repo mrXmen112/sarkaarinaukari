@@ -11,6 +11,13 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   async redirects() {
     return [
+      // Single-host policy: bare domain 301s to the www primary.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "sarkaarinaukri.online" }],
+        destination: "https://www.sarkaarinaukri.online/:path*",
+        permanent: true,
+      },
       {
         source: "/signup",
         destination: "/login",

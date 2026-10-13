@@ -1,7 +1,6 @@
 /**
- * Original site mark. Deliberately NOT the Ashoka Emblem or any official
- * government insignia (Section 1 constraint) — this is an abstract document +
- * checkmark motif with a tricolour accent bar.
+ * Site mark — briefcase with tricolour clasp, original artwork (not the Ashoka
+ * Emblem or any official government insignia). Matches /public/icon.svg.
  */
 export function SiteLogo({
   className = "",
@@ -14,33 +13,22 @@ export function SiteLogo({
     <svg
       width={size}
       height={size}
-      viewBox="0 0 48 48"
+      viewBox="0 0 512 512"
       fill="none"
       role="img"
       aria-label="SarkaariNaukri.online logo"
       className={className}
     >
-      {/* Document body */}
-      <rect x="9" y="4" width="27" height="36" rx="2" fill="#FFFFFF" />
-      <rect
-        x="9"
-        y="4"
-        width="27"
-        height="36"
-        rx="2"
-        stroke="#0B3D6E"
-        strokeWidth="2.5"
-      />
-      {/* Tricolour accent bar */}
-      <rect x="13" y="10" width="19" height="2.6" rx="1.3" fill="#FF9933" />
-      <rect x="13" y="15" width="19" height="2.6" rx="1.3" fill="#CBD5E1" />
-      <rect x="13" y="20" width="12" height="2.6" rx="1.3" fill="#138808" />
-      {/* Verification badge */}
-      <circle cx="33" cy="33" r="10.5" fill="#138808" stroke="#FFFFFF" strokeWidth="2.5" />
+      <rect width="512" height="512" rx="112" fill="#0B3D6E" />
+      <rect x="198" y="132" width="116" height="78" rx="26" fill="none" stroke="#FFFFFF" strokeWidth="26" />
+      <rect x="106" y="196" width="300" height="212" rx="34" fill="#FFFFFF" />
+      <rect x="106" y="276" width="300" height="26" fill="#FF9933" />
+      <rect x="216" y="250" width="80" height="78" rx="18" fill="#138808" stroke="#FFFFFF" strokeWidth="8" />
       <path
-        d="M28.5 33.2l3.1 3.1 6-6.3"
+        d="M236 290 L252 306 L280 270"
+        fill="none"
         stroke="#FFFFFF"
-        strokeWidth="2.6"
+        strokeWidth="12"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

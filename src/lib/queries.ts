@@ -84,8 +84,9 @@ export async function listJobs({
 
   if (status && status !== "all") {
     if (status === "recently_closed") {
+      // Jobs flipped to "closed" by refresh_job_statuses(), still fresh.
       query = query
-        .eq("status", "active")
+        .eq("status", "closed")
         .lt("application_end", isoDatePlusDays(0))
         .gte("application_end", isoDatePlusDays(-30));
     } else {
@@ -227,9 +228,27 @@ export async function getRecentlyClosedJobs(limit = 8): Promise<JobWithCategory[
       .from("jobs")
       .select(JOB_SELECT)
       .eq("is_published", true)
-      .eq("status", "active")
+      .eq("status", "closed")
       .lt("application_end", isoDatePlusDays(0))
       .gte("application_end", isoDatePlusDays(-30))
+      .order("application_end", { ascending: false })
+      .limit(limit);
+    return (data ?? []) as JobWithCategory[];
+  });
+}
+
+/**
+ * Archive listing (Phase 1): jobs closed for more than 90 days. Pages stay
+ * live and indexable — we never delete vacancies.
+ */
+export async function listArchivedJobs(limit = 100): Promise<JobWithCategory[]> {
+  return guard(async () => {
+    const { data } = await createStaticClient()
+      .from("jobs")
+      .select(JOB_SELECT)
+      .eq("is_published", true)
+      .eq("status", "closed")
+      .lt("application_end", isoDatePlusDays(-90))
       .order("application_end", { ascending: false })
       .limit(limit);
     return (data ?? []) as JobWithCategory[];
@@ -602,6 +621,52 @@ export async function getAllAnswerKeySlugs(): Promise<string[]> {
       .order("release_date", { ascending: false, nullsFirst: false });
     return ((data ?? []) as Pick<AnswerKey, "slug">[]).map((d) => d.slug);
   });
+}
+
+/* ------------------------------------------------------------------ */
+/* Recruitment timeline (Phase 1)                                       */
+/* ------------------------------------------------------------------ */
+
+/** Published admit cards / results / answer keys linked to one job. */
+export type JobTimeline = {
+  admitCards: Pick<AdmitCard, "title" | "slug" | "release_date" | "exam_date">[];
+  results: Pick<ResultRow, "title" | "slug" | "result_date">[];
+  answerKeys: Pick<AnswerKey, "title" | "slug" | "release_date">[];
+};
+
+export async function getJobTimeline(jobId: string): Promise<JobTimeline> {
+  const empty: JobTimeline = { admitCards: [], results: [], answerKeys: [] };
+  if (!isSupabaseConfigured) return empty;
+  try {
+    const [admits, results, keys] = await Promise.all([
+      createStaticClient()
+        .from("admit_cards")
+        .select("title, slug, release_date, exam_date")
+        .eq("job_id", jobId)
+        .eq("is_published", true)
+        .order("release_date", { ascending: false }),
+      createStaticClient()
+        .from("results")
+        .select("title, slug, result_date")
+        .eq("job_id", jobId)
+        .eq("is_published", true)
+        .order("result_date", { ascending: false, nullsFirst: false }),
+      createStaticClient()
+        .from("answer_keys")
+        .select("title, slug, release_date")
+        .eq("job_id", jobId)
+        .eq("is_published", true)
+        .order("release_date", { ascending: false, nullsFirst: false }),
+    ]);
+    return {
+      admitCards: (admits.data ?? []) as JobTimeline["admitCards"],
+      results: (results.data ?? []) as JobTimeline["results"],
+      answerKeys: (keys.data ?? []) as JobTimeline["answerKeys"],
+    };
+  } catch (err) {
+    console.error("[queries] job timeline failed:", err);
+    return empty;
+  }
 }
 
 /* ------------------------------------------------------------------ */

@@ -52,6 +52,11 @@ export default async function HomePage() {
             Sarkari Yojana schemes — verified against official sources and
             updated daily.
           </p>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-ink-muted" lang="hi">
+            सरकारी नौकरी.ऑनलाइन पर पाएं केंद्र व राज्य सरकार की भर्तियां, बिहार
+            सरकारी नौकरी (BPSC, BSSC, बिहार पुलिस, TRE), एडमिट कार्ड, रिजल्ट,
+            आंसर की और सरकारी योजना की जानकारी — हर दिन अपडेट।
+          </p>
         </section>
 
         <section aria-labelledby="quick-links" className="mb-6">

@@ -10,12 +10,14 @@ import { PageContainer, Panel } from "@/components/layout/PageContainer";
 import { JobActions } from "@/components/jobs/JobActions";
 import { JobTable } from "@/components/jobs/JobTable";
 import { ApplyButton } from "@/components/jobs/ApplyButton";
-import { validateOfficialLink, hasBrokenLink } from "@/lib/url";
+import { RecruitmentTimeline } from "@/components/jobs/RecruitmentTimeline";
+import { hasBrokenLink } from "@/lib/url";
 import { formatDate } from "@/lib/date";
 import { categoryLabel as fmtCategoryLabel, formatIndianNumber, formatRupees, truncate } from "@/lib/utils";
 import {
   getAllJobSlugs,
   getJobBySlug,
+  getJobTimeline,
   getRelatedJobs,
   stateLabel,
 } from "@/lib/queries";
@@ -39,11 +41,31 @@ export async function generateMetadata({
 
   if (!job) return { title: "Job Not Found" };
 
-  const year = new Date(job.application_end).getUTCFullYear();
-  const title = `${job.title} — Sarkari Naukri ${year}`;
+  const end = new Date(job.application_end);
+  const year = end.getUTCFullYear();
+  const lastDateShort = end.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    timeZone: "UTC",
+  });
+
+  const vacancyPart = job.vacancy_total
+    ? `${formatIndianNumber(job.vacancy_total)} Posts, `
+    : "";
+
+  const title =
+    job.status === "closed"
+      ? `${job.title} ${year} — Application Closed, Details & Notification`
+      : `${job.title} ${year}: ${vacancyPart}Last Date ${lastDateShort}, Apply Online`;
+
+  const vacancySentence = job.vacancy_total
+    ? `${formatIndianNumber(job.vacancy_total)} vacancies.`
+    : "";
+  const educationSentence = job.eligibility_education
+    ? ` Eligibility: ${job.eligibility_education}.`
+    : "";
   const description = truncate(
-    job.short_description ??
-      `Eligibility, vacancy, application dates and official apply link for ${job.title}.`,
+    `${job.title}: ${vacancySentence} Last date ${formatDate(job.application_end)}.${educationSentence} Application fee, selection process, official notification PDF and apply link.`,
     158,
   );
 
@@ -56,6 +78,9 @@ export async function generateMetadata({
       title,
       description,
       url: `${SITE.url}/jobs/${slug}`,
+      publishedTime: job.notification_date ?? undefined,
+      modifiedTime: job.updated_at ?? undefined,
+      images: ["/opengraph-image"],
     },
     robots: { index: true, follow: true },
   };
@@ -71,6 +96,7 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
   if (!job) notFound();
 
   const related = await getRelatedJobs(job, 6);
+  const timeline = await getJobTimeline(job.id);
   const url = `${SITE.url}/jobs/${job.slug}`;
 
   const breadcrumbs = [
@@ -148,6 +174,9 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
         />
       </Panel>
 
+      {/* Recruitment lifecycle — notification through result (Phase 1) */}
+      <RecruitmentTimeline job={job} timeline={timeline} />
+
       {/* Section 3 — Eligibility */}
       <Panel title="Eligibility Criteria" className="mb-4">
         <div className="space-y-3 text-sm">
@@ -200,9 +229,16 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       {/* Section 8 — How to Apply */}
       <Panel title="How to Apply Online" className="mb-4">
         <Steps items={job.how_to_apply ?? []} />
-        <div className="mt-3">
-          <ApplyButton href={job.official_link} title={job.title} />
-        </div>
+        {job.status === "closed" ? null : job.link_flagged ? (
+          <p className="mt-3 rounded-sm bg-alert-bg px-2.5 py-2 text-sm font-semibold text-alert">
+            Apply link under verification — please open the official website
+            directly until we confirm it.
+          </p>
+        ) : (
+          <div className="mt-3">
+            <ApplyButton href={job.official_link} title={job.title} />
+          </div>
+        )}
         {hasBrokenLink(job) ? (
           <p className="mt-2 text-xs text-alert">
             ⚠️ Official apply link could not be verified. Please check the official website directly.
@@ -288,11 +324,12 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
         headline={job.title}
       />
 
-      {/* Section 11 — Related jobs (internal linking for SEO) */}
+      {/* Section 11 — Related jobs (internal linking for SEO); closed jobs
+          point readers to similar open vacancies instead of a dead end. */}
       {related.length > 0 ? (
         <section aria-labelledby="related-jobs" className="gov-panel">
           <div className="gov-panel-title" id="related-jobs">
-            Related Jobs
+            {job.status === "closed" ? "Similar Open Jobs" : "Related Jobs"}
           </div>
           <div className="p-3">
             <JobTable

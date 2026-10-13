@@ -9,6 +9,9 @@ import {
   type AdminResult,
 } from "@/app/actions/admin";
 import { requireAdmin } from "@/lib/admin";
+import { validateOfficialLink } from "@/lib/url";
+import { isTelegramAutoPostEnabled, postJobToTelegram } from "@/lib/telegram";
+import { slugify } from "@/lib/utils";
 import {
   buildAdmitCardInput,
   buildJobInput,
@@ -144,6 +147,23 @@ function validateReviewInput(
     if (!JOB_STATUSES.has(extra.status)) {
       return "Status must be active, upcoming, or closed.";
     }
+    // Link gate (Phase 1): a job may not publish with a dead or placeholder
+    // official link; the notification PDF link is checked when present.
+    const officialLink = (fields.official_link ?? "").trim();
+    if (!officialLink) {
+      return "Official apply link is required before publishing.";
+    }
+    const officialCheck = validateOfficialLink(officialLink);
+    if (officialCheck.status === "broken") {
+      return `Official apply link rejected: ${officialCheck.reason}.`;
+    }
+    const pdfLink = (fields.notification_pdf_link ?? "").trim();
+    if (pdfLink) {
+      const pdfCheck = validateOfficialLink(pdfLink);
+      if (pdfCheck.status === "broken") {
+        return `Notification PDF link rejected: ${pdfCheck.reason}.`;
+      }
+    }
     return (
       firstInvalidFormat(
         fields,
@@ -276,6 +296,25 @@ export async function approvePendingEntry(
     })
     .eq("id", entryId);
   if (markError) return err(markError.message);
+
+  // Telegram auto-post (Phase 1): opt-in toggle, failures never fail approval.
+  if (entry.target_type === "job") {
+    try {
+      if (await isTelegramAutoPostEnabled()) {
+        const posted = await postJobToTelegram({
+          title: (fields.title ?? "").trim(),
+          slug: slugify((fields.title ?? "").trim()),
+          application_end: (fields.application_end ?? "").trim(),
+          vacancy_total: Number(fields.vacancy_total) || null,
+        });
+        if (!posted.ok) {
+          console.error("[reviewQueue] telegram auto-post failed:", posted.error);
+        }
+      }
+    } catch (error) {
+      console.error("[reviewQueue] telegram auto-post threw:", error);
+    }
+  }
 
   revalidatePath("/admin/review-queue");
   return { ok: true };

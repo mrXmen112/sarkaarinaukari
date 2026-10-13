@@ -4,86 +4,137 @@ import { createStaticClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
 import { SITE } from "@/lib/site";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+/**
+ * Sitemap index (Phase 2): each id below becomes /sitemap/<id>.xml, with the
+ * index served at /sitemap.xml. Split by section so listings stay fast and
+ * lastmod stays accurate per content type.
+ */
+const SITEMAP_SECTIONS = ["static", "jobs", "updates", "prep"] as const;
+
+export async function generateSitemaps() {
+  return SITEMAP_SECTIONS.map((id) => ({ id }));
+}
+
+export default async function sitemap({
+  id,
+}: {
+  id: string;
+}): Promise<MetadataRoute.Sitemap> {
   const base = SITE.url;
-  const staticRoutes: MetadataRoute.Sitemap = [
-    { url: `${base}/`, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
-    { url: `${base}/jobs`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
-    { url: `${base}/bihar`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
-    { url: `${base}/admit-card`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${base}/result`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${base}/answer-key`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${base}/yojana`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${base}/exams`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${base}/current-affairs`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
-    { url: `${base}/quiz`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
-    { url: `${base}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${base}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${base}/privacy`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${base}/terms`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${base}/disclaimer`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${base}/profile`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: `${base}/login`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-  ];
 
-  const dynamicRoutes: MetadataRoute.Sitemap = [];
+  if (id === "static") {
+    const staticRoutes: MetadataRoute.Sitemap = [
+      { url: `${base}/`, changeFrequency: "daily", priority: 1 },
+      { url: `${base}/bihar`, changeFrequency: "daily", priority: 0.9 },
+      { url: `${base}/about`, changeFrequency: "monthly", priority: 0.6 },
+      { url: `${base}/contact`, changeFrequency: "monthly", priority: 0.6 },
+      { url: `${base}/privacy`, changeFrequency: "monthly", priority: 0.5 },
+      { url: `${base}/terms`, changeFrequency: "monthly", priority: 0.5 },
+      { url: `${base}/disclaimer`, changeFrequency: "monthly", priority: 0.5 },
+    ];
+    return staticRoutes;
+  }
 
-  if (isSupabaseConfigured) {
-    try {
-      const supabase = createStaticClient();
+  if (!isSupabaseConfigured) return [];
 
-      const [{ data: jobs }, { data: exams }, { data: yojana }, { data: admitCards }, { data: results }, { data: answerKeys }, { data: currentAffairs }, { data: quizzes }, { data: syllabi }] = await Promise.all([
-        supabase.from("jobs").select("slug").eq("is_published", true),
-        supabase.from("exams").select("slug").eq("is_published", true),
-        supabase.from("yojana").select("slug").eq("is_published", true),
-        supabase.from("admit_cards").select("slug").eq("is_published", true),
-        supabase.from("results").select("slug").eq("is_published", true),
-        supabase.from("answer_keys").select("slug").eq("is_published", true),
-        supabase.from("current_affairs").select("slug").eq("is_published", true),
-        supabase.from("quizzes").select("slug").eq("is_published", true),
-        supabase.from("syllabus").select("slug"),
-      ]);
+  const tableForSlug: Record<string, string> = {
+    jobs: "jobs",
+    admit_cards: "admit-card",
+    results: "result",
+    answer_keys: "answer-key",
+    exams: "exams",
+    syllabus: "syllabus",
+    current_affairs: "current-affairs",
+    quizzes: "quiz",
+    yojana: "yojana",
+  };
 
-      const tableForSlug = (table: string) => {
-        switch (table) {
-          case "jobs": return "jobs";
-          case "exams": return "exams";
-          case "yojana": return "yojana";
-          case "admit_cards": return "admit-card";
-          case "results": return "result";
-          case "answer_keys": return "answer-key";
-          case "current_affairs": return "current-affairs";
-          case "quizzes": return "quiz";
-          default: return table;
-        }
-      };
+  const routeFor: Record<string, { table: string; columns: string }> = {
+    jobs: { table: "jobs", columns: "slug, updated_at" },
+    updates: { table: "admit_cards", columns: "slug, updated_at" },
+    prep: { table: "exams", columns: "slug, updated_at" },
+  };
 
-      const addSlugs = (table: string, rows: { slug: string }[] | null) => {
-        if (!rows) return;
-        const path = tableForSlug(table);
-        for (const row of rows) {
-          dynamicRoutes.push({
-            url: `${base}/${path}/${row.slug}`,
-            lastModified: new Date(),
+  type SlugRow = { slug: string; updated_at: string | null };
+
+  const routes: MetadataRoute.Sitemap = [];
+
+  try {
+    const supabase = createStaticClient();
+
+    if (id === "jobs") {
+      routes.push(
+        { url: `${base}/jobs`, changeFrequency: "daily", priority: 0.9 },
+        { url: `${base}/jobs/archive`, changeFrequency: "weekly", priority: 0.5 },
+      );
+      const { data: jobs } = await supabase
+        .from("jobs")
+        .select(routeFor.jobs.columns)
+        .eq("is_published", true)
+        .order("updated_at", { ascending: false });
+      for (const row of (jobs ?? []) as unknown as SlugRow[]) {
+        routes.push({
+          url: `${base}/${tableForSlug.jobs}/${row.slug}`,
+          lastModified: row.updated_at ? new Date(row.updated_at) : undefined,
+          changeFrequency: "weekly",
+          priority: 0.8,
+        });
+      }
+      return routes;
+    }
+
+    if (id === "updates") {
+      const listingPaths: MetadataRoute.Sitemap = [
+        { url: `${base}/admit-card`, changeFrequency: "daily" },
+        { url: `${base}/result`, changeFrequency: "daily" },
+        { url: `${base}/answer-key`, changeFrequency: "daily" },
+      ];
+      routes.push(...listingPaths);
+
+      for (const table of ["admit_cards", "results", "answer_keys"]) {
+        const { data } = await supabase
+          .from(table)
+          .select("slug, updated_at")
+          .eq("is_published", true)
+          .order("updated_at", { ascending: false });
+        for (const row of (data ?? []) as unknown as SlugRow[]) {
+          routes.push({
+            url: `${base}/${tableForSlug[table]}/${row.slug}`,
+            lastModified: row.updated_at ? new Date(row.updated_at) : undefined,
             changeFrequency: "weekly",
             priority: 0.7,
           });
         }
-      };
-
-      addSlugs("jobs", jobs as { slug: string }[]);
-      addSlugs("exams", exams as { slug: string }[]);
-      addSlugs("yojana", yojana as { slug: string }[]);
-      addSlugs("admit_cards", admitCards as { slug: string }[]);
-      addSlugs("results", results as { slug: string }[]);
-      addSlugs("answer_keys", answerKeys as { slug: string }[]);
-      addSlugs("current_affairs", currentAffairs as { slug: string }[]);
-      addSlugs("quizzes", quizzes as { slug: string }[]);
-      addSlugs("syllabus", syllabi as { slug: string }[]);
-    } catch {
-      // Return static routes only if the query fails.
+      }
+      return routes;
     }
-  }
 
-  return [...staticRoutes, ...dynamicRoutes];
+    // prep: exams, syllabus, quiz, current-affairs, yojana + their listings
+    const prepListings: MetadataRoute.Sitemap = [
+      { url: `${base}/exams`, changeFrequency: "daily" },
+      { url: `${base}/quiz`, changeFrequency: "weekly" },
+      { url: `${base}/current-affairs`, changeFrequency: "daily" },
+      { url: `${base}/yojana`, changeFrequency: "weekly" },
+    ];
+    routes.push(...prepListings);
+
+    for (const table of ["exams", "syllabus", "current_affairs", "quizzes", "yojana"]) {
+      const { data } = await supabase
+        .from(table)
+        .select("slug, updated_at")
+        .eq("is_published", true)
+        .order("updated_at", { ascending: false });
+      for (const row of (data ?? []) as unknown as SlugRow[]) {
+        routes.push({
+          url: `${base}/${tableForSlug[table]}/${row.slug}`,
+          lastModified: row.updated_at ? new Date(row.updated_at) : undefined,
+          changeFrequency: "weekly",
+          priority: 0.7,
+        });
+      }
+    }
+    return routes;
+  } catch {
+    return routes;
+  }
 }

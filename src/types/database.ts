@@ -125,6 +125,10 @@ export type Job = {
   status: JobStatus;
   source_url: string | null;
   is_published: boolean;
+  /** Link validation (0016): 0 = unreachable; null = not checked yet. */
+  link_last_checked_at: string | null;
+  link_http_status: number | null;
+  link_flagged: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -312,9 +316,19 @@ export type ScrapeSource = {
   target_type: ScrapeTargetType;
   scrape_frequency_hours: number;
   is_active: boolean;
+  /** Trusted-source switch: when true, future tooling may auto-publish. */
+  auto_publish: boolean;
+  parser: string | null;
   robots_txt_checked_at: string | null;
   last_scraped_at: string | null;
   created_at: string;
+};
+
+/** Key/value admin toggles (0016) — e.g. telegram_auto_post. */
+export type SiteSetting = {
+  key: string;
+  value: Json;
+  updated_at: string;
 };
 
 export type RawScrape = {
@@ -488,6 +502,8 @@ export type Database = {
       raw_scrapes: Table<RawScrape, []>;
       pending_entries: Table<PendingEntry, []>;
       scrape_logs: Table<ScrapeLog, []>;
+      site_settings: Table<SiteSetting, []>;
+      archived_jobs: Table<Job, []>;
     };
     Views: Record<string, never>;
     Functions: {

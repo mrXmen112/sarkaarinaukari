@@ -22,24 +22,15 @@ const ptSerif = PT_Serif({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://sarkaarinaukri.online"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.sarkaarinaukri.online"),
   title: {
     default: `${SITE.name} — Sarkari Naukri, Admit Card, Result 2026`,
     template: `%s | ${SITE.shortName}`,
   },
   description:
     "Latest Sarkari Naukri 2026: central & state government jobs, Bihar vacancies (BPSC, BSSC, Bihar Police, TRE), admit cards, results, answer keys, syllabus and Sarkari Yojana — updated daily.",
-  keywords: [
-    "sarkari naukri",
-    "government jobs 2026",
-    "bihar govt jobs",
-    "bpsc",
-    "bssc",
-    "admit card",
-    "sarkari result",
-    "sarkari yojana",
-  ],
   robots: { index: true, follow: true },
+  manifest: "/manifest.webmanifest",
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg",
@@ -53,6 +44,14 @@ export const metadata: Metadata = {
     title: `${SITE.name} — Sarkari Naukri, Admit Card, Result 2026`,
     description:
       "Latest central & state government jobs, Bihar vacancies, admit cards, results and Sarkari Yojana updates.",
+    images: ["/opengraph-image"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE.name} — Sarkari Naukri, Admit Card, Result 2026`,
+    description:
+      "Latest central & state government jobs, Bihar vacancies, admit cards, results and Sarkari Yojana updates.",
+    images: ["/opengraph-image"],
   },
 };
 

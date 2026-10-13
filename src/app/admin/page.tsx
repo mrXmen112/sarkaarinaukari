@@ -4,6 +4,8 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { PageContainer, PageHeader } from "@/components/layout/PageContainer";
 import { requireAdmin } from "@/lib/admin";
 import { formatDate } from "@/lib/date";
+import { isTelegramAutoPostEnabled } from "@/lib/telegram";
+import { TelegramToggle } from "./TelegramToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +15,7 @@ export const metadata = {
 
 export default async function AdminDashboard() {
   const { supabase } = await requireAdmin();
+  const telegramEnabled = await isTelegramAutoPostEnabled();
 
   const [caRes, quizRes, yojanaRes, examRes, catRes, jobRes, admitRes, resultRes, keyRes, recentCA, recentQuiz, recentJobs] =
     await Promise.all([
@@ -158,7 +161,36 @@ export default async function AdminDashboard() {
             {keyRes.count ?? 0} keys
           </p>
         </Link>
+        <Link
+          href="/admin/sources"
+          className="rounded border border-rule p-4 no-underline hover:border-navy"
+        >
+          <h2 className="font-serif text-base font-bold text-navy">
+            Scrape Sources
+          </h2>
+          <p className="mt-1 text-sm text-ink-muted">
+            Official sites feeding the pipeline
+          </p>
+        </Link>
+        <Link
+          href="/admin/link-report"
+          className="rounded border border-rule p-4 no-underline hover:border-navy"
+        >
+          <h2 className="font-serif text-base font-bold text-navy">
+            Link Report
+          </h2>
+          <p className="mt-1 text-sm text-ink-muted">
+            Dead apply/notification links
+          </p>
+        </Link>
       </div>
+
+      <section className="mb-4 rounded border border-rule p-4">
+        <h2 className="font-serif text-base font-bold">Telegram Auto-post</h2>
+        <div className="mt-2">
+          <TelegramToggle enabled={telegramEnabled} />
+        </div>
+      </section>
 
       <div className="grid gap-4 md:grid-cols-3">
         <section className="rounded border border-rule p-4">

@@ -83,15 +83,20 @@ export function JobTable({
     {
       key: "apply",
       header: "Apply",
-      cell: (job) => (
-        <Link
-          href={`/jobs/${job.slug}`}
-          className="gov-btn whitespace-nowrap"
-          aria-label={`Read details and apply for ${job.title}`}
-        >
-          Apply
-        </Link>
-      ),
+      cell: (job) =>
+        job.status === "closed" || new Date(job.application_end) < new Date() ? (
+          <span className="inline-block whitespace-nowrap rounded-sm bg-alert-bg px-2.5 py-1.5 text-xs font-bold text-alert">
+            Closed
+          </span>
+        ) : (
+          <Link
+            href={`/jobs/${job.slug}`}
+            className="gov-btn whitespace-nowrap"
+            aria-label={`Read details and apply for ${job.title}`}
+          >
+            Apply
+          </Link>
+        ),
     },
   ];
 
