@@ -15,6 +15,11 @@ import {
   prettyLabel,
   type FlatFields,
 } from "@/lib/reviewQueue";
+import {
+  ALL_DEPARTMENTS,
+  STATE_SLUGS_FROM_DEPTS,
+  stateForDepartment,
+} from "@/lib/departments";
 import type { Job, JobCategory } from "@/types/database";
 
 export type ReviewEntry = {
@@ -58,10 +63,19 @@ export function ReviewEntryForm({
   );
 
   const [categoryId, setCategoryId] = useState("");
-  const [stateVal, setStateVal] = useState("");
+  const [stateVal, setStateVal] = useState(() =>
+    entry.target_type === "job" && structured
+      ? String((data as Record<string, unknown>).state ?? "").trim()
+      : "",
+  );
   const [statusVal, setStatusVal] = useState("active");
   const [jobId, setJobId] = useState("");
   const [published, setPublished] = useState(true);
+  const [deptSlug, setDeptSlug] = useState(() =>
+    entry.target_type === "job" && structured
+      ? String((data as Record<string, unknown>).department_slug ?? "").trim()
+      : "",
+  );
 
   const chips = flagChips(entry.confidence_flags ?? {});
   const missingKeys = new Set(
@@ -228,13 +242,42 @@ export function ReviewEntryForm({
                   </select>
                 </label>
                 <label className={labelCls}>
-                  State (slug, e.g. bihar — blank = central)
-                  <input
+                  Department
+                  <select
+                    value={deptSlug}
+                    onChange={(e) => {
+                      const slug = e.target.value;
+                      setDeptSlug(slug);
+                      set("department_slug", slug);
+                      const implied = slug ? stateForDepartment(slug) : null;
+                      if (implied) {
+                        setStateVal(implied);
+                      }
+                    }}
+                    className={fieldCls}
+                  >
+                    <option value="">— none —</option>
+                    {ALL_DEPARTMENTS.map((d) => (
+                      <option key={d.slug} value={d.slug}>
+                        {d.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className={labelCls}>
+                  State
+                  <select
                     value={stateVal}
-                    type="text"
                     onChange={(e) => setStateVal(e.target.value)}
                     className={fieldCls}
-                  />
+                  >
+                    <option value="">— central —</option>
+                    {STATE_SLUGS_FROM_DEPTS.map((s) => (
+                      <option key={s} value={s}>
+                        {s}
+                      </option>
+                    ))}
+                  </select>
                 </label>
                 <label className={labelCls}>
                   Status

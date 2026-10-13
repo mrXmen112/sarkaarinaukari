@@ -7,6 +7,8 @@
  * derived afterwards by the orchestrator (one flag per null field).
  */
 
+import { DEPARTMENT_VOCAB, STATE_VOCAB } from "./vocab.mjs";
+
 const BASE_RULES = `Rules:
 - Do not fabricate any date, number, or fact not present in the source text.
 - If a value is ambiguous or you are not fully confident, still extract your best reading as the value (a human reviews everything), but the orchestrator will flag nulls separately.
@@ -21,6 +23,8 @@ const FIELD_DOCS = {
   job: `{
   "title": string,
   "department": string,
+  "department_slug": string | null,
+  "state": string | null,
   "short_description": string,
   "eligibility_education": string | null,
   "eligibility_age_min": number | null,
@@ -56,6 +60,21 @@ const FIELD_DOCS = {
 }`,
 };
 
+/**
+ * Closed vocabulary for department_slug + state. These two fields drive the
+ * landing pages, so they must be chosen from the list exactly — never
+ * invented, never free text. Mirrors src/lib/departments.ts.
+ */
+const VOCAB_NOTE = `
+department_slug and state drive the site's landing pages, so choose ONLY from these closed lists (use null if the notice does not identify the recruiting body unambiguously):
+
+department_slug values: ${DEPARTMENT_VOCAB.join("; ")}
+
+state values (lowercase slugs): ${STATE_VOCAB.join(", ")}
+- For national / central recruiting bodies (ssc, upsc, rrb, ibps, psu, defence, central-police) set "state": null.
+- For a state body, set state to that body's state slug.
+- Never invent a slug that is not in the list. Never put a display name in these fields.`;
+
 const TASK_LINE = {
   job: "You are extracting structured data from an official Indian government job notification.",
   result:
@@ -77,6 +96,7 @@ export function buildPrompt(targetType, meta, sourceText, { garbled = false } = 
     `${TASK_LINE[targetType]}\n` +
     `Read the text below and output ONLY a JSON object with these exact fields:\n\n` +
     `${FIELD_DOCS[targetType]}\n\n` +
+    (targetType === "job" ? VOCAB_NOTE + "\n\n" : "") +
     `${BASE_RULES}\n` +
     (garbled ? GARBLE_NOTE + "\n" : "") +
     `\n${metaBlock}\n\nSOURCE TEXT:\n${sourceText}`
@@ -86,6 +106,7 @@ export function buildPrompt(targetType, meta, sourceText, { garbled = false } = 
 /** Fields whose absence raises a confidence flag (missing_<field>: true). */
 const FLAGGABLE = {
   job: [
+    "department_slug", "state",
     "eligibility_education", "eligibility_age_min", "eligibility_age_max",
     "vacancy_total", "application_fee", "pay_scale",
     "notification_date", "application_start", "application_end", "exam_date",

@@ -17,6 +17,11 @@ import { USER_AGENT } from "./config.mjs";
 import { htmlToCleanText } from "./text.mjs";
 import { buildPrompt, flaggableFields, requiredFields } from "./prompts.mjs";
 import { callLLM, cleanJsonResponse } from "./llm.mjs";
+import {
+  DEPARTMENT_STATE,
+  isValidDepartmentSlug,
+  isValidStateSlug,
+} from "./vocab.mjs";
 
 /** Cap on text sent to the LLM per row. */
 const MAX_PROMPT_CHARS = 15000;
@@ -117,12 +122,38 @@ export function validateStructured(targetType, obj, { garbled = false } = {}) {
       return { ok: false, error: `required field "${f}" missing/empty` };
     }
   }
+  normalizeJobTaxonomy(obj);
   const flags = {};
   for (const f of flaggableFields(targetType)) {
     if (obj[f] === null || obj[f] === undefined || obj[f] === "") flags[`missing_${f}`] = true;
   }
   if (garbled) flags.pdf_unreadable_text = true;
   return { ok: true, flags };
+}
+
+/**
+ * Force department_slug / state onto the controlled vocabulary: any value the
+ * model invented (or a display name) becomes null so it can never reach a
+ * live table. A state body always resolves to its own state's slug.
+ */
+function normalizeJobTaxonomy(obj) {
+  if (typeof obj.department_slug === "string") {
+    const slug = obj.department_slug.trim().toLowerCase();
+    obj.department_slug = isValidDepartmentSlug(slug) ? slug : null;
+  } else {
+    obj.department_slug = null;
+  }
+  const deptState = obj.department_slug ? DEPARTMENT_STATE[obj.department_slug] ?? null : null;
+  if (typeof obj.state === "string") {
+    const state = obj.state.trim().toLowerCase();
+    obj.state = isValidStateSlug(state) ? state : null;
+  } else {
+    obj.state = null;
+  }
+  // The department's own state wins when both are present and disagree.
+  if (deptState) obj.state = deptState;
+  // A national department can never carry a state.
+  if (obj.department_slug && !deptState) obj.state = null;
 }
 
 export async function structureOneRow(row, { store, limiter, pdfParse, llm, dryRun = false }) {

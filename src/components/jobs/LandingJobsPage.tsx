@@ -28,12 +28,14 @@ export async function LandingJobsPage({
   breadcrumbName: string;
   pageNumber?: number;
 }) {
-  // Open vacancies lead the page; a "recently closed" block is added only when
-  // a category is between recruitment cycles, so thin org pages still carry
-  // useful, honest content instead of an empty table.
+  // Open vacancies lead the page (live now + announced/upcoming); a "recently
+  // closed" block is added only when a category is between recruitment cycles,
+  // so thin org pages still carry useful, honest content instead of an empty
+  // table.
   const [open, closed] = await Promise.all([
     listJobs({
       ...config.filters,
+      status: "open",
       page: pageNumber,
       pageSize: PAGE_SIZE,
     }),

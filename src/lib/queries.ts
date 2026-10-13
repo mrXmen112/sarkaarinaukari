@@ -48,7 +48,8 @@ export type JobListFilters = {
   state?: string;
   /** Stable recruiting-body key, e.g. "bihar-police" (Bihar Hub chips). */
   department?: string;
-  status?: string; // "active" | "upcoming" | "closed" | "recently_closed" | "all"
+  /** "active" | "upcoming" | "closed" | "recently_closed" | "open" | "all" */
+  status?: string; // "active" | "upcoming" | "closed" | "recently_closed" | "open" | "all"
   qualification?: string;
   /** Free-text search across post title and department. */
   q?: string;
@@ -92,6 +93,9 @@ export async function listJobs({
         .eq("status", "closed")
         .lt("application_end", isoDatePlusDays(0))
         .gte("application_end", isoDatePlusDays(-30));
+    } else if (status === "open") {
+      // Everything a candidate can still act on: live now or announced.
+      query = query.in("status", ["active", "upcoming"]);
     } else {
       query = query.eq("status", status as JobStatus);
     }

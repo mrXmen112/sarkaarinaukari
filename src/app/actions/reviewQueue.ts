@@ -10,6 +10,11 @@ import {
 } from "@/app/actions/admin";
 import { requireAdmin } from "@/lib/admin";
 import { validateOfficialLink } from "@/lib/url";
+import {
+  STATE_SLUGS_FROM_DEPTS,
+  isValidDepartmentSlug,
+  stateForDepartment,
+} from "@/lib/departments";
 import { isTelegramAutoPostEnabled, postJobToTelegram } from "@/lib/telegram";
 import { pingIndexNow, targetUrl } from "@/lib/indexNow";
 import { slugify } from "@/lib/utils";
@@ -142,8 +147,27 @@ function validateReviewInput(
     if (!isValidId(extra.category_id)) {
       return "Category must be a valid job-category record.";
     }
+    // Taxonomy gate (Phase 3 fix): department_slug must be in the controlled
+    // vocabulary and state must match that body's state. Prevents junk slugs
+    // from ever reaching the landing-page filters.
+    const deptSlug = (fields.department_slug ?? "").trim().toLowerCase();
+    if (deptSlug) {
+      if (!isValidDepartmentSlug(deptSlug)) {
+        return "Department is not a known recruiting body — leave it blank or pick one from the list.";
+      }
+      const implied = stateForDepartment(deptSlug);
+      const state = extra.state.trim();
+      if (implied && state !== implied) {
+        return `Department "${deptSlug}" belongs to ${implied} — set state to ${implied}.`;
+      }
+      if (!implied && state) {
+        return "That department is a national body — leave state blank (central).";
+      }
+    } else if (extra.state && !STATE_SLUGS_FROM_DEPTS.includes(extra.state)) {
+      return "State is not a known state slug.";
+    }
     if (extra.state && !STATE_RE.test(extra.state)) {
-      return "State must be a lowercase slug such as bihar or central-services.";
+      return "State must be a lowercase slug such as bihar or uttar-pradesh.";
     }
     if (!JOB_STATUSES.has(extra.status)) {
       return "Status must be active, upcoming, or closed.";

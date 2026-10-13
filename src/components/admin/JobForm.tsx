@@ -3,6 +3,8 @@
 import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 
+import { ALL_DEPARTMENTS, STATE_SLUGS_FROM_DEPTS } from "@/lib/departments";
+
 import {
   createJob,
   updateJob,
@@ -116,13 +118,18 @@ export function JobForm({
         </label>
         <label className={labelCls}>
           State
-          <input
+          <select
             name="state"
-            type="text"
-            placeholder="central / bihar / up…"
             defaultValue={job?.state ?? ""}
             className={fieldCls}
-          />
+          >
+            <option value="">— central —</option>
+            {STATE_SLUGS_FROM_DEPTS.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
         </label>
         <label className={labelCls}>
           Department
@@ -134,14 +141,19 @@ export function JobForm({
           />
         </label>
         <label className={labelCls}>
-          Department slug (filter key)
-          <input
+          Department (filter key)
+          <select
             name="department_slug"
-            type="text"
-            placeholder="e.g. bpsc, ssc, bihar-police"
             defaultValue={job?.department_slug ?? ""}
             className={fieldCls}
-          />
+          >
+            <option value="">— none —</option>
+            {ALL_DEPARTMENTS.map((d) => (
+              <option key={d.slug} value={d.slug}>
+                {d.label}
+              </option>
+            ))}
+          </select>
         </label>
       </div>
 
