@@ -9,6 +9,8 @@ import { signOut } from "@/app/actions/profile";
 import { createClient } from "@/lib/supabase/server";
 import { breadcrumbSchema } from "@/lib/seo";
 import { formatDate } from "@/lib/date";
+import { listJobs } from "@/lib/queries";
+import { matchJobsToProfile } from "@/lib/eligibility";
 import type { Job, Quiz } from "@/types/database";
 
 export const dynamic = "force-dynamic";
@@ -67,6 +69,10 @@ export default async function ProfilePage() {
     quiz: a.quizzes as unknown as Pick<Quiz, "id" | "title" | "slug"> | null,
   }));
 
+  // Eligibility shortlist (Phase 4F) — computed from the saved profile.
+  const { jobs: openJobs } = await listJobs({ status: "open", pageSize: 100 });
+  const eligible = matchJobsToProfile(openJobs, profile);
+
   return (
     <PageContainer>
       <JsonLd
@@ -81,6 +87,67 @@ export default async function ProfilePage() {
       />
 
       <ProfileForm profile={profile} />
+
+      <Panel title="Jobs You Are Eligible For" className="mb-4">
+        {eligible.length === 0 ? (
+          <p className="text-sm text-ink-muted">
+            {profile &&
+            (profile.age != null || profile.education || profile.state) ? (
+              <>
+                No current vacancies match your saved age, qualification and
+                state. Jobs whose eligibility is not notified are shown as
+                &ldquo;check eligibility&rdquo; — check the official
+                notification before applying.
+              </>
+            ) : (
+              <>
+                Fill in your age, qualification and state above and we will
+                shortlist the vacancies you can apply for.
+              </>
+            )}
+          </p>
+        ) : (
+          <ul className="divide-y divide-rule">
+            {eligible.slice(0, 12).map(({ job, matches, needsCheck }) => (
+              <li key={job.id} className="py-2.5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <Link
+                    href={`/jobs/${job.slug}`}
+                    className="text-sm font-semibold text-navy no-underline hover:text-alert hover:underline"
+                  >
+                    {job.title}
+                  </Link>
+                  <span className="whitespace-nowrap text-xs text-ink-muted">
+                    Last date {formatDate(job.application_end)}
+                  </span>
+                </div>
+                <div className="mt-1 flex flex-wrap gap-1.5">
+                  {matches.map((m) => (
+                    <span
+                      key={m}
+                      className="rounded-sm bg-ok-bg px-1.5 py-0.5 text-[0.625rem] font-bold text-ok"
+                    >
+                      {m}
+                    </span>
+                  ))}
+                  {needsCheck.map((n) => (
+                    <span
+                      key={n}
+                      className="rounded-sm bg-alert-bg px-1.5 py-0.5 text-[0.625rem] font-bold text-alert"
+                    >
+                      {n}
+                    </span>
+                  ))}
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+        <p className="mt-2 text-xs text-ink-faint">
+          This shortlist is a guide based on your profile and the notified
+          eligibility — the official notification always has the final say.
+        </p>
+      </Panel>
 
       <Panel title="Applied Jobs" className="mb-4">
         {appliedJobs.length === 0 ? (

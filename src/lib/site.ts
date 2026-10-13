@@ -65,6 +65,8 @@ export const FOOTER_NAV: { heading: string; items: NavItem[] }[] = [
     items: [
       { label: "Admit Card", href: "/admit-card" },
       { label: "Result", href: "/result" },
+      { label: "Class 10 Result", href: "/result/10th" },
+      { label: "Class 12 Result", href: "/result/12th" },
       { label: "Answer Key", href: "/answer-key" },
       { label: "Current Affairs", href: "/current-affairs" },
     ],

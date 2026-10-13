@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { DataTable } from "@/components/ui/DataTable";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
@@ -35,6 +36,22 @@ export default async function ResultListingPage() {
             : "No results declared yet"
         }
       />
+
+      {/* Phase 4C — school board result hubs (guides + official redirects) */}
+      <nav aria-label="School board results" className="mb-4 flex flex-wrap gap-2">
+        <Link
+          href="/result/10th"
+          className="inline-block rounded-sm border border-rule bg-surface px-3 py-2 text-sm font-semibold text-navy no-underline hover:border-navy-400 hover:bg-navy-50"
+        >
+          Class 10 Result — all boards
+        </Link>
+        <Link
+          href="/result/12th"
+          className="inline-block rounded-sm border border-rule bg-surface px-3 py-2 text-sm font-semibold text-navy no-underline hover:border-navy-400 hover:bg-navy-50"
+        >
+          Class 12 Result — all boards
+        </Link>
+      </nav>
 
       <DataTable
         columns={[

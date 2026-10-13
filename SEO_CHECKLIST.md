@@ -123,5 +123,54 @@ Notes:
 - Intro copy is hand-written per page (recruiting bodies, eligibility, selection process) — no templated spin, no invented vacancy numbers.
 - To add a page later: add one entry to `QUALIFICATION_PAGES` / `CATEGORY_PAGES` / `BIHAR_ORG_PAGES` and a thin route file.
 
-## Phase 4+ — ready when you are
-Phase 4 sections: previous-papers (`/previous-papers/[exam]/[year]`), board result hubs (`/result/10th`, `/result/12th` + one page per board redirecting to the official portal), richer job detail pages (sticky Apply, documents required, salary details), aspirant UX (save job, closing-in-7-days strip, eligibility checker, Hindi/English toggle). Then Phase 5 trust pages (editorial/data policy) and Phase 6 PNG branding assets. Reply with the next phase.
+## Phase 4 — New sections
+
+### 4B Previous year papers
+| Item | Status |
+|---|---|
+| `/previous-papers/[exam]` — one page per published exam, linked from the exam detail page | **DONE** |
+| Only official (conducting-body) PDFs are listed | **DONE** |
+| **Removed 9 fabricated seeded paper links** (e.g. `ssc.gov.in/papers/cgl-2025-tier1` returns the site's catch-all 200 page for any path — not a real paper) | **DONE** (cleared in DB) |
+| When a body has published nothing, the page says so plainly instead of linking a fake PDF | **DONE** |
+| Added to sitemap (per exam) | **DONE** |
+
+### 4C Board result hubs (10th / 12th + per board)
+| Item | Status |
+|---|---|
+| `/result/10th` and `/result/12th` class hubs | **DONE** |
+| `/result/boards/[slug]` for 18 boards (CBSE, BSEB, CISCE, UP, MP, Rajasthan, Maharashtra, WB, Jharkhand, Haryana, Gujarat, Odisha, Punjab, Karnataka, TN, Telangana, AP, Kerala) | **DONE** |
+| "Check result" opens the board's own portal in a new tab, `rel="noopener noreferrer nofollow"` | **DONE** |
+| Step-by-step guide, what you need, re-evaluation + compartment info per board | **DONE** |
+| **Every portal URL verified** — 9 wrong hostnames were found and corrected (Bihar = biharboardonline.com, Rajasthan = rajeduboard.rajasthan.gov.in, Karnataka = kseeb.karnataka.gov.in, TN = tnresults.nic.in, Haryana = bseh.org.in, Punjab = pseb.ac.in, Telangana = bse.telangana.gov.in, Maharashtra = mahahsscboard.in, AP = apsche.ap.gov.in) | **DONE** |
+| No roll number / marks collected anywhere — guide + redirect only | **DONE** |
+| `scripts/board-links-check.mjs` — weekly DNS + HTTP check, 0 broken at last run | **DONE** (add the cron, see below) |
+| Linked from `/result` listing + footer | **DONE** |
+
+### 4D / 4E Job detail + apply behaviour
+| Item | Status |
+|---|---|
+| Quick Summary box (post, vacancy, last date, fee, apply mode, age) | **DONE** |
+| "Apply Online (Official Website)" with `noopener noreferrer nofollow` | **DONE** |
+| Documents required (standard checklist, clearly labelled generic) | **DONE** |
+| Salary panel — shows the notified pay scale only, never estimates in-hand | **DONE** |
+| Visible "Last Updated" date | **DONE** |
+| Job-table Apply goes straight to the verified official URL when open + unflagged; falls back to the detail page; shows **Closed** after the last date | **DONE** |
+| Apply button hidden when the link is flagged (dead) | **DONE** |
+
+### 4F Aspirant UX
+| Item | Status |
+|---|---|
+| Eligibility checker on `/profile` (age + category relaxation + qualification + state) with "check eligibility" chips where a limit is not notified | **DONE** |
+| NEW / UPDATED badges in job tables | **DONE** |
+| Closing-soon ticker on the homepage | **DONE** (earlier) |
+| Save job / mark applied | **DONE** (earlier) |
+| Hindi/English UI toggle | **NOT DONE** — needs a i18n pass across ~60 pages; UI labels are still English-only apart from the homepage Hindi intro. Would be a large, separate change. |
+
+### YOU DO — Phase 4
+1. Add a weekly cron for the board link checker (e.g. in the Supabase pg_cron schedule from Phase 1, or Vercel cron):
+   `select cron.schedule('board-links', '0 5 * * 1', $$select net.http_post(url := 'https://www.sarkaarinaukri.online/api/cron/board-links', headers := jsonb_build_object('Authorization','Bearer ' || current_setting('app.cron_secret', true)), body := '{}'::jsonb)$$);`
+   — and I can add the matching `/api/cron/board-links` route on request.
+2. Add real official previous-year paper URLs in the admin (`/admin/exams/{id}/edit`) as the conducting bodies release them.
+
+## Phase 5+ — ready when you are
+Phase 5 trust & quality: an editorial / data-verification policy page, "source link + last verified" on every job, and an AdSense-ready layout audit. Then Phase 6 PNG icon assets.

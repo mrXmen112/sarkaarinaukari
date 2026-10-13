@@ -133,6 +133,14 @@ export default async function ExamDetailPage({
         <p className="text-sm leading-relaxed whitespace-pre-line">
           {exam.overview ?? "Information coming soon."}
         </p>
+        <p className="mt-3">
+          <Link
+            href={`/previous-papers/${exam.slug}`}
+            className="inline-block rounded-sm border border-rule bg-surface px-3 py-2 text-sm font-semibold text-navy no-underline hover:border-navy-400 hover:bg-navy-50"
+          >
+            Previous Year Question Papers →
+          </Link>
+        </p>
       </Panel>
 
       <Panel title="Eligibility Criteria" className="mb-4">

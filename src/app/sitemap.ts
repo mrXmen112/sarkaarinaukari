@@ -8,6 +8,7 @@ import {
   QUALIFICATION_PAGES,
 } from "@/lib/landingPages";
 import { BIHAR_ORG_PAGES, STATE_SLUGS } from "@/lib/landingPagesState";
+import { BOARDS } from "@/lib/boards";
 
 /**
  * Sitemap index (Phase 2): each id below becomes /sitemap/<id>.xml, with the
@@ -35,6 +36,14 @@ export default async function sitemap(props: {
       { url: `${base}/privacy`, changeFrequency: "monthly", priority: 0.5 },
       { url: `${base}/terms`, changeFrequency: "monthly", priority: 0.5 },
       { url: `${base}/disclaimer`, changeFrequency: "monthly", priority: 0.5 },
+      // Phase 4C — board result hubs (guides + official redirects)
+      { url: `${base}/result/10th`, changeFrequency: "weekly", priority: 0.7 },
+      { url: `${base}/result/12th`, changeFrequency: "weekly", priority: 0.7 },
+      ...BOARDS.map((board) => ({
+        url: `${base}/result/boards/${board.slug}`,
+        changeFrequency: "weekly" as const,
+        priority: 0.6,
+      })),
     ];
     return staticRoutes;
   }
@@ -162,13 +171,24 @@ export default async function sitemap(props: {
         .select("slug, updated_at")
         .eq("is_published", true)
         .order("updated_at", { ascending: false });
-      for (const row of (data ?? []) as unknown as SlugRow[]) {
+      for (const row of (data ?? []) as SlugRow[]) {
         routes.push({
           url: `${base}/${tableForSlug[table]}/${row.slug}`,
           lastModified: row.updated_at ? new Date(row.updated_at) : undefined,
           changeFrequency: "weekly",
           priority: 0.7,
         });
+      }
+      // Phase 4B — one previous-papers page per published exam.
+      if (table === "exams") {
+        for (const row of (data ?? []) as SlugRow[]) {
+          routes.push({
+            url: `${base}/previous-papers/${row.slug}`,
+            lastModified: row.updated_at ? new Date(row.updated_at) : undefined,
+            changeFrequency: "monthly",
+            priority: 0.5,
+          });
+        }
       }
     }
     return routes;

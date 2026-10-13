@@ -175,9 +175,74 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
             },
             { label: "Exam Date", value: job.exam_date ? formatDate(job.exam_date) : "To be announced" },
             { label: "Pay Scale", value: job.pay_scale ?? "—" },
+            {
+              label: "Last Updated",
+              value: formatDate(job.updated_at ?? job.created_at),
+            },
           ]}
         />
       </Panel>
+
+      {/* Section 2b — Quick summary + sticky Apply (Phase 4D/4E) */}
+      <section aria-labelledby="quick-summary" className="gov-panel mb-4">
+        <div className="gov-panel-title" id="quick-summary">
+          Quick Summary
+        </div>
+        <div className="p-3">
+          <DetailTable
+            caption="Quick summary of this vacancy"
+            rows={[
+              { label: "Post", value: job.title },
+              {
+                label: "Total Vacancy",
+                value: job.vacancy_total
+                  ? formatIndianNumber(job.vacancy_total)
+                  : "Not notified",
+              },
+              {
+                label: "Last Date",
+                value: `${formatDate(job.application_end)}${
+                  job.status === "closed" ? " (closed)" : ""
+                }`,
+              },
+              {
+                label: "Application Fee",
+                value:
+                  job.application_fee &&
+                  Object.keys(job.application_fee).length > 0
+                    ? `${fmtCategoryLabel("general")}: ${formatRupees(
+                        (job.application_fee as Record<string, number>).general,
+                      )}`
+                    : "Not notified",
+              },
+              {
+                label: "Apply Mode",
+                value: "Online — official website only",
+              },
+              {
+                label: "Age Limit",
+                value:
+                  job.eligibility_age_min == null && job.eligibility_age_max == null
+                    ? "As per notification"
+                    : `${job.eligibility_age_min ?? "—"}–${job.eligibility_age_max ?? "—"} years`,
+              },
+            ]}
+          />
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            {job.status === "closed" ? (
+              <span className="inline-block rounded-sm bg-alert-bg px-3 py-2 text-sm font-bold text-alert">
+                Applications closed
+              </span>
+            ) : job.link_flagged ? (
+              <span className="inline-block rounded-sm border border-alert px-3 py-2 text-sm font-bold text-alert">
+                Apply link under verification
+              </span>
+            ) : (
+              <ApplyButton href={job.official_link} title={job.title} />
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* Recruitment lifecycle — notification through result (Phase 1) */}
       <RecruitmentTimeline job={job} timeline={timeline} />
@@ -229,6 +294,48 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       {/* Section 6 — Selection Process */}
       <Panel title="Selection Process" className="mb-4">
         <Steps items={job.selection_process ?? []} note="Post-wise process may differ — verify in the official notification." />
+      </Panel>
+
+      {/* Section 6b — Documents required (Phase 4D). Generic guidance only:
+          what any government application needs, clearly labelled as such. */}
+      <Panel title="Documents Required" className="mb-4">
+        <ul className="list-disc space-y-1 pl-5 text-sm text-ink-muted">
+          <li>Recent passport-size photographs (number as per the notification)</li>
+          <li>Signature / thumb impression on white background, as specified</li>
+          <li>
+            Class 10 marksheet and certificate for date of birth and category
+            proof
+          </li>
+          <li>Higher-secondary marksheet and certificate (if the post requires it)</li>
+          <li>Category certificate (SC/ST/OBC/EWS) or EWS certificate, if claiming relaxation</li>
+          <li>PwD / differently-abled certificate and disability board UDID, where applicable</li>
+          <li>
+            Driving licence, ITI certificate or diploma, where the post specifies
+            a trade or vehicle
+          </li>
+          <li>Experience certificate for posts that require it</li>
+        </ul>
+        <p className="mt-2 text-xs text-ink-faint">
+          This is the standard document checklist for Indian government
+          applications. The exact list, number of photos and certificate format
+          are defined by the recruiting body — always read the official
+          notification&apos;s annexure before uploading.
+        </p>
+      </Panel>
+
+      {/* Section 6c — Salary details: only what the notification states. */}
+      <Panel title="Salary / Pay Details" className="mb-4">
+        {job.pay_scale ? (
+          <p className="text-sm text-ink">
+            <strong className="text-navy">Pay scale:</strong> {job.pay_scale}
+          </p>
+        ) : (
+          <p className="text-sm text-ink-muted">
+            Pay scale not notified yet — it appears in the official advertisement
+            once the recruiting body publishes it. In-hand salary depends on
+            allowances, DA and deductions, so we never estimate it.
+          </p>
+        )}
       </Panel>
 
       {/* Section 8 — How to Apply */}

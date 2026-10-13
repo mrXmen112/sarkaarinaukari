@@ -6,6 +6,33 @@ import { stateLabel } from "@/lib/queries";
 import { formatIndianNumber } from "@/lib/utils";
 import type { JobWithCategory } from "@/types/database";
 
+/** "New" for jobs published in the last 3 days, "Updated" for recent edits. */
+function freshnessBadge(job: JobWithCategory): React.ReactNode {
+  const now = Date.now();
+  const created = new Date(job.created_at).getTime();
+  const updated = new Date(job.updated_at).getTime();
+  if (Number.isFinite(created) && now - created <= 3 * 24 * 60 * 60 * 1000) {
+    return (
+      <span className="rounded-sm bg-ingreen px-1.5 py-0.5 text-[0.625rem] font-bold text-white">
+        NEW
+      </span>
+    );
+  }
+  if (
+    Number.isFinite(updated) &&
+    Number.isFinite(created) &&
+    updated - created > 60 * 60 * 1000 &&
+    now - updated <= 7 * 24 * 60 * 60 * 1000
+  ) {
+    return (
+      <span className="rounded-sm bg-saffron px-1.5 py-0.5 text-[0.625rem] font-bold text-navy">
+        UPDATED
+      </span>
+    );
+  }
+  return null;
+}
+
 /**
  * Standard government-style job row: Post | Dept | Vacancy | Last Date | Apply.
  * Used by /jobs, /bihar and the homepage. Department and vacancy collapse on
@@ -41,15 +68,14 @@ export function JobTable({
           >
             {job.title}
           </Link>
-          <div className="mt-0.5 flex flex-wrap gap-x-2 text-xs text-ink-faint">
+          <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-ink-faint">
             {job.state ? (
               <span className="font-medium text-ingreen">
                 {stateLabel(job.state)}
               </span>
             ) : null}
-            <span>
-              {job.job_categories?.name ?? "Government"}
-            </span>
+            <span>{job.job_categories?.name ?? "Government"}</span>
+            {freshnessBadge(job)}
           </div>
         </div>
       ),
@@ -83,20 +109,43 @@ export function JobTable({
     {
       key: "apply",
       header: "Apply",
-      cell: (job) =>
-        job.status === "closed" || new Date(job.application_end) < new Date() ? (
-          <span className="inline-block whitespace-nowrap rounded-sm bg-alert-bg px-2.5 py-1.5 text-xs font-bold text-alert">
-            Closed
-          </span>
-        ) : (
-          <Link
-            href={`/jobs/${job.slug}`}
+      // Phase 4E: verified + open jobs link straight to the official apply URL;
+      // everything else falls back to the detail page, and closed jobs show
+      // a disabled "Closed" label instead of a dead button.
+      cell: (job) => {
+        const closed =
+          job.status === "closed" ||
+          new Date(job.application_end) < new Date();
+        if (closed) {
+          return (
+            <span className="inline-block whitespace-nowrap rounded-sm bg-alert-bg px-2.5 py-1.5 text-xs font-bold text-alert">
+              Closed
+            </span>
+          );
+        }
+        if (job.link_flagged || !job.official_link) {
+          return (
+            <Link
+              href={`/jobs/${job.slug}`}
+              className="gov-btn whitespace-nowrap"
+              aria-label={`View details for ${job.title} — apply link under verification`}
+            >
+              View
+            </Link>
+          );
+        }
+        return (
+          <a
+            href={job.official_link}
+            target="_blank"
+            rel="noopener noreferrer nofollow"
             className="gov-btn whitespace-nowrap"
-            aria-label={`Read details and apply for ${job.title}`}
+            aria-label={`Apply online for ${job.title} on the official website (opens in a new tab)`}
           >
             Apply
-          </Link>
-        ),
+          </a>
+        );
+      },
     },
   ];
 
