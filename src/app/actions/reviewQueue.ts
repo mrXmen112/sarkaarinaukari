@@ -11,6 +11,7 @@ import {
 import { requireAdmin } from "@/lib/admin";
 import { validateOfficialLink } from "@/lib/url";
 import { isTelegramAutoPostEnabled, postJobToTelegram } from "@/lib/telegram";
+import { pingIndexNow, targetUrl } from "@/lib/indexNow";
 import { slugify } from "@/lib/utils";
 import {
   buildAdmitCardInput,
@@ -317,6 +318,18 @@ export async function approvePendingEntry(
   }
 
   revalidatePath("/admin/review-queue");
+
+  // IndexNow ping (Phase 2): tell Bing/Yandex the new URL right away.
+  try {
+    const publishedUrl = targetUrl(entry.target_type, slugify((fields.title ?? "").trim()));
+    if (publishedUrl) {
+      const ping = await pingIndexNow([publishedUrl]);
+      if (!ping.ok) console.error("[reviewQueue] indexnow ping failed:", ping.error);
+    }
+  } catch (error) {
+    console.error("[reviewQueue] indexnow ping threw:", error);
+  }
+
   return { ok: true };
 }
 

@@ -15,11 +15,10 @@ export async function generateSitemaps() {
   return SITEMAP_SECTIONS.map((id) => ({ id }));
 }
 
-export default async function sitemap({
-  id,
-}: {
-  id: string;
+export default async function sitemap(props: {
+  id: Promise<string>;
 }): Promise<MetadataRoute.Sitemap> {
+  const id = await props.id;
   const base = SITE.url;
 
   if (id === "static") {

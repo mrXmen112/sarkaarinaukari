@@ -56,7 +56,7 @@ The SVG icon is wired. Drop your PNGs into `/public` when ready and re-add to
 | Job tables show "Closed" instead of "Apply" after the last date | **DONE** |
 
 ### YOU DO — to switch the pipeline on
-1. Apply migration 0016: `supabase db push` (or run the SQL file in the Supabase SQL editor).
+1. Apply migration 0016: `supabase db push` (or run the SQL file in the Supabase SQL editor). — **DONE (already applied to the live DB)**
 2. In Supabase SQL editor, enable 30-60 min scraping (Vercel Hobby crons are daily-only):
    ```sql
    create extension if not exists pg_cron;
@@ -77,3 +77,34 @@ The SVG icon is wired. Drop your PNGs into `/public` when ready and re-add to
 1. Do you have the PNG icon set ready to drop in, or should I generate PNGs from the SVG?
 2. Vercel plan: Hobby (daily crons only) or Pro (allows 30-60 min crons)?
 3. Phase 2 next: per-page generated OG images + `Organization`/`WebSite` JSON-LD + `BreadcrumbList` on inner pages. Say the word and I'll continue with Phase 2.
+
+## Phase 2 — Technical SEO
+
+| Item | Status |
+|---|---|
+| Organization + WebSite (SearchAction) JSON-LD on every page (root layout) | **DONE** |
+| `dateModified` on Article schema for admit-card / result / answer-key / exam pages | **DONE** |
+| Self-referencing canonical on every public page (already present) | **DONE** |
+| Per-page OG images (1200x630, generated): jobs, admit-card, result, answer-key, exams, yojana, quiz, current-affairs, syllabus + site default | **DONE** |
+| Twitter `summary_large_image` cards | **DONE** |
+| Search-engine verification via env (`GOOGLE_SITE_VERIFICATION`, `BING_SITE_VERIFICATION`) | **DONE** (envs) |
+| Sitemap **index** at `/sitemap.xml` (hand-rolled index + `generateSitemaps` sections; Next 16 needs both) | **DONE** |
+| robots.txt: public allow, admin/profile/login/auth/api + filter URLs disallowed, sitemap reference | **DONE** |
+| Site search `/jobs?q=` + search box on jobs page and 404 page (matches WebSite SearchAction URL) | **DONE** |
+| 404 page: search box + latest jobs + popular pages, `noindex` | **DONE** |
+| IndexNow ping on publish (review approve + admin job create), key file in `public/` | **DONE** |
+| Monetag + GA scripts changed `afterInteractive` -> `lazyOnload` (Core Web Vitals) | **DONE** |
+| ISR: listings 30m, job details 3h, evergreen 24h | **DONE** (existing) |
+| Breadcrumbs (visible + BreadcrumbList JSON-LD) on all inner pages | **DONE** (existing) |
+| hreflang | **SKIPPED** — no separate language URLs exist yet (planned for Phase 4F) |
+| Internal linking (job -> syllabus/related/category/state; timeline cross-links) | **DONE** |
+| Performance: `next/image`, no layout shift | mostly N/A — the site is table/HTML-first with almost no raster assets |
+
+### YOU DO — after deploy
+1. Rich Results Test a job page (JobPosting + FAQPage) and a result page (Article).
+2. Set `GOOGLE_SITE_VERIFICATION` + `BING_SITE_VERIFICATION` envs in Vercel after adding the properties.
+3. Submit `https://www.sarkaarinaukri.online/sitemap.xml` in GSC + Bing (the index references 4 section files).
+4. IndexNow: `INDEXNOW_KEY` env is already set locally; set it in Vercel too (the key file is committed at `public/2755f80bfa9ee945ffd84d887a043a4c.txt`).
+
+## Phase 3+ — ready when you are
+Programmatic landing pages (`/jobs/10th-pass`, `/12th-pass`, `/graduate`, iti/diploma/engineering/nursing, all states, departments, Bihar districts), then Phase 4 sections (syllabus pages already exist; previous-papers, board result hubs, richer job pages, aspirant UX), Phase 5 trust pages, Phase 6 branding (PNG icons). Reply with the next phase.

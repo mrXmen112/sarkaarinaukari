@@ -71,6 +71,7 @@ export default async function AnswerKeyDetailPage({
         headline: key.title,
         description: key.description ?? undefined,
         datePublished: toISODate(key.release_date),
+        dateModified: toISODate(key.updated_at),
         url,
       })} />
       <JsonLd

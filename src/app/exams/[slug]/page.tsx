@@ -101,6 +101,7 @@ export default async function ExamDetailPage({
           headline: exam.name,
           description: exam.overview ?? undefined,
           datePublished: toISODate(exam.created_at),
+          dateModified: toISODate(exam.updated_at),
           url,
         })}
       />

@@ -25,6 +25,14 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: "/sitemap.xml",
+        destination: "/sitemap-index",
+      },
+    ];
+  },
   async headers() {
     return [
       {

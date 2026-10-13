@@ -21,6 +21,48 @@ function stateName(code: string | null | undefined): string | undefined {
 
 export type Breadcrumb = { name: string; path: string };
 
+/**
+ * Organization (Phase 2) — rendered once in the root layout. Honest
+ * descriptor: an independent information portal, not a government body.
+ */
+export function organizationSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE.name,
+    url: SITE.url,
+    logo: `${SITE.url}/icon.svg`,
+    description:
+      "Sarkari Naukri, Admit Card, Result & Yojana information portal — an independent government-job listings website.",
+    email: SITE.contactEmail,
+    sameAs: [],
+  };
+}
+
+/**
+ * WebSite + SearchAction (Phase 2) — powers the sitelinks search box once
+ * the property is verified in Search Console. The search target matches the
+ * /jobs listing's ?q= parameter.
+ */
+export function websiteSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE.name,
+    url: SITE.url,
+    inLanguage: "en-IN",
+    publisher: { "@type": "Organization", name: SITE.name, url: SITE.url },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${SITE.url}/jobs?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+}
+
 /** BreadcrumbList — site root to the current page. */
 export function breadcrumbSchema(crumbs: Breadcrumb[]) {
   return {
@@ -51,11 +93,13 @@ export function articleSchema({
   headline,
   description,
   datePublished,
+  dateModified,
   url,
 }: {
   headline: string;
   description?: string;
   datePublished?: string;
+  dateModified?: string;
   url: string;
 }) {
   return {
@@ -64,7 +108,7 @@ export function articleSchema({
     headline,
     description,
     datePublished,
-    dateModified: datePublished,
+    dateModified: dateModified ?? datePublished,
     inLanguage: "en-IN",
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
     author: { "@type": "Organization", name: SITE.name },

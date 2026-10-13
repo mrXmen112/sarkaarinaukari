@@ -50,6 +50,8 @@ export type JobListFilters = {
   department?: string;
   status?: string; // "active" | "upcoming" | "closed" | "recently_closed" | "all"
   qualification?: string;
+  /** Free-text search across post title and department. */
+  q?: string;
   sort?: "newest" | "closing";
   page?: number;
   pageSize?: number;
@@ -68,6 +70,7 @@ export async function listJobs({
   department,
   status = "active",
   qualification,
+  q,
   sort = "newest",
   page = 1,
   pageSize = 25,
@@ -114,6 +117,13 @@ export async function listJobs({
         kw.map((k) => `eligibility_education.ilike.%${k}%`).join(","),
       );
     }
+  }
+  if (q && q.trim()) {
+    // Escape PostgREST or() string syntax; match title and department.
+    const term = q.trim().replace(/[%,()]/g, " ").slice(0, 80);
+    query = query.or(
+      `title.ilike.%${term}%,department.ilike.%${term}%`,
+    );
   }
 
   if (sort === "closing") {

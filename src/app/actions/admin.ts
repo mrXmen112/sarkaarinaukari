@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { requireAdmin } from "@/lib/admin";
 import { slugify } from "@/lib/utils";
+import { pingIndexNow } from "@/lib/indexNow";
 import type { QuizQuestion } from "@/types/database";
 
 export type AdminResult =
@@ -13,6 +14,16 @@ export type AdminResult =
 
 function err(message: string): AdminResult {
   return { ok: false, error: message };
+}
+
+/** IndexNow ping after publishing; never blocks the publish on failure. */
+async function pingPublished(path: string): Promise<void> {
+  try {
+    const result = await pingIndexNow([path]);
+    if (!result.ok) console.error("[admin] indexnow ping failed:", result.error);
+  } catch (error) {
+    console.error("[admin] indexnow ping threw:", error);
+  }
 }
 
 function parseQuestions(raw: string): QuizQuestion[] | null {
@@ -569,8 +580,13 @@ export async function createJob(input: JobInput): Promise<AdminResult> {
   const { supabase } = await requireAdmin();
   const built = buildJobPayload(input);
   if (!built.ok) return built;
-  const { error } = await supabase.from("jobs").insert(built.payload as never);
+  const payload = built.payload;
+  if (!payload) return { ok: false, error: "Invalid job payload." };
+  const { error } = await supabase.from("jobs").insert(payload as never);
   if (error) return err(error.message);
+  if (payload.is_published) {
+    await pingPublished(`/jobs/${payload.slug}`);
+  }
   revalidatePath("/admin/jobs");
   revalidatePath("/jobs", "layout");
   return { ok: true };

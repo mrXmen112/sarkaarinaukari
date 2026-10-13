@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { FilterBar } from "@/components/ui/FilterBar";
@@ -6,6 +7,7 @@ import { JsonLd } from "@/components/ui/JsonLd";
 import { Pagination } from "@/components/ui/Pagination";
 import { PageContainer, PageHeader } from "@/components/layout/PageContainer";
 import { JobTable } from "@/components/jobs/JobTable";
+import { SearchBox } from "@/components/ui/SearchBox";
 import { listCategories, listJobs, stateLabel } from "@/lib/queries";
 import { breadcrumbSchema } from "@/lib/seo";
 import { formatIndianNumber, firstParam, parsePage } from "@/lib/utils";
@@ -38,6 +40,7 @@ export default async function JobsPage({
   const state = firstParam(sp.state);
   const status = firstParam(sp.status) ?? "active";
   const qualification = firstParam(sp.qualification);
+  const q = firstParam(sp.q)?.trim() || undefined;
   const sort = (firstParam(sp.sort) === "closing" ? "closing" : "newest") as
     | "newest"
     | "closing";
@@ -45,7 +48,7 @@ export default async function JobsPage({
 
   const [categories, { jobs, total, totalPages }] = await Promise.all([
     listCategories(),
-    listJobs({ categorySlug: category, state, status, qualification, sort, page }),
+    listJobs({ categorySlug: category, state, status, qualification, q, sort, page }),
   ]);
 
   const carriable = {
@@ -54,6 +57,7 @@ export default async function JobsPage({
     status: status === "active" ? undefined : status,
     qualification,
     sort,
+    q,
   };
 
   return (
@@ -68,6 +72,21 @@ export default async function JobsPage({
         subtitle="Central & state government job notifications, updated daily."
         meta={`Showing ${jobs.length} of ${formatIndianNumber(total)}${state ? ` in ${stateLabel(state)}` : ""}`}
       />
+
+      <div className="mb-4 max-w-xl">
+        <SearchBox />
+        {q ? (
+          <p className="mt-2 text-sm text-ink-muted">
+            Showing results for <strong className="text-navy">{q}</strong>.{" "}
+            <Link
+              href="/jobs"
+              className="font-semibold text-navy underline decoration-navy/30 underline-offset-2 hover:decoration-navy"
+            >
+              Clear search
+            </Link>
+          </p>
+        ) : null}
+      </div>
 
       <FilterBar
         action="/jobs"
@@ -118,7 +137,13 @@ export default async function JobsPage({
         empty={
           <p>
             No jobs match these filters. Try widening{" "}
-            <a href="/jobs">the search</a>.
+            <Link
+              href="/jobs"
+              className="font-semibold text-navy underline decoration-navy/30 underline-offset-2 hover:decoration-navy"
+            >
+              the search
+            </Link>
+            .
           </p>
         }
       />

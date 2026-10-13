@@ -68,6 +68,7 @@ export default async function AdmitCardDetailPage({
         headline: card.title,
         description: card.description ?? undefined,
         datePublished: toISODate(card.release_date),
+        dateModified: toISODate(card.updated_at),
         url,
       })} />
       <JsonLd

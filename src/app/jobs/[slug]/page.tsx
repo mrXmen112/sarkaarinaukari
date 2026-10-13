@@ -49,14 +49,17 @@ export async function generateMetadata({
     timeZone: "UTC",
   });
 
+  // Titles like "Bihar Home Guard 2026" must not become "...2026 2026".
+  const cleanedTitle = job.title.replace(/\s+20\d{2}\s*$/, "").trim() || job.title;
+
   const vacancyPart = job.vacancy_total
     ? `${formatIndianNumber(job.vacancy_total)} Posts, `
     : "";
 
   const title =
     job.status === "closed"
-      ? `${job.title} ${year} — Application Closed, Details & Notification`
-      : `${job.title} ${year}: ${vacancyPart}Last Date ${lastDateShort}, Apply Online`;
+      ? `${cleanedTitle} ${year} — Application Closed, Details & Notification`
+      : `${cleanedTitle} ${year}: ${vacancyPart}Last Date ${lastDateShort}, Apply Online`;
 
   const vacancySentence = job.vacancy_total
     ? `${formatIndianNumber(job.vacancy_total)} vacancies.`
@@ -70,7 +73,9 @@ export async function generateMetadata({
   );
 
   return {
-    title,
+    // Absolute: these long, keyword-aware titles should not also carry the
+    // "%s | SarkaariNaukri" suffix from the root layout template.
+    title: { absolute: title },
     description,
     alternates: { canonical: `/jobs/${slug}` },
     openGraph: {

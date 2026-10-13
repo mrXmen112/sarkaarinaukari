@@ -68,6 +68,7 @@ export default async function ResultDetailPage({
         headline: result.title,
         description: result.description ?? undefined,
         datePublished: toISODate(result.result_date),
+        dateModified: toISODate(result.updated_at),
         url,
       })} />
       <JsonLd

@@ -4,7 +4,9 @@ import { Noto_Sans, PT_Serif } from "next/font/google";
 
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { JsonLd } from "@/components/ui/JsonLd";
 import { SITE } from "@/lib/site";
+import { organizationSchema, websiteSchema } from "@/lib/seo";
 
 import "./globals.css";
 
@@ -31,6 +33,16 @@ export const metadata: Metadata = {
     "Latest Sarkari Naukri 2026: central & state government jobs, Bihar vacancies (BPSC, BSSC, Bihar Police, TRE), admit cards, results, answer keys, syllabus and Sarkari Yojana — updated daily.",
   robots: { index: true, follow: true },
   manifest: "/manifest.webmanifest",
+  // Set GOOGLE_SITE_VERIFICATION / BING_SITE_VERIFICATION in the environment
+  // once the properties are created in Search Console / Bing Webmaster Tools.
+  verification: {
+    ...(process.env.GOOGLE_SITE_VERIFICATION
+      ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+      : {}),
+    ...(process.env.BING_SITE_VERIFICATION
+      ? { other: { "msvalidate.01": process.env.BING_SITE_VERIFICATION } }
+      : {}),
+  },
   icons: {
     icon: "/icon.svg",
     shortcut: "/icon.svg",
@@ -83,26 +95,31 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </div>
 
         <Footer />
-        <Script id="monetag-ad-script" strategy="afterInteractive">
+        {/* Site-wide structured data (Phase 2): Organization + WebSite with SearchAction */}
+        <JsonLd data={organizationSchema()} />
+        <JsonLd data={websiteSchema()} />
+        {/* Ads + analytics load after the page is idle (Phase 2 performance:
+            Core Web Vitals must not wait on third-party scripts). */}
+        <Script id="monetag-ad-script" strategy="lazyOnload">
           {`(function(s){s.dataset.zone='11839114',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
         </Script>
-        <Script id="monetag-popunder-script" strategy="afterInteractive">
+        <Script id="monetag-popunder-script" strategy="lazyOnload">
           {`(function(s){s.dataset.zone='11839131',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
         </Script>
         <Script
           id="monetag-push-script"
           src="https://5gvci.com/act/files/tag.min.js?z=11839138"
           data-cfasync="false"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="monetag-vignette-script" strategy="afterInteractive">
+        <Script id="monetag-vignette-script" strategy="lazyOnload">
           {`(function(s){s.dataset.zone='11845231',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
         </Script>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-FZ8FR3C82D"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
+        <Script id="google-analytics" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
