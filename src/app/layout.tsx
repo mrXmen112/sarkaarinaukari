@@ -33,6 +33,17 @@ export const metadata: Metadata = {
     "Latest Sarkari Naukri 2026: central & state government jobs, Bihar vacancies (BPSC, BSSC, Bihar Police, TRE), admit cards, results, answer keys, syllabus and Sarkari Yojana — updated daily.",
   robots: { index: true, follow: true },
   manifest: "/manifest.webmanifest",
+  // Icons are generated from public/icon.svg by `node scripts/generate-icons.mjs`
+  // and served from /public (not app/ — app/icon.png breaks Next 16 route types).
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   // Set GOOGLE_SITE_VERIFICATION / BING_SITE_VERIFICATION in the environment
   // once the properties are created in Search Console / Bing Webmaster Tools.
   verification: {
@@ -42,11 +53,6 @@ export const metadata: Metadata = {
     ...(process.env.BING_SITE_VERIFICATION
       ? { other: { "msvalidate.01": process.env.BING_SITE_VERIFICATION } }
       : {}),
-  },
-  icons: {
-    icon: "/icon.svg",
-    shortcut: "/icon.svg",
-    apple: "/icon.svg",
   },
   other: { monetag: "0b94690020c4d73b3027549ddfa9878e" },
   openGraph: {

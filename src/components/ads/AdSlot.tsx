@@ -13,11 +13,15 @@
  *     site uses: after the summary/above-the-fold block and after the job
  *     table on listings — never between a job title and its Apply button, and
  *     never inside the FAQ or important-links panels.
- *  4. **Disabled until approved.** Without NEXT_PUBLIC_ADSENSE_CLIENT it
- *     renders an empty reserved slot (no visible box, no layout shift), so we
- *     can ship the layout now and switch ads on at approval time.
+ *  4. **Off unless configured.** We run Monetag, not AdSense, so this slot is
+ *     inert by default and renders NOTHING at all — no empty box and no
+ *     wasted vertical space on content pages. If an AdSense account is ever
+ *     added, set NEXT_PUBLIC_ADSENSE_CLIENT and the slots appear.
  *  5. **No ad on policy pages** — the About, Contact, Privacy, Terms,
  *     Disclaimer and Editorial Policy pages render no ad slots at all.
+ *
+ * Monetag note: Monetag units (popunder, push, vignette) are loaded through
+ * the scripts in the root layout with lazyOnload, not through this component.
  */
 
 const AD_SENSE_ENABLED = !!process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
@@ -31,13 +35,11 @@ export function AdSlot({
   slot: string;
   variant?: AdSlotVariant;
 }) {
-  const minHeight = variant === "in-content" ? "min-h-[90px]" : "min-h-[90px]";
+  // Not configured (our normal state) -> render nothing, so pages keep their
+  // full height instead of showing an empty reserved gap.
+  if (!AD_SENSE_ENABLED) return null;
 
-  if (!AD_SENSE_ENABLED) {
-    // Keep the space reserved (invisible) so enabling ads later does not move
-    // anything, but show no empty box to visitors today.
-    return <div aria-hidden="true" className={`w-full ${minHeight}`} />;
-  }
+  const minHeight = variant === "in-content" ? "min-h-[90px]" : "min-h-[90px]";
 
   return (
     <aside

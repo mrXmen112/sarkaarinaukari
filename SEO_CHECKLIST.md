@@ -201,5 +201,36 @@ Notes:
 2. Optionally add your social profiles to `SITE_SAME_AS` for `sameAs` in schema.
 3. Ensure the Monetag zones you already run stay compliant and do not overlap the new in-content slot.
 
-## Phase 6 — ready when you are
-Branding assets: drop the PNG icon set (icon-192/512, apple-touch-icon, favicon.ico) into `/public` and wire them via `src/app/layout.tsx` + `manifest.webmanifest`, or I can generate them from your `icon.svg`. Then a final pass: Lighthouse on a job page and the homepage, and confirm Core Web Vitals in Search Console.
+## Phase 6 — Branding & final pass ✅
+
+| Item | Status |
+|---|---|
+| Full PNG icon set generated from `public/icon.svg` via `scripts/generate-icons.mjs` (`sharp`) | **DONE** |
+| `icon-192.png`, `icon-512.png` (maskable), `apple-touch-icon.png` (180×180), `favicon-32.png`, `favicon.ico` | **DONE** (in `/public`) |
+| Icons wired explicitly in `src/app/layout.tsx` (`icons` metadata) + `manifest.webmanifest` | **DONE** |
+| Icon routes verified live (200 + correct MIME types: `image/png`, `image/x-icon`) | **DONE** |
+| `AdSlot` renders **nothing** when no ad client is configured (no empty 90px band) | **DONE** |
+| Final structural / accessibility smoke test on `/`, `/jobs`, `/jobs/ssc-cgl-2026` | **DONE** (20/20 checks) |
+| Build + payload budget check | **DONE** (build passes) |
+| Lighthouse + Core Web Vitals on production | **YOU DO** (needs a real browser run) |
+
+### Icon regeneration
+```bash
+npm run icons     # node scripts/generate-icons.mjs — rebuilds the whole set from public/icon.svg
+```
+Icons are committed, so this is only needed after the SVG logo itself changes.
+
+### Compressed payload (gzip / Brotli)
+| Page | Raw | Gzip | Brotli |
+|---|---|---|---|
+| `/` | 142.1 kB | 16.0 kB | 10.7 kB |
+| `/jobs` | 186.1 kB | 19.9 kB | 13.8 kB |
+| `/jobs/ssc-cgl-2026` | 166.4 kB | 24.1 kB | 15.5 kB |
+
+### YOU DO — Phase 6
+1. Run Lighthouse on the **production** URLs (a job page and the homepage) — locally this is only an approximation because dev-mode React overhead inflates the numbers.
+2. Confirm Core Web Vitals in Search Console after the deploy (needs 28 days of real traffic for field data).
+3. After deploying, confirm the icons resolve on the production host: `https://www.sarkaarinaukri.online/icon-192.png` (and `/icon-512.png`, `/apple-touch-icon.png`, `/favicon.ico`) should return 200.
+
+### Note on ads
+Ad slots are **inert** today — `AdSlot` returns `null` until an ad client is configured. Monetag remains the live network; keep its zones from overlapping the reserved in-content slot if it is ever enabled.
