@@ -6,7 +6,7 @@ import { SITE } from "@/lib/site";
  * /sitemap.xml by the rewrite in next.config.ts.
  */
 
-const SECTIONS = ["static", "jobs", "updates", "prep"] as const;
+const SECTIONS = ["static", "landing", "jobs", "updates", "prep"] as const;
 
 export const dynamic = "force-dynamic";
 

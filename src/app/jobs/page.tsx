@@ -9,6 +9,11 @@ import { PageContainer, PageHeader } from "@/components/layout/PageContainer";
 import { JobTable } from "@/components/jobs/JobTable";
 import { SearchBox } from "@/components/ui/SearchBox";
 import { listCategories, listJobs, stateLabel } from "@/lib/queries";
+import {
+  CATEGORY_PAGES,
+  LANDING_LABELS,
+  QUALIFICATION_PAGES,
+} from "@/lib/landingPages";
 import { breadcrumbSchema } from "@/lib/seo";
 import { formatIndianNumber, firstParam, parsePage } from "@/lib/utils";
 import { JOB_STATUSES, PAGE_SIZE, QUALIFICATIONS, STATES } from "@/lib/site";
@@ -154,6 +159,49 @@ export default async function JobsPage({
         basePath="/jobs"
         params={carriable}
       />
+
+      {/* Phase 3 internal links — qualification and department landing pages */}
+      <section aria-labelledby="browse-qualification" className="mt-6">
+        <h2
+          id="browse-qualification"
+          className="mb-2 font-serif text-base font-bold text-navy"
+        >
+          Browse Jobs by Qualification
+        </h2>
+        <ul className="flex flex-wrap gap-2">
+          {QUALIFICATION_PAGES.map((landing) => (
+            <li key={landing.slug}>
+              <Link
+                href={`/jobs/${landing.slug}`}
+                className="inline-block rounded-sm border border-rule bg-surface px-3 py-1.5 text-sm font-semibold text-navy no-underline hover:border-navy-400 hover:bg-navy-50"
+              >
+                {LANDING_LABELS[landing.slug] ?? landing.slug}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section aria-labelledby="browse-department" className="mt-5">
+        <h2
+          id="browse-department"
+          className="mb-2 font-serif text-base font-bold text-navy"
+        >
+          Browse Jobs by Department
+        </h2>
+        <ul className="flex flex-wrap gap-2">
+          {CATEGORY_PAGES.map((landing) => (
+            <li key={landing.slug}>
+              <Link
+                href={`/jobs/category/${landing.slug}`}
+                className="inline-block rounded-sm border border-rule bg-surface px-3 py-1.5 text-sm font-semibold text-navy no-underline hover:border-navy-400 hover:bg-navy-50"
+              >
+                {LANDING_LABELS[landing.slug] ?? landing.slug}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
     </PageContainer>
   );
 }

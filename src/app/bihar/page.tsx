@@ -3,7 +3,9 @@ import Link from "next/link";
 
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { JsonLd } from "@/components/ui/JsonLd";
-import { PageContainer, PageHeader, Panel } from "@/components/layout/PageContainer";
+import { BIHAR_ORG_PAGES } from "@/lib/landingPagesState";
+import { LANDING_LABELS } from "@/lib/landingPages";
+import { PageContainer, PageHeader } from "@/components/layout/PageContainer";
 import { JobTable } from "@/components/jobs/JobTable";
 import { listJobs, listRecentUpdates, type RecentUpdate } from "@/lib/queries";
 import { breadcrumbSchema } from "@/lib/seo";
@@ -19,6 +21,16 @@ export const metadata: Metadata = {
     "Bihar government jobs hub: BPSC, BSSC, Bihar Police, Bihar TRE (teachers), Health Department & Panchayati Raj vacancies. Updated daily with last dates and official apply links.",
   alternates: { canonical: "/bihar" },
 };
+
+/**
+ * Deep Bihar organisation landing pages (Phase 3) — each has its own H1,
+ * intro, eligibility FAQ and live filtered table.
+ */
+const BIHAR_ORG_LINKS = BIHAR_ORG_PAGES.map((org) => ({
+  slug: org.slug,
+  label: LANDING_LABELS[org.slug] ?? org.slug,
+  href: `/bihar/${org.slug}`,
+}));
 
 /**
  * Bihar Hub (Section 4.7): department chips + live job table + a rail of the
@@ -61,10 +73,10 @@ export default async function BiharHubPage({
 
       <nav aria-label="Bihar departments" className="mb-4 flex flex-wrap gap-2">
         <DepartmentChip href="/bihar" active={!activeDept} label="All Bihar" />
-        {BIHAR_DEPARTMENTS.map((d) => (
+        {BIHAR_ORG_LINKS.map((d) => (
           <DepartmentChip
             key={d.slug}
-            href={`/bihar?department=${d.slug}`}
+            href={d.href}
             active={activeDept?.slug === d.slug}
             label={d.label}
           />
@@ -77,7 +89,7 @@ export default async function BiharHubPage({
         empty={
           <p>
             No open Bihar jobs for this department right now.{" "}
-            <a href="/bihar">Browse all Bihar jobs</a>.
+            <Link href="/bihar">Browse all Bihar jobs</Link>.
           </p>
         }
       />

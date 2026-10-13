@@ -3,13 +3,18 @@ import { MetadataRoute } from "next";
 import { createStaticClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
 import { SITE } from "@/lib/site";
+import {
+  CATEGORY_PAGES,
+  QUALIFICATION_PAGES,
+} from "@/lib/landingPages";
+import { BIHAR_ORG_PAGES, STATE_SLUGS } from "@/lib/landingPagesState";
 
 /**
  * Sitemap index (Phase 2): each id below becomes /sitemap/<id>.xml, with the
  * index served at /sitemap.xml. Split by section so listings stay fast and
  * lastmod stays accurate per content type.
  */
-const SITEMAP_SECTIONS = ["static", "jobs", "updates", "prep"] as const;
+const SITEMAP_SECTIONS = ["static", "landing", "jobs", "updates", "prep"] as const;
 
 export async function generateSitemaps() {
   return SITEMAP_SECTIONS.map((id) => ({ id }));
@@ -32,6 +37,40 @@ export default async function sitemap(props: {
       { url: `${base}/disclaimer`, changeFrequency: "monthly", priority: 0.5 },
     ];
     return staticRoutes;
+  }
+
+  // Landing pages (Phase 3): qualification + category + Bihar organisation.
+  if (id === "landing") {
+    const routes: MetadataRoute.Sitemap = [];
+    for (const page of QUALIFICATION_PAGES) {
+      routes.push({
+        url: `${base}/jobs/${page.slug}`,
+        changeFrequency: "daily",
+        priority: 0.7,
+      });
+    }
+    for (const page of CATEGORY_PAGES) {
+      routes.push({
+        url: `${base}/jobs/category/${page.slug}`,
+        changeFrequency: "daily",
+        priority: 0.7,
+      });
+    }
+    for (const page of BIHAR_ORG_PAGES) {
+      routes.push({
+        url: `${base}/bihar/${page.slug}`,
+        changeFrequency: "daily",
+        priority: 0.8,
+      });
+    }
+    for (const state of STATE_SLUGS) {
+      routes.push({
+        url: `${base}/jobs/state/${state}`,
+        changeFrequency: "daily",
+        priority: state === "bihar" ? 0.8 : 0.6,
+      });
+    }
+    return routes;
   }
 
   if (!isSupabaseConfigured) return [];

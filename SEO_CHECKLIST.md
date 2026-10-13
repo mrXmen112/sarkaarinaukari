@@ -106,5 +106,22 @@ The SVG icon is wired. Drop your PNGs into `/public` when ready and re-add to
 3. Submit `https://www.sarkaarinaukri.online/sitemap.xml` in GSC + Bing (the index references 4 section files).
 4. IndexNow: `INDEXNOW_KEY` env is already set locally; set it in Vercel too (the key file is committed at `public/2755f80bfa9ee945ffd84d887a043a4c.txt`).
 
-## Phase 3+ — ready when you are
-Programmatic landing pages (`/jobs/10th-pass`, `/12th-pass`, `/graduate`, iti/diploma/engineering/nursing, all states, departments, Bihar districts), then Phase 4 sections (syllabus pages already exist; previous-papers, board result hubs, richer job pages, aspirant UX), Phase 5 trust pages, Phase 6 branding (PNG icons). Reply with the next phase.
+## Phase 3 — Programmatic landing pages
+
+| Page family | URLs | Status |
+|---|---|---|
+| Qualification | `/jobs/10th-pass`, `/12th-pass`, `/iti`, `/diploma`, `/engineering`, `/nursing`, `/graduate`, `/post-graduate`, `/bed` | **DONE** — 9 pages, own H1 / intro / FAQ / live table |
+| Department/category | `/jobs/category/ssc`, `/railway`, `/banking`, `/defence`, `/police`, `/teaching`, `/psu` | **DONE** — 7 pages |
+| Bihar organisations | `/bihar/bpsc`, `/bssc`, `/bihar-police`, `/bihar-tre`, `/bihar-health`, `/bihar-home-guard`, `/bihar-jal-nigam`, `/bihar-panchayat` | **DONE** — 8 deep pages; `/bihar` chips now link to them |
+| States | `/jobs/state/[state]` for all 29 states with written intros | **DONE** — Bihar highest sitemap priority |
+| Sitemap | new `/sitemap/landing.xml` section (53 URLs) referenced from the `/sitemap.xml` index | **DONE** |
+| Internal links | "Browse by Qualification" + "Browse by Department" blocks on `/jobs`; Bihar chips → org pages; neighbour links on every landing page | **DONE** |
+
+Notes:
+- Bihar **district** pages are deferred — jobs have no district field yet.
+- Thin categories (e.g. `/jobs/nursing`, `/bihar/bihar-police`) automatically append a "Recently Closed" table when fewer than 5 open vacancies exist, so no page is ever empty.
+- Intro copy is hand-written per page (recruiting bodies, eligibility, selection process) — no templated spin, no invented vacancy numbers.
+- To add a page later: add one entry to `QUALIFICATION_PAGES` / `CATEGORY_PAGES` / `BIHAR_ORG_PAGES` and a thin route file.
+
+## Phase 4+ — ready when you are
+Phase 4 sections: previous-papers (`/previous-papers/[exam]/[year]`), board result hubs (`/result/10th`, `/result/12th` + one page per board redirecting to the official portal), richer job detail pages (sticky Apply, documents required, salary details), aspirant UX (save job, closing-in-7-days strip, eligibility checker, Hindi/English toggle). Then Phase 5 trust pages (editorial/data policy) and Phase 6 PNG branding assets. Reply with the next phase.
