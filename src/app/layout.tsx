@@ -7,6 +7,12 @@ import { Header } from "@/components/layout/Header";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { SITE } from "@/lib/site";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
+import {
+  AD_ZONE_1_ENABLED,
+  AD_ZONE_2_ENABLED,
+  AD_ZONE_3_ENABLED,
+  AD_ZONE_4_ENABLED,
+} from "@/lib/adZones";
 
 import "./globals.css";
 
@@ -116,22 +122,38 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />
         {/* Ads + analytics load after the page is idle (Phase 2 performance:
-            Core Web Vitals must not wait on third-party scripts). */}
-        <Script id="monetag-ad-script" strategy="lazyOnload">
-          {`(function(s){s.dataset.zone='11839114',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
-        </Script>
-        <Script id="monetag-popunder-script" strategy="lazyOnload">
-          {`(function(s){s.dataset.zone='11839131',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
-        </Script>
-        <Script
-          id="monetag-push-script"
-          src="https://5gvci.com/act/files/tag.min.js?z=11839138"
-          data-cfasync="false"
-          strategy="lazyOnload"
-        />
-        <Script id="monetag-vignette-script" strategy="lazyOnload">
-          {`(function(s){s.dataset.zone='11845231',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
-        </Script>
+            Core Web Vitals must not wait on third-party scripts).
+
+            Phase 7A: every Monetag zone sits behind its own env flag. Zones 2
+            (popunder — opened a new tab) and 4 (vignette — full-screen overlay)
+            are OFF by default; zones 1 and 3 stay on. Disabling a zone means
+            the <script> is never emitted at all, so its code cannot run. */}
+        {AD_ZONE_1_ENABLED ? (
+          <Script id="monetag-ad-script" strategy="lazyOnload">
+            {`(function(s){s.dataset.zone='11839114',s.src='https://nap5k.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
+          </Script>
+        ) : null}
+
+        {AD_ZONE_2_ENABLED ? (
+          <Script id="monetag-popunder-script" strategy="lazyOnload">
+            {`(function(s){s.dataset.zone='11839131',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
+          </Script>
+        ) : null}
+
+        {AD_ZONE_3_ENABLED ? (
+          <Script
+            id="monetag-push-script"
+            src="https://5gvci.com/act/files/tag.min.js?z=11839138"
+            data-cfasync="false"
+            strategy="lazyOnload"
+          />
+        ) : null}
+
+        {AD_ZONE_4_ENABLED ? (
+          <Script id="monetag-vignette-script" strategy="lazyOnload">
+            {`(function(s){s.dataset.zone='11845231',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))`}
+          </Script>
+        ) : null}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-FZ8FR3C82D"
           strategy="lazyOnload"
