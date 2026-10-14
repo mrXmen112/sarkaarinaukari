@@ -9,6 +9,7 @@ import {
 } from "@/lib/landingPages";
 import { BIHAR_ORG_PAGES, STATE_SLUGS } from "@/lib/landingPagesState";
 import { BOARDS } from "@/lib/boards";
+import { VERIFICATION_GATE_ENABLED } from "@/lib/queries";
 
 /**
  * Sitemap index (Phase 2): each id below becomes /sitemap/<id>.xml, with the
@@ -115,11 +116,17 @@ export default async function sitemap(props: {
         { url: `${base}/jobs`, changeFrequency: "daily", priority: 0.9 },
         { url: `${base}/jobs/archive`, changeFrequency: "weekly", priority: 0.5 },
       );
-      const { data: jobs } = await supabase
+      // Phase 8A: only human-verified jobs belong in the sitemap. Guarded by an
+      // env flag so this cannot empty the sitemap if migration 0017 has not been
+      // applied yet — set NEXT_PUBLIC_VERIFICATION_GATE=on only after running it.
+      const jobQuery = supabase
         .from("jobs")
         .select(routeFor.jobs.columns)
-        .eq("is_published", true)
-        .order("updated_at", { ascending: false });
+        .eq("is_published", true);
+      const { data: jobs } = await (VERIFICATION_GATE_ENABLED
+        ? jobQuery.eq("verification_status", "verified")
+        : jobQuery
+      ).order("updated_at", { ascending: false });
       for (const row of (jobs ?? []) as unknown as SlugRow[]) {
         routes.push({
           url: `${base}/${tableForSlug.jobs}/${row.slug}`,

@@ -15,6 +15,8 @@ export type Json =
   | Json[];
 
 export type JobStatus = "active" | "closed" | "upcoming";
+/** Phase 8A. See migration 0017. */
+export type VerificationStatus = "verified" | "unverified" | "needs_review";
 export type SocialCategory = "general" | "obc" | "sc" | "st" | "ews";
 export type AnswerKeyType = "provisional" | "final";
 export type YojanaLevel = "central" | "state";
@@ -129,6 +131,18 @@ export type Job = {
   link_last_checked_at: string | null;
   link_http_status: number | null;
   link_flagged: boolean;
+  /**
+   * Phase 8A. Only `verified` rows are shown in listings, landing pages, the
+   * homepage and the sitemap. `unverified` / `needs_review` stay in the
+   * database and stay reachable by direct URL, where they show a
+   * "Details being verified" banner and are noindex.
+   */
+  verification_status: VerificationStatus;
+  verified_at: string | null;
+  verified_by: string | null;
+  verification_note: string | null;
+  /** Evergreen exam hub this notification belongs to (Phase 8A.5). */
+  exam_slug: string | null;
   created_at: string;
   updated_at: string;
 };

@@ -14,6 +14,7 @@ import type {
   Quiz,
   ResultRow,
   Syllabus,
+  VerificationStatus,
   Yojana,
 } from "@/types/database";
 
@@ -30,6 +31,45 @@ import type {
 
 const JOB_SELECT =
   "*, job_categories(id, name, slug, parent_category), syllabus(id, slug, exam_name)";
+
+/**
+ * Phase 8A — public visibility gate.
+ *
+ * Only jobs a human has verified against an official notification appear in
+ * listings, landing pages, the homepage, related-job blocks or the sitemap.
+ * `getJobBySlug` deliberately does NOT apply this: an unverified job must still
+ * render on a direct URL visit so the visitor sees the "Details being
+ * verified" banner instead of a bare 404.
+ *
+ * DEPLOYMENT ORDER MATTERS. Until migration 0017 is applied the column does not
+ * exist, the query errors, and `guard()` would return an empty list — which
+ * would silently empty the homepage AND the sitemap. So the gate starts OFF and
+ * is switched on with NEXT_PUBLIC_VERIFICATION_GATE=on in the same deploy that
+ * runs the migration:
+ *
+ *   1. apply supabase/migrations/0017_phase8a_verification_status.sql
+ *   2. set NEXT_PUBLIC_VERIFICATION_GATE=on in Vercel and redeploy
+ *
+ * Leave it off until step 1 has actually run.
+ */
+export const VERIFICATION_GATE_ENABLED =
+  process.env.NEXT_PUBLIC_VERIFICATION_GATE === "on";
+
+/** Narrow a jobs builder to verified rows only, when the gate is on. */
+function verifiedOnly<T extends { eq: (column: string, value: string) => T }>(
+  q: T,
+): T {
+  return VERIFICATION_GATE_ENABLED
+    ? q.eq("verification_status", "verified")
+    : q;
+}
+
+/** True when a job is safe to show in public listings and the sitemap. */
+export function isPubliclyVisible(job: {
+  verification_status?: VerificationStatus | null;
+}): boolean {
+  return job.verification_status === "verified";
+}
 
 type Result<T> = T[];
 
@@ -81,10 +121,12 @@ export async function listJobs({
 
   const cats = await listCategories();
 
-  let query = createStaticClient()
-    .from("jobs")
-    .select(JOB_SELECT, { count: "exact" })
-    .eq("is_published", true);
+  let query = verifiedOnly(
+    createStaticClient()
+      .from("jobs")
+      .select(JOB_SELECT, { count: "exact" })
+      .eq("is_published", true),
+  );
 
   if (status && status !== "all") {
     if (status === "recently_closed") {
@@ -173,12 +215,14 @@ export async function getRelatedJobs(
 ): Promise<JobWithCategory[]> {
   if (!isSupabaseConfigured) return [];
 
-  let query = createStaticClient()
-    .from("jobs")
-    .select(JOB_SELECT)
-    .eq("is_published", true)
-    .eq("status", "active")
-    .neq("slug", job.slug);
+  let query = verifiedOnly(
+    createStaticClient()
+      .from("jobs")
+      .select(JOB_SELECT)
+      .eq("is_published", true)
+      .eq("status", "active")
+      .neq("slug", job.slug),
+  );
 
   if (job.category_id) {
     query = query.eq("category_id", job.category_id);
@@ -190,13 +234,15 @@ export async function getRelatedJobs(
   // Top up from same-state jobs if the category pool is thin.
   if (related.length < limit && job.state) {
     const seen = new Set(related.map((r) => r.slug).concat(job.slug));
-    const { data: stateJobs } = await createStaticClient()
-      .from("jobs")
-      .select(JOB_SELECT)
-      .eq("is_published", true)
-      .eq("status", "active")
-      .eq("state", job.state)
-      .not("slug", "in", `(${[...seen].join(",")})`)
+    const { data: stateJobs } = await verifiedOnly(
+      createStaticClient()
+        .from("jobs")
+        .select(JOB_SELECT)
+        .eq("is_published", true)
+        .eq("status", "active")
+        .eq("state", job.state)
+        .not("slug", "in", `(${[...seen].join(",")})`),
+    )
       .order("created_at", { ascending: false })
       .limit(limit - related.length);
     related = related.concat((stateJobs ?? []) as JobWithCategory[]);
@@ -208,12 +254,14 @@ export async function getRelatedJobs(
 /** Newest active (non-expired) jobs — homepage table. */
 export async function getLatestJobs(limit = 8): Promise<JobWithCategory[]> {
   return guard(async () => {
-    const { data } = await createStaticClient()
-      .from("jobs")
-      .select(JOB_SELECT)
-      .eq("is_published", true)
-      .eq("status", "active")
-      .gte("application_end", isoDatePlusDays(0))
+    const { data } = await verifiedOnly(
+      createStaticClient()
+        .from("jobs")
+        .select(JOB_SELECT)
+        .eq("is_published", true)
+        .eq("status", "active")
+        .gte("application_end", isoDatePlusDays(0)),
+    )
       .order("created_at", { ascending: false })
       .limit(limit);
     return (data ?? []) as JobWithCategory[];
@@ -223,12 +271,14 @@ export async function getLatestJobs(limit = 8): Promise<JobWithCategory[]> {
 /** Closing-soonest active (non-expired) jobs — used by the NoticeBar countdown strip. */
 export async function getClosingJobs(limit = 8): Promise<JobWithCategory[]> {
   return guard(async () => {
-    const { data } = await createStaticClient()
-      .from("jobs")
-      .select(JOB_SELECT)
-      .eq("is_published", true)
-      .eq("status", "active")
-      .gte("application_end", isoDatePlusDays(-1))
+    const { data } = await verifiedOnly(
+      createStaticClient()
+        .from("jobs")
+        .select(JOB_SELECT)
+        .eq("is_published", true)
+        .eq("status", "active")
+        .gte("application_end", isoDatePlusDays(-1)),
+    )
       .order("application_end", { ascending: true })
       .limit(limit);
     return (data ?? []) as JobWithCategory[];
@@ -238,13 +288,15 @@ export async function getClosingJobs(limit = 8): Promise<JobWithCategory[]> {
 /** Recently expired jobs — shown in a separate "Recently Closed" section (last 30 days). */
 export async function getRecentlyClosedJobs(limit = 8): Promise<JobWithCategory[]> {
   return guard(async () => {
-    const { data } = await createStaticClient()
-      .from("jobs")
-      .select(JOB_SELECT)
-      .eq("is_published", true)
-      .eq("status", "closed")
-      .lt("application_end", isoDatePlusDays(0))
-      .gte("application_end", isoDatePlusDays(-30))
+    const { data } = await verifiedOnly(
+      createStaticClient()
+        .from("jobs")
+        .select(JOB_SELECT)
+        .eq("is_published", true)
+        .eq("status", "closed")
+        .lt("application_end", isoDatePlusDays(0))
+        .gte("application_end", isoDatePlusDays(-30)),
+    )
       .order("application_end", { ascending: false })
       .limit(limit);
     return (data ?? []) as JobWithCategory[];
@@ -257,12 +309,14 @@ export async function getRecentlyClosedJobs(limit = 8): Promise<JobWithCategory[
  */
 export async function listArchivedJobs(limit = 100): Promise<JobWithCategory[]> {
   return guard(async () => {
-    const { data } = await createStaticClient()
-      .from("jobs")
-      .select(JOB_SELECT)
-      .eq("is_published", true)
-      .eq("status", "closed")
-      .lt("application_end", isoDatePlusDays(-90))
+    const { data } = await verifiedOnly(
+      createStaticClient()
+        .from("jobs")
+        .select(JOB_SELECT)
+        .eq("is_published", true)
+        .eq("status", "closed")
+        .lt("application_end", isoDatePlusDays(-90)),
+    )
       .order("application_end", { ascending: false })
       .limit(limit);
     return (data ?? []) as JobWithCategory[];
@@ -279,13 +333,15 @@ export async function listCategories(): Promise<JobCategory[]> {
   });
 }
 
+/** Sitemap slugs — Phase 8A: unverified jobs must NOT be listed. */
 export async function getAllJobSlugs(): Promise<string[]> {
   return guard(async () => {
-    const { data } = await createStaticClient()
-      .from("jobs")
-      .select("slug")
-      .eq("is_published", true)
-      .order("created_at", { ascending: false });
+    const { data } = await verifiedOnly(
+      createStaticClient()
+        .from("jobs")
+        .select("slug")
+        .eq("is_published", true),
+    ).order("created_at", { ascending: false });
     return ((data ?? []) as Pick<Job, "slug">[]).map((d) => d.slug);
   });
 }
@@ -472,12 +528,14 @@ export async function listJobsBySyllabus(
   limit = 6,
 ): Promise<JobWithCategory[]> {
   return guard(async () => {
-    const { data } = await createStaticClient()
-      .from("jobs")
-      .select(JOB_SELECT)
-      .eq("syllabus_id", syllabusId)
-      .eq("is_published", true)
-      .eq("status", "active")
+    const { data } = await verifiedOnly(
+      createStaticClient()
+        .from("jobs")
+        .select(JOB_SELECT)
+        .eq("syllabus_id", syllabusId)
+        .eq("is_published", true)
+        .eq("status", "active"),
+    )
       .order("created_at", { ascending: false })
       .limit(limit);
     return (data ?? []) as JobWithCategory[];

@@ -46,6 +46,8 @@ export async function generateMetadata({
 
   if (!job) return { title: "Job Not Found" };
 
+  const verified = job.verification_status === "verified";
+
   const end = new Date(job.application_end);
   const year = end.getUTCFullYear();
   const lastDateShort = end.toLocaleDateString("en-IN", {
@@ -92,7 +94,10 @@ export async function generateMetadata({
       modifiedTime: job.updated_at ?? undefined,
       images: ["/opengraph-image"],
     },
-    robots: { index: true, follow: true },
+    // Phase 8A: a job nobody has checked against the official notification is
+    // kept out of the index. It stays reachable on a direct URL so the visitor
+    // can see it, but it must not compete in search results.
+    robots: { index: verified, follow: verified },
   };
 }
 
@@ -109,6 +114,11 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
   const timeline = await getJobTimeline(job.id);
   const url = `${SITE.url}/jobs/${job.slug}`;
 
+  // Phase 8A — a bulk-seeded job we have not yet matched to an official
+  // notification. It renders, but it is clearly labelled and carries no
+  // JobPosting structured data, because we cannot stand behind the claims yet.
+  const verified = job.verification_status === "verified";
+
   const breadcrumbs = [
     { name: "Latest Jobs", path: "/jobs" },
     ...(job.job_categories?.slug
@@ -121,8 +131,8 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
   ];
 
   return (
-    <PageContainer>
-      <JsonLd data={jobPostingSchema(job, url)} />
+      <PageContainer>
+      {verified ? <JsonLd data={jobPostingSchema(job, url)} /> : null}
       <JsonLd
         data={jobFAQSchema(job, url)}
       />
@@ -138,6 +148,32 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       />
 
       <ShareButtons title={job.title} url={url} />
+
+      {/* Phase 8A — "Details being verified" banner */}
+      {!verified ? (
+        <div
+          role="status"
+          className="mb-4 rounded-sm border-2 border-alert bg-alert-bg px-4 py-3"
+        >
+          <p className="text-sm font-bold text-alert">
+            <span className="lang-en">Details being verified</span>
+            <span className="lang-hi">विवरण सत्यापित किया जा रहा है</span>
+          </p>
+          <p className="mt-1 text-xs text-navy">
+            <span className="lang-en">
+              This listing has not yet been matched to a confirmed official
+              notification, so the dates and vacancy figures shown here may be
+              out of date. Please confirm everything on the recruiting body&apos;s
+              own website before applying.
+            </span>
+            <span className="lang-hi">
+              यह सूची अभी आधिकारिक अधिसूचना से मिलाई नहीं गई है, इसलिए यहाँ दी गई तारीखें
+              और पदों की संख्या पुरानी हो सकती हैं। आवेदन से पहले कृपया संबंधित
+              संस्थान की आधिकारिक वेबसाइट से सब कुछ जाँच लें।
+            </span>
+          </p>
+        </div>
+      ) : null}
 
       {/* Section 1 — Title + Last Date countdown (top-right) */}
       <header className="mb-4 flex flex-wrap items-start justify-between gap-3 border-b-2 border-navy pb-3">
