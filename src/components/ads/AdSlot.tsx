@@ -39,7 +39,11 @@ export function AdSlot({
   // full height instead of showing an empty reserved gap.
   if (!AD_SENSE_ENABLED) return null;
 
-  const minHeight = variant === "in-content" ? "min-h-[90px]" : "min-h-[90px]";
+  // In-content sits between prose blocks, so it needs a taller reserved box to
+  // absorb a 90px unit plus its "Advertisement" label. After a listing table
+  // there is nothing above it to shift, so a shorter box is enough.
+  const minHeight =
+    variant === "in-content" ? "min-h-[120px]" : "min-h-[72px]";
 
   return (
     <aside
