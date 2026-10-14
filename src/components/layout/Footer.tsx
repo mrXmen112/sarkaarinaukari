@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { DISCLAIMER, FOOTER_NAV, SITE } from "@/lib/site";
+import { SiteBrand } from "@/components/layout/SiteBrand";
 
 /**
  * Site footer: sitemap links + the mandatory non-affiliation disclaimer
@@ -11,6 +12,23 @@ export function Footer() {
 
   return (
     <footer className="mt-8 border-t-[3px] border-saffron bg-navy text-navy-100">
+      {/* Brand block */}
+      <div className="border-b border-navy-400">
+        <div className="mx-auto max-w-6xl px-3 py-6">
+          <SiteBrand size={40} />
+          <p className="mt-2.5 max-w-md text-sm text-navy-100">
+            <span className="lang-en">
+              Latest government job notifications, admit cards, results and
+              answer keys — with the official source link on every page.
+            </span>
+            <span className="lang-hi">
+              नवीनतम सरकारी नौकरी सूचना, एडमिट कार्ड, रिजल्ट और उत्तर कुंजी — हर
+              पेज पर आधिकारिक स्रोत लिंक के साथ।
+            </span>
+          </p>
+        </div>
+      </div>
+
       {/* Sitemap columns */}
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-6 px-3 py-7 md:grid-cols-4">
         {FOOTER_NAV.map((col) => (

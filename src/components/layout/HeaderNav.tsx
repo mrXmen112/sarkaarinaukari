@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -8,6 +7,7 @@ import { useEffect, useState } from "react";
 import type { NavItem } from "@/lib/site";
 import { cn } from "@/lib/utils";
 import { T } from "@/components/i18n/T";
+import { SiteBrand } from "@/components/layout/SiteBrand";
 
 /** Nav item with the optional Hindi label used by the bilingual UI. */
 type BilingualNavItem = NavItem & { labelHi?: string };
@@ -44,24 +44,8 @@ export function HeaderNav({
           href="/"
           className="flex min-w-0 items-center gap-2.5 no-underline hover:no-underline"
         >
-          {/*
-            `unoptimized` is required: the Next image optimizer rejects SVG
-            (400 "not a valid image") unless `dangerouslyAllowSVG` is enabled,
-            and we don't want to loosen that security setting for one logo.
-            Width/height match the SVG viewBox ratio of 420x100 exactly, so the
-            wordmark is not distorted.
-          */}
-          <Image
-            src="/logo-full.svg"
-            alt="SarkaariNaukri logo"
-            width={168}
-            height={40}
-            unoptimized
-            className="shrink-0"
-          />
-          <span className="hidden sm:block text-xs text-navy-100">
-            {tagline}
-          </span>
+          {/* The tagline now lives inside SiteBrand, under the wordmark. */}
+          <SiteBrand size={38} tagline={tagline} />
         </Link>
 
         <button

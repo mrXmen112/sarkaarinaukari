@@ -1,11 +1,34 @@
+import fs from "node:fs";
+import path from "node:path";
+
 import { ImageResponse } from "next/og";
 
 export const alt = "SarkaariNaukri.online — Sarkari Naukri, Admit Card, Result & Yojana Portal";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+/**
+ * The brand icon, inlined as a data URI so the OG image is self-contained.
+ *
+ * `next/og` runs on the Node runtime here (no `export const runtime = "edge"`),
+ * so fs is available. Reading the generated icon keeps the OG card locked to the
+ * same artwork as the favicon set — if the file is ever missing we degrade to
+ * the wordmark alone rather than throwing during the build.
+ */
+function brandIconDataUri(): string | null {
+  try {
+    const file = path.join(process.cwd(), "public", "icon-192.png");
+    const buf = fs.readFileSync(file);
+    return `data:image/png;base64,${buf.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
 /** Default Open Graph image (Phase 2) — generated, no binary asset needed. */
 export default function Image() {
+  const icon = brandIconDataUri();
+
   return new ImageResponse(
     (
       <div
@@ -20,16 +43,28 @@ export default function Image() {
           padding: "72px",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            fontSize: 84,
-            fontWeight: 700,
-            color: "white",
-            fontFamily: "serif",
-          }}
-        >
-          SarkaariNaukri<span style={{ color: "#FF9933" }}>.online</span>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {icon ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={icon}
+              alt=""
+              width={112}
+              height={112}
+              style={{ borderRadius: 24, marginRight: 28 }}
+            />
+          ) : null}
+          <div
+            style={{
+              display: "flex",
+              fontSize: 84,
+              fontWeight: 700,
+              color: "white",
+              fontFamily: "serif",
+            }}
+          >
+            SarkaariNaukri<span style={{ color: "#FF9933" }}>.online</span>
+          </div>
         </div>
         <div
           style={{

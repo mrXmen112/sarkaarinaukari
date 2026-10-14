@@ -31,7 +31,11 @@ export function organizationSchema() {
     "@type": "Organization",
     name: SITE.name,
     url: SITE.url,
-    logo: `${SITE.url}/icon.svg`,
+    // Google requires a square raster logo of at least 512x512 for the
+  // Organization rich result. The SVG is kept as an additional entry but is
+  // not sufficient on its own.
+  logo: `${SITE.url}/icon-512.png`,
+  image: `${SITE.url}/icon-512.png`,
     description:
       "Sarkari Naukri, Admit Card, Result & Yojana information portal — an independent government-job listings website.",
     email: SITE.contactEmail,

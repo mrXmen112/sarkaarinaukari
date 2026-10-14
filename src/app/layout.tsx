@@ -39,13 +39,20 @@ export const metadata: Metadata = {
     "Latest Sarkari Naukri 2026: central & state government jobs, Bihar vacancies (BPSC, BSSC, Bihar Police, TRE), admit cards, results, answer keys, syllabus and Sarkari Yojana — updated daily.",
   robots: { index: true, follow: true },
   manifest: "/manifest.webmanifest",
-  // Icons are generated from public/icon.svg by `node scripts/generate-icons.mjs`
-  // and served from /public (not app/ — app/icon.png breaks Next 16 route types).
+  // Icons are generated from public/icon.svg by `npm run icons` and served from
+  // /public (NOT app/ — app/icon.png breaks Next 16 route-type generation).
+  //
+  // favicon.ico is a real multi-image ICO (16/32/48) built by the generator.
+  // Google fetches /favicon.ico and picks the largest image it contains; a
+  // 32x32-only file is what produced the generic black circle in search
+  // results, so the 48x48 entry below is the one that matters most.
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "32x32" },
-      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.ico", sizes: "48x48" },
+      { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/icon-96.png", sizes: "96x96", type: "image/png" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
       { url: "/icon.svg", type: "image/svg+xml" },
     ],
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
