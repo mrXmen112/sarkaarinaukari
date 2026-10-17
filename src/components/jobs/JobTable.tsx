@@ -3,28 +3,27 @@ import Link from "next/link";
 import { CountdownBadge } from "@/components/ui/CountdownBadge";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { stateLabel } from "@/lib/queries";
+import { freshnessOf } from "@/lib/freshness";
+import { classifyApplyLink } from "@/lib/applyLink";
 import { formatIndianNumber } from "@/lib/utils";
 import { T } from "@/components/i18n/T";
 import type { JobWithCategory } from "@/types/database";
 
-/** "New" for jobs published in the last 3 days, "Updated" for recent edits. */
+/**
+ * W5.1: "UPDATED" within 48h of content_changed_at, "NEW" within 48h of
+ * published_at. Both come from src/lib/freshness.ts, which never reads
+ * updated_at — see that file for why.
+ */
 function freshnessBadge(job: JobWithCategory): React.ReactNode {
-  const now = Date.now();
-  const created = new Date(job.created_at).getTime();
-  const updated = new Date(job.updated_at).getTime();
-  if (Number.isFinite(created) && now - created <= 3 * 24 * 60 * 60 * 1000) {
+  const kind = freshnessOf(job);
+  if (kind === "new") {
     return (
       <span className="rounded-sm bg-ingreen px-1.5 py-0.5 text-[0.625rem] font-bold text-white">
         <T k="new" />
       </span>
     );
   }
-  if (
-    Number.isFinite(updated) &&
-    Number.isFinite(created) &&
-    updated - created > 60 * 60 * 1000 &&
-    now - updated <= 7 * 24 * 60 * 60 * 1000
-  ) {
+  if (kind === "updated") {
     return (
       <span className="rounded-sm bg-saffron px-1.5 py-0.5 text-[0.625rem] font-bold text-navy">
         <T k="updated" />
@@ -110,24 +109,23 @@ export function JobTable({
     {
       key: "apply",
       header: <T k="applyCol" />,
-      // Phase 4E: verified + open jobs link straight to the official apply URL;
-      // everything else falls back to the detail page, and closed jobs show
-      // a disabled "Closed" label instead of a dead button.
+      // W5.5: one classifier decides the destination and the label, so this cell
+      // and the job detail page can never disagree. See src/lib/applyLink.ts.
       cell: (job) => {
-        const closed =
-          job.status === "closed" ||
-          new Date(job.application_end) < new Date();
-        if (closed) {
+        const link = classifyApplyLink(job);
+
+        if (link.kind === "closed") {
           return (
             <span className="inline-block whitespace-nowrap rounded-sm bg-alert-bg px-2.5 py-1.5 text-xs font-bold text-alert">
               <T k="closed" />
             </span>
           );
         }
-        if (job.link_flagged || !job.official_link) {
+
+        if (link.kind === "details") {
           return (
             <Link
-              href={`/jobs/${job.slug}`}
+              href={link.href}
               className="gov-btn whitespace-nowrap"
               aria-label={`View details for ${job.title} — apply link under verification`}
             >
@@ -135,15 +133,22 @@ export function JobTable({
             </Link>
           );
         }
+
+        // apply | website — both outbound, but labelled honestly.
+        const label = link.kind === "website" ? "officialWebsite" : "apply";
+        const aria =
+          link.kind === "website"
+            ? `Visit the official website for ${job.title} (opens in a new tab)`
+            : `Apply online for ${job.title} on the official website (opens in a new tab)`;
         return (
           <a
-            href={job.official_link}
+            href={link.href}
             target="_blank"
             rel="noopener noreferrer nofollow"
             className="gov-btn whitespace-nowrap"
-            aria-label={`Apply online for ${job.title} on the official website (opens in a new tab)`}
+            aria-label={aria}
           >
-            <T k="apply" />
+            <T k={label} />
           </a>
         );
       },

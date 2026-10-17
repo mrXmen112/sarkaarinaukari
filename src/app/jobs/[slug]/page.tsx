@@ -9,7 +9,7 @@ import { JsonLd } from "@/components/ui/JsonLd";
 import { PageContainer, Panel } from "@/components/layout/PageContainer";
 import { JobActions } from "@/components/jobs/JobActions";
 import { JobTable } from "@/components/jobs/JobTable";
-import { ApplyButton } from "@/components/jobs/ApplyButton";
+import { ApplyCta } from "@/components/jobs/ApplyButton";
 import { RecruitmentTimeline } from "@/components/jobs/RecruitmentTimeline";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { T } from "@/components/i18n/T";
@@ -23,6 +23,12 @@ import { robotsFor } from "@/lib/indexable";
 import { CATEGORY_PAGES_BY_SLUG } from "@/lib/landingPages";
 import { STATE_SLUGS } from "@/lib/landingPagesState";
 import { categoryLabel as fmtCategoryLabel, formatIndianNumber, formatRupees, truncate } from "@/lib/utils";
+import {
+  cleanAgeRelaxation,
+  cleanFees,
+  cleanVacancyBreakdown,
+  type CategoryRow,
+} from "@/lib/sanity";
 import {
   getAllJobSlugs,
   getJobBySlug,
@@ -92,8 +98,10 @@ export async function generateMetadata({
       title,
       description,
       url: `${SITE.url}/jobs/${slug}`,
-      publishedTime: job.notification_date ?? undefined,
-      modifiedTime: job.updated_at ?? undefined,
+      publishedTime: job.notification_date ?? job.published_at ?? undefined,
+      // W5.1: content_changed_at, never updated_at (a link check or migration
+      // clobbers updated_at on every row). Omitted when there is no real edit.
+      modifiedTime: job.content_changed_at ?? undefined,
       images: ["/opengraph-image"],
     },
     // Phase 8A: a job nobody has checked against the official notification is
@@ -271,7 +279,11 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
             { label: <T k="payScale" />, value: job.pay_scale ?? "—" },
             {
               label: <T k="lastUpdated" />,
-              value: formatDate(job.updated_at ?? job.created_at),
+              // W5.1: a real content edit, else when it was first published.
+              // Not updated_at, which bulk operations rewrite on every row.
+              value: formatDate(
+                job.content_changed_at ?? job.published_at ?? job.created_at,
+              ),
             },
           ]}
         />
@@ -301,13 +313,14 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
               },
               {
                 label: <T k="applicationFeeLabel" />,
-                value:
-                  job.application_fee &&
-                  Object.keys(job.application_fee).length > 0
-                    ? `${fmtCategoryLabel("general")}: ${formatRupees(
-                        (job.application_fee as Record<string, number>).general,
-                      )}`
-                    : <T k="notNotified" />,
+                // W5.4: collapsed and de-duplicated; a single uniform fee shows
+                // once as "All categories" instead of repeating per category.
+                value: (() => {
+                  const rows = cleanFees(job.application_fee);
+                  if (!rows) return <T k="notNotified" />;
+                  const general = rows.find((r) => r.key === "general") ?? rows[0];
+                  return `${fmtCategoryLabel(general.key)}: ${formatRupees(general.value)}`;
+                })(),
               },
               {
                 label: <T k="applyMode" />,
@@ -323,17 +336,16 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
             ]}
           />
           <div className="mt-3 flex flex-wrap items-center gap-3">
-            {job.status === "closed" ? (
-              <span className="inline-block rounded-sm bg-alert-bg px-3 py-2 text-sm font-bold text-alert">
-                <T k="applicationsClosed" />
-              </span>
-            ) : job.link_flagged ? (
-              <span className="inline-block rounded-sm border border-alert px-3 py-2 text-sm font-bold text-alert">
-                <T k="applyLinkUnderVerification" />
-              </span>
-            ) : (
-              <ApplyButton href={job.official_link} title={job.title} />
-            )}
+            <ApplyCta
+              job={{
+                slug: job.slug,
+                official_link: job.official_link,
+                link_flagged: job.link_flagged,
+                status: job.status,
+                application_end: job.application_end,
+              }}
+              title={job.title}
+            />
           </div>
         </div>
       </section>
@@ -361,33 +373,40 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
 
           {job.age_relaxation && Object.keys(job.age_relaxation).length > 0 ? (
             <div>
-              <AgeRelaxationTable data={job.age_relaxation} />
+              <AgeRelaxationTable rows={cleanAgeRelaxation(job.age_relaxation) ?? []} />
             </div>
           ) : null}
         </div>
       </Panel>
 
       {/* Section 4 — Application Fee */}
-      {job.application_fee && Object.keys(job.application_fee).length > 0 ? (
-        <Panel title={<T k="applicationFee" />} className="mb-4">
-          <CategoryValueTable
-            caption="Category-wise application fee"
-            data={job.application_fee}
-            format={(v) => formatRupees(v)}
-          />
-        </Panel>
-      ) : null}
+      {(() => {
+        const rows = cleanFees(job.application_fee);
+        return rows ? (
+          <Panel title={<T k="applicationFee" />} className="mb-4">
+            <CategoryValueTable
+              caption="Category-wise application fee"
+              rows={rows}
+              format={(v) => formatRupees(v)}
+            />
+          </Panel>
+        ) : null;
+      })()}
 
-      {/* Section 5 — Vacancy Breakdown */}
-      {job.vacancy_breakdown && Object.keys(job.vacancy_breakdown).length > 0 ? (
-        <Panel title="Vacancy Details (Category-wise)" className="mb-4">
-          <CategoryValueTable
-            caption="Category-wise vacancy distribution"
-            data={job.vacancy_breakdown}
-            format={(v) => formatIndianNumber(v)}
-          />
-        </Panel>
-      ) : null}
+      {/* Section 5 — Vacancy Breakdown. W5.4: withheld entirely when the parts do
+          not add up to the stated total, so it can never contradict the total. */}
+      {(() => {
+        const rows = cleanVacancyBreakdown(job.vacancy_breakdown, job.vacancy_total);
+        return rows ? (
+          <Panel title="Vacancy Details (Category-wise)" className="mb-4">
+            <CategoryValueTable
+              caption="Category-wise vacancy distribution"
+              rows={rows}
+              format={(v) => formatIndianNumber(v)}
+            />
+          </Panel>
+        ) : null;
+      })()}
 
       {/* Section 6 — Selection Process */}
       <Panel title={<T k="selectionProcess" />} className="mb-4">
@@ -468,7 +487,9 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
             },
             {
               label: "Page Last Updated",
-              value: formatDate(job.updated_at ?? job.created_at),
+              value: formatDate(
+                job.content_changed_at ?? job.published_at ?? job.created_at,
+              ),
             },
             {
               label: "Data Policy",
@@ -494,7 +515,16 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
           </p>
         ) : (
           <div className="mt-3">
-            <ApplyButton href={job.official_link} title={job.title} />
+            <ApplyCta
+              job={{
+                slug: job.slug,
+                official_link: job.official_link,
+                link_flagged: job.link_flagged,
+                status: job.status,
+                application_end: job.application_end,
+              }}
+              title={job.title}
+            />
           </div>
         )}
         {hasBrokenLink(job) ? (
@@ -557,9 +587,14 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
           },
           {
             question: "Application fee kitni hai?",
-            answer: job.application_fee && Object.keys(job.application_fee).length > 0
-              ? `Application fee category-wise: ${Object.entries(job.application_fee).map(([k, v]) => `${k}: Rs ${v}`).join(", ")}. SC/ST/PwBD candidates are usually exempt.`
-              : "Application fee is as per the official notification. Category-wise details are available in the official advertisement.",
+            answer: (() => {
+              const rows = cleanFees(job.application_fee);
+              return rows
+                ? `Application fee category-wise: ${rows
+                    .map((r) => `${fmtCategoryLabel(r.key)}: ${formatRupees(r.value)}`)
+                    .join(", ")}. SC/ST/PwBD candidates are usually exempt.`
+                : "Application fee is as per the official notification. Category-wise details are available in the official advertisement.";
+            })(),
           },
           {
             question: `Apply karne ki last date kab hai?`,
@@ -606,14 +641,14 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
 /* Section-local presentational pieces                                 */
 /* ------------------------------------------------------------------ */
 
-/** Category-wise rows (fee, vacancy, age relaxation). */
+/** Category-wise rows (fee, vacancy, age relaxation). W5.4 cleaned upstream. */
 function CategoryValueTable({
   caption,
-  data,
+  rows,
   format,
 }: {
   caption: string;
-  data: Record<string, number>;
+  rows: CategoryRow[];
   format: (v: number) => string;
 }) {
   return (
@@ -621,7 +656,7 @@ function CategoryValueTable({
       <table className="gov-table">
         <caption className="sr-only">{caption}</caption>
         <tbody>
-          {Object.entries(data).map(([key, value]) => (
+          {rows.map(({ key, value }) => (
             <tr key={key}>
               <th
                 scope="row"
@@ -629,7 +664,7 @@ function CategoryValueTable({
               >
                 {fmtCategoryLabel(key)}
               </th>
-              <td className="font-semibold tabular-nums">{format(value ?? 0)}</td>
+              <td className="font-semibold tabular-nums">{format(value)}</td>
             </tr>
           ))}
         </tbody>
@@ -638,13 +673,13 @@ function CategoryValueTable({
   );
 }
 
-function AgeRelaxationTable({ data }: { data: Record<string, number> }) {
+function AgeRelaxationTable({ rows }: { rows: CategoryRow[] }) {
   return (
     <div className="w-full overflow-x-auto">
       <table className="gov-table">
         <caption className="sr-only">Age relaxation by category</caption>
         <tbody>
-          {Object.entries(data).map(([key, value]) => (
+          {rows.map(({ key, value }) => (
             <tr key={key}>
               <th
                 scope="row"
