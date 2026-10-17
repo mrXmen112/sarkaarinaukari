@@ -30,14 +30,26 @@ const PDF_MARKER = "[PDF detail";
 
 const KIND_TO_TARGET = {
   advertisement: "job",
-  notice: "job",
   apply_portal: "job",
   result: "result",
   admit_card: "admit_card",
 };
 
-export function kindToTargetType(kind) {
-  return KIND_TO_TARGET[kind] ?? "job";
+/**
+ * A generic "notice" is only a job when its title is clearly about a
+ * recruitment (advt/vacancy/apply/corrigendum/last date). Document
+ * verification, original-document submission, cancellation-of-candidature
+ * and selection-confirmation notices are NOT job listings, so they return
+ * null and Phase C skips them instead of creating junk job rows. (The
+ * schema has no "notice" target_type, so skipping is the only non-polluting
+ * option.) Unknown kinds are skipped too, never defaulted to "job".
+ */
+const RECRUITMENT_NOTICE =
+  /advert|advt|vacanc|recruit|apply|application|online form|last date|corrigendum|extension/i;
+
+export function kindToTargetType(kind, { title = "" } = {}) {
+  if (kind === "notice") return RECRUITMENT_NOTICE.test(title) ? "job" : null;
+  return KIND_TO_TARGET[kind] ?? null;
 }
 
 /** Split a stored raw_content into { meta, body }. */
@@ -112,6 +124,92 @@ export async function getFullText(raw, { limiter, pdfParse, refetch = true }) {
   return { meta, text: body.slice(0, MAX_PROMPT_CHARS), garbled: false };
 }
 
+/* ---- W5.4 (pipeline side): category-JSON sanity ---------------------- *
+ * The admin save path validates again, but normalising here means the review
+ * queue never even receives "Female: 0" placeholder rows or a breakdown that
+ * contradicts its own total. Mirrors src/lib/sanity.ts (kept as a small
+ * duplicate because this module runs standalone as .mjs).
+ */
+const PLACEHOLDER_NUM = new Set(["", "nil", "n/a", "na", "none", "-", "—"]);
+
+function numberMap(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const out = {};
+  for (const [k, v] of Object.entries(value)) {
+    if (typeof v === "number") {
+      if (Number.isFinite(v)) out[k] = v;
+      continue;
+    }
+    if (typeof v === "string") {
+      const t = v.trim();
+      if (PLACEHOLDER_NUM.has(t.toLowerCase())) continue; // placeholder -> dropped
+      const n = Number(t);
+      if (Number.isFinite(n)) out[k] = n;
+    }
+  }
+  return out;
+}
+
+// Alias set mirrors sanity.ts's KEY_ALIASES so the pipeline flags the same
+// collisions the save-side gate rejects ("All categories" + "Total" = one row).
+const CATEGORY_ALIASES = {
+  all: "all",
+  all_categories: "all",
+  all_category: "all",
+  all_categories_combined: "all",
+  total: "all",
+};
+
+function canonicalCategory(key) {
+  const k = String(key)
+    .trim()
+    .toLowerCase()
+    .replace(/[()[\]{}]+/g, " ")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  return CATEGORY_ALIASES[k] ?? k;
+}
+
+/** Normalise + flag the three job JSON columns in place. Returns a flags object. */
+function sanitiseCategoryJson(targetType, obj) {
+  const flags = {};
+  if (targetType !== "job") return flags;
+
+  const vb = numberMap(obj.vacancy_breakdown);
+  if (vb) {
+    const kept = Object.fromEntries(Object.entries(vb).filter(([, v]) => v > 0));
+    if (Object.keys(kept).length !== Object.keys(vb).length) {
+      flags.dropped_zero_vacancy_rows = true;
+    }
+    const total = Number(obj.vacancy_total);
+    const sum = Object.values(kept).reduce((a, b) => a + b, 0);
+    if (Number.isFinite(total) && total > 0 && Object.keys(kept).length > 0 && sum !== total) {
+      flags.vacancy_breakdown_mismatch = true;
+    }
+    obj.vacancy_breakdown = Object.keys(kept).length ? kept : null;
+  }
+
+  if (obj.application_fee && typeof obj.application_fee === "object" && !Array.isArray(obj.application_fee)) {
+    const seen = new Set();
+    let dup = false;
+    for (const k of Object.keys(obj.application_fee)) {
+      const c = canonicalCategory(k);
+      if (seen.has(c)) dup = true;
+      else seen.add(c);
+    }
+    if (dup) flags.duplicate_fee_rows = true;
+    const fee = numberMap(obj.application_fee);
+    obj.application_fee = fee && Object.keys(fee).length ? fee : null;
+  }
+
+  if (obj.age_relaxation && typeof obj.age_relaxation === "object" && !Array.isArray(obj.age_relaxation)) {
+    const age = numberMap(obj.age_relaxation);
+    obj.age_relaxation = age && Object.keys(age).length ? age : null;
+  }
+
+  return flags;
+}
+
 /** Validate parsed JSON; returns { ok, error?, flags }. */
 export function validateStructured(targetType, obj, { garbled = false } = {}) {
   if (!obj || typeof obj !== "object" || Array.isArray(obj)) {
@@ -124,6 +222,7 @@ export function validateStructured(targetType, obj, { garbled = false } = {}) {
   }
   normalizeJobTaxonomy(obj);
   const flags = {};
+  Object.assign(flags, sanitiseCategoryJson(targetType, obj));
   for (const f of flaggableFields(targetType)) {
     if (obj[f] === null || obj[f] === undefined || obj[f] === "") flags[`missing_${f}`] = true;
   }
@@ -158,7 +257,14 @@ function normalizeJobTaxonomy(obj) {
 
 export async function structureOneRow(row, { store, limiter, pdfParse, llm, dryRun = false }) {
   const { meta, text, garbled } = await getFullText(row, { limiter, pdfParse, refetch: !dryRun });
-  const targetType = kindToTargetType((meta.kind ?? "").toLowerCase());
+  const targetType = kindToTargetType((meta.kind ?? "").toLowerCase(), { title: meta.title ?? "" });
+  if (!targetType) {
+    // Non-recruitment notice (or unknown kind): consume the row but create no
+    // pending entry, keeping the review queue free of junk jobs. The raw row is
+    // retained (processed=true) for audit.
+    if (!dryRun) await store.markProcessed(row.id);
+    return { skipped: true, reason: `kind "${meta.kind ?? "unknown"}" is not a recruitment listing` };
+  }
   const prompt = buildPrompt(
     targetType,
     { title: meta.title, url: meta.url ?? row.source_url, date: meta.date, kind: meta.kind },
@@ -195,11 +301,12 @@ export async function structureOneRow(row, { store, limiter, pdfParse, llm, dryR
 
 export async function runStructure({ store, limiter, pdfParse, llm, sourceId = null, limit = 10, dryRun = false }) {
   const rows = await store.listUnprocessed({ sourceId, limit });
-  const out = { examined: rows.length, created: 0, failed: 0, errors: [], previews: [] };
+  const out = { examined: rows.length, created: 0, skipped: 0, failed: 0, errors: [], previews: [] };
   for (const row of rows) {
     try {
       const r = await structureOneRow(row, { store, limiter, pdfParse, llm, dryRun });
-      if (dryRun) out.previews.push(r);
+      if (r.skipped && !dryRun) out.skipped++;
+      else if (dryRun) out.previews.push(r);
       else out.created++;
     } catch (e) {
       out.failed++;

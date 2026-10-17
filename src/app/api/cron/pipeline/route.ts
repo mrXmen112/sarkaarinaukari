@@ -95,7 +95,12 @@ export async function GET(req: NextRequest) {
           }
         : null,
       structure: structure
-        ? { examined: structure.examined, created: structure.created, failed: structure.failed }
+        ? {
+            examined: structure.examined,
+            created: structure.created,
+            skipped: structure.skipped,
+            failed: structure.failed,
+          }
         : null,
     });
   } catch (error) {

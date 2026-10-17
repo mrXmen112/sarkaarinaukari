@@ -177,7 +177,7 @@ async function cmdStructure(name, limit, dryRun) {
       : `STRUCTURE live run (limit ${limit}) — model ${llm.model}.`,
   );
   const out = await runStructure({ store, limiter, pdfParse, llm, sourceId, limit, dryRun });
-  console.log(`Done: examined=${out.examined} created=${out.created} failed=${out.failed}`);
+  console.log(`Done: examined=${out.examined} created=${out.created} skipped=${out.skipped} failed=${out.failed}`);
   for (const e of out.errors) console.log(`  ERR ${e}`);
   if (dryRun) {
     for (const p of out.previews.slice(0, 2)) {

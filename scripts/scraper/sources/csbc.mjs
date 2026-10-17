@@ -32,17 +32,39 @@ function resolveUrl(href, base) {
   }
 }
 
-/** First DD-MM-YYYY (or DD-MM-YY) found in href, else in text. Null if none. */
+function toIso(dayStr, monthStr, yearStr) {
+  const dd = Number(dayStr);
+  const mm = Number(monthStr);
+  let yyyy = Number(yearStr);
+  if (yearStr.length === 2) yyyy += 2000;
+  if (dd >= 1 && dd <= 31 && mm >= 1 && mm <= 12 && yyyy >= 1990 && yyyy <= 2099) {
+    return `${yyyy}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
+  }
+  return null;
+}
+
+/**
+ * Best DD-MM-YYYY date from an href/filename, else from text.
+ *
+ * CSBC filenames embed BOTH a notice sequence (e.g. "Notice-02-2025-...",
+ * "Results-01-2026-...") and a trailing DD-MM-YYYY date, so several digit
+ * groups look date-like. We therefore prefer an explicit 4-digit-year
+ * DD-MM-YYYY and take the LAST plausible one (the trailing official date
+ * wins). A 2-digit-year DD-MM-YY pass is only a fallback. This replaces a
+ * naive "first match" that turned "…-06-10-2026.pdf" into 2010-06-25.
+ */
 export function extractDate(href, text) {
   for (const src of [href, text]) {
-    const m = String(src ?? "").match(/(\d{1,2})-(\d{1,2})-(\d{2,4})/);
-    if (m) {
-      const dd = m[1].padStart(2, "0");
-      const mm = m[2].padStart(2, "0");
-      const yyyy = m[3].length === 2 ? `20${m[3]}` : m[3];
-      if (Number(mm) >= 1 && Number(mm) <= 12 && Number(dd) >= 1 && Number(dd) <= 31) {
-        return `${yyyy}-${mm}-${dd}`;
-      }
+    const s = String(src ?? "");
+    const four = [...s.matchAll(/(\d{1,2})-(\d{1,2})-(\d{4})/g)];
+    for (let i = four.length - 1; i >= 0; i--) {
+      const iso = toIso(four[i][1], four[i][2], four[i][3]);
+      if (iso) return iso;
+    }
+    const two = [...s.matchAll(/(\d{1,2})-(\d{1,2})-(\d{2})/g)];
+    for (let i = two.length - 1; i >= 0; i--) {
+      const iso = toIso(two[i][1], two[i][2], two[i][3]);
+      if (iso) return iso;
     }
   }
   return null;
