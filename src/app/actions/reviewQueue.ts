@@ -17,6 +17,7 @@ import {
 } from "@/lib/departments";
 import { isTelegramAutoPostEnabled, postJobToTelegram } from "@/lib/telegram";
 import { pingIndexNow, targetUrl } from "@/lib/indexNow";
+import { normaliseJobJsonFields, validateJobJsonFields } from "@/lib/sanity";
 import { slugify } from "@/lib/utils";
 import {
   buildAdmitCardInput,
@@ -207,7 +208,8 @@ function validateReviewInput(
         ["notification_pdf_link", "official_link"],
         isValidUrl,
         "must be a valid http or https URL",
-      )
+      ) ??
+      validateJobJsonFields(fields)
     );
   }
 
@@ -271,7 +273,11 @@ export async function approvePendingEntry(
       `Auto-approve for "${entry.target_type}" is not wired yet — please add it manually for now.`,
     );
   }
-  const validationError = validateReviewInput(entry.target_type, fields, extra);
+  // W5.4 (save side): normalise the category JSON columns (drop zero/placeholder
+  // vacancy rows and placeholder fee/age strings) BEFORE validation + build, so
+  // the approve path can never persist "Female: 0" cruft.
+  const effectiveFields = entry.target_type === "job" ? normaliseJobJsonFields(fields) : fields;
+  const validationError = validateReviewInput(entry.target_type, effectiveFields, extra);
   if (validationError) return err(validationError);
 
   let sourceUrl: string | null = null;
@@ -287,7 +293,7 @@ export async function approvePendingEntry(
   let res: AdminResult;
   if (entry.target_type === "job") {
     res = await createJob(
-      buildJobInput(fields, {
+      buildJobInput(effectiveFields, {
         category_id: extra.category_id,
         state: extra.state,
         status: extra.status,
@@ -297,14 +303,14 @@ export async function approvePendingEntry(
     );
   } else if (entry.target_type === "result") {
     res = await createResult(
-      buildResultInput(fields, {
+      buildResultInput(effectiveFields, {
         job_id: extra.job_id,
         is_published: extra.is_published,
       }),
     );
   } else {
     res = await createAdmitCard(
-      buildAdmitCardInput(fields, {
+      buildAdmitCardInput(effectiveFields, {
         job_id: extra.job_id,
         is_published: extra.is_published,
       }),
@@ -327,10 +333,10 @@ export async function approvePendingEntry(
     try {
       if (await isTelegramAutoPostEnabled()) {
         const posted = await postJobToTelegram({
-          title: (fields.title ?? "").trim(),
-          slug: slugify((fields.title ?? "").trim()),
-          application_end: (fields.application_end ?? "").trim(),
-          vacancy_total: Number(fields.vacancy_total) || null,
+          title: (effectiveFields.title ?? "").trim(),
+          slug: slugify((effectiveFields.title ?? "").trim()),
+          application_end: (effectiveFields.application_end ?? "").trim(),
+          vacancy_total: Number(effectiveFields.vacancy_total) || null,
         });
         if (!posted.ok) {
           console.error("[reviewQueue] telegram auto-post failed:", posted.error);
@@ -345,7 +351,7 @@ export async function approvePendingEntry(
 
   // IndexNow ping (Phase 2): tell Bing/Yandex the new URL right away.
   try {
-    const publishedUrl = targetUrl(entry.target_type, slugify((fields.title ?? "").trim()));
+    const publishedUrl = targetUrl(entry.target_type, slugify((effectiveFields.title ?? "").trim()));
     if (publishedUrl) {
       const ping = await pingIndexNow([publishedUrl]);
       if (!ping.ok) console.error("[reviewQueue] indexnow ping failed:", ping.error);

@@ -146,3 +146,154 @@ export function hasDisplayValue(value: unknown): boolean {
   }
   return true;
 }
+
+/* ------------------------------------------------------------------ *
+ * W5.4 (SAVE side) — validation + normalisation.
+ *
+ * The functions above HIDE bad data at render time; the ones below stop it
+ * being written at all. Both the admin approve action and the pipeline use
+ * them, so a "Female: 0" placeholder, a duplicated fee row or a breakdown
+ * that contradicts its total is rejected (or normalised away) with a message
+ * a reviewer can act on — never silently persisted.
+ * ------------------------------------------------------------------ */
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const proto = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+
+/** Strings that mean "no value" where a number is expected (dropped, not rejected). */
+const PLACEHOLDER_NUM = new Set(["", "nil", "n/a", "na", "none", "-", "—"]);
+
+export type NumberMapResult =
+  | { ok: true; map: Record<string, number> }
+  | { ok: false; error: string };
+
+/**
+ * Parse a category-keyed JSON column from the admin form into numbers.
+ * Empty input is a valid empty map. Placeholder strings ("Nil", "-", "N/A")
+ * are dropped (normalised away). Anything that is not a JSON object of
+ * numbers is rejected with the offending key named.
+ */
+export function parseNumberMap(raw: string | null | undefined): NumberMapResult {
+  const t = (raw ?? "").trim();
+  if (!t) return { ok: true, map: {} };
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(t);
+  } catch {
+    return { ok: false, error: "must be valid JSON" };
+  }
+  if (!isPlainObject(parsed)) {
+    return { ok: false, error: "must be a JSON object of category: number" };
+  }
+  const map: Record<string, number> = {};
+  for (const [key, value] of Object.entries(parsed)) {
+    if (typeof value === "number") {
+      if (!Number.isFinite(value)) return { ok: false, error: `"${key}" must be a number` };
+      map[key] = value;
+    } else if (typeof value === "string") {
+      const v = value.trim();
+      if (PLACEHOLDER_NUM.has(v.toLowerCase())) continue;
+      const n = Number(v);
+      if (!Number.isFinite(n)) return { ok: false, error: `"${key}" must be a number` };
+      map[key] = n;
+    } else {
+      return { ok: false, error: `"${key}" must be a number` };
+    }
+  }
+  return { ok: true, map };
+}
+
+/**
+ * Raw keys that fold to the same canonical category ("All categories" +
+ * "Total", or "SC/ST" + "sc_st"). Two rows for one category is the duplicate
+ * fee case W5 called out.
+ */
+export function duplicateCategoryKeys(
+  raw: string | null | undefined,
+): { ok: true; groups: { key: string; rawKeys: string[] }[] } | { ok: false; error: string } {
+  const t = (raw ?? "").trim();
+  if (!t) return { ok: true, groups: [] };
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(t);
+  } catch {
+    return { ok: false, error: "must be valid JSON" };
+  }
+  if (!isPlainObject(parsed)) return { ok: false, error: "must be a JSON object" };
+  const byKey = new Map<string, string[]>();
+  for (const key of Object.keys(parsed)) {
+    const c = normaliseKey(key);
+    const arr = byKey.get(c) ?? [];
+    arr.push(key);
+    byKey.set(c, arr);
+  }
+  const groups = [...byKey.entries()]
+    .filter(([, keys]) => keys.length > 1)
+    .map(([key, rawKeys]) => ({ key, rawKeys }));
+  return { ok: true, groups };
+}
+
+function formatGroups(groups: { rawKeys: string[] }[]): string {
+  return groups.map((g) => g.rawKeys.map((k) => `"${k}"`).join(" and ")).join("; ");
+}
+
+/**
+ * Save-side gate for a JOB's three category JSON columns. Returns a
+ * reviewer-facing error message, or null when the columns are safe to store.
+ *  - vacancy_breakdown must parse and, when vacancy_total is known, sum to it;
+ *  - application_fee must parse and must not contain duplicate categories;
+ *  - age_relaxation must parse.
+ */
+export function validateJobJsonFields(fields: Record<string, string>): string | null {
+  const vb = parseNumberMap(fields.vacancy_breakdown);
+  if (!vb.ok) return `Vacancy breakdown ${vb.error}.`;
+  const totalRaw = (fields.vacancy_total ?? "").trim();
+  if (/^\d+$/.test(totalRaw)) {
+    const total = Number(totalRaw);
+    const parts = Object.values(vb.map).filter((v) => v > 0);
+    const sum = parts.reduce((a, b) => a + b, 0);
+    if (parts.length > 0 && sum !== total) {
+      return `Vacancy breakdown sums to ${sum} but total vacancies is ${total}.`;
+    }
+  }
+
+  const fee = parseNumberMap(fields.application_fee);
+  if (!fee.ok) return `Application fee ${fee.error}.`;
+  const dup = duplicateCategoryKeys(fields.application_fee);
+  if (!dup.ok) return `Application fee ${dup.error}.`;
+  if (dup.groups.length > 0) {
+    return `Duplicate fee rows: ${formatGroups(dup.groups)} are the same category — keep one.`;
+  }
+
+  const age = parseNumberMap(fields.age_relaxation);
+  if (!age.ok) return `Age relaxation ${age.error}.`;
+
+  return null;
+}
+
+/**
+ * Normalise a JOB draft before saving: drop zero/placeholder vacancy rows,
+ * drop placeholder strings from the fee and age columns, and re-serialise as
+ * canonical JSON. Values that fail to parse are left untouched so
+ * validateJobJsonFields can still reject them with a clear message.
+ */
+export function normaliseJobJsonFields(fields: Record<string, string>): Record<string, string> {
+  const out = { ...fields };
+  const vb = parseNumberMap(fields.vacancy_breakdown);
+  if (vb.ok) {
+    const kept = Object.fromEntries(Object.entries(vb.map).filter(([, v]) => v > 0));
+    out.vacancy_breakdown = Object.keys(kept).length ? JSON.stringify(kept) : "";
+  }
+  const fee = parseNumberMap(fields.application_fee);
+  if (fee.ok) {
+    out.application_fee = Object.keys(fee.map).length ? JSON.stringify(fee.map) : "";
+  }
+  const age = parseNumberMap(fields.age_relaxation);
+  if (age.ok) {
+    out.age_relaxation = Object.keys(age.map).length ? JSON.stringify(age.map) : "";
+  }
+  return out;
+}

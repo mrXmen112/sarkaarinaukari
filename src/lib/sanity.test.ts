@@ -5,7 +5,11 @@ import {
   cleanAgeRelaxation,
   cleanFees,
   cleanVacancyBreakdown,
+  duplicateCategoryKeys,
   hasDisplayValue,
+  normaliseJobJsonFields,
+  parseNumberMap,
+  validateJobJsonFields,
 } from "./sanity.ts";
 
 /**
@@ -117,4 +121,121 @@ test("hasDisplayValue treats placeholders as nothing", () => {
   assert.equal(hasDisplayValue("Graduate"), true);
   assert.equal(hasDisplayValue(0), true);
   assert.equal(hasDisplayValue(false), true);
+});
+
+/* ------------------------------------------------------------------ *
+ * W5.4 (save side) — the guard that stops junk being written at all.
+ * ------------------------------------------------------------------ */
+
+test("parseNumberMap: empty input is a valid empty map", () => {
+  assert.deepEqual(parseNumberMap(""), { ok: true, map: {} });
+  assert.deepEqual(parseNumberMap(null), { ok: true, map: {} });
+  assert.deepEqual(parseNumberMap("   "), { ok: true, map: {} });
+});
+
+test("parseNumberMap coerces numeric strings and drops placeholders", () => {
+  assert.deepEqual(parseNumberMap('{"A":"5","B":"Nil","C":-2,"D":0}'), {
+    ok: true,
+    map: { A: 5, C: -2, D: 0 },
+  });
+});
+
+test("parseNumberMap rejects malformed / non-numeric input with a named key", () => {
+  assert.deepEqual(parseNumberMap("{"), { ok: false, error: "must be valid JSON" });
+  assert.deepEqual(parseNumberMap("[]"), {
+    ok: false,
+    error: "must be a JSON object of category: number",
+  });
+  assert.deepEqual(parseNumberMap('{"A":"abc"}'), { ok: false, error: '"A" must be a number' });
+  assert.deepEqual(parseNumberMap('{"A":{"x":1}}'), { ok: false, error: '"A" must be a number' });
+});
+
+test("duplicateCategoryKeys flags alias collisions but not distinct keys", () => {
+  const dup = duplicateCategoryKeys('{"All categories":0,"Total":0}');
+  assert.equal(dup.ok, true);
+  assert.equal(dup.ok && dup.groups.length, 1);
+  assert.equal(dup.ok && dup.groups[0].rawKeys.length, 2);
+
+  assert.deepEqual(duplicateCategoryKeys('{"General":0,"OBC":0}'), { ok: true, groups: [] });
+  assert.deepEqual(duplicateCategoryKeys(""), { ok: true, groups: [] });
+  assert.deepEqual(duplicateCategoryKeys("nope"), { ok: false, error: "must be valid JSON" });
+});
+
+test("validateJobJsonFields accepts a clean job draft", () => {
+  const fields = {
+    vacancy_breakdown: '{"General":100,"OBC":50}',
+    vacancy_total: "150",
+    application_fee: '{"General":500,"SC/ST":250}',
+    age_relaxation: '{"OBC":3}',
+  };
+  assert.equal(validateJobJsonFields(fields), null);
+});
+
+test("validateJobJsonFields rejects a breakdown that contradicts its total", () => {
+  const fields = {
+    vacancy_breakdown: '{"General":100}',
+    vacancy_total: "150",
+    application_fee: "",
+    age_relaxation: "",
+  };
+  assert.equal(
+    validateJobJsonFields(fields),
+    "Vacancy breakdown sums to 100 but total vacancies is 150.",
+  );
+});
+
+test("validateJobJsonFields skips the sum check when the total is unknown", () => {
+  assert.equal(
+    validateJobJsonFields({
+      vacancy_breakdown: '{"General":100}',
+      vacancy_total: "",
+      application_fee: "",
+      age_relaxation: "",
+    }),
+    null,
+  );
+});
+
+test("validateJobJsonFields rejects duplicate fee rows", () => {
+  const fields = {
+    vacancy_breakdown: "",
+    vacancy_total: "",
+    application_fee: '{"All categories":0,"Total":0}',
+    age_relaxation: "",
+  };
+  assert.match(validateJobJsonFields(fields) ?? "", /Duplicate fee rows/);
+});
+
+test("validateJobJsonFields names the column when a JSON field is malformed", () => {
+  const fields = {
+    vacancy_breakdown: "not json",
+    vacancy_total: "",
+    application_fee: "",
+    age_relaxation: "",
+  };
+  assert.equal(validateJobJsonFields(fields), "Vacancy breakdown must be valid JSON.");
+});
+
+test("normaliseJobJsonFields drops zero rows and placeholder strings", () => {
+  const out = normaliseJobJsonFields({
+    vacancy_breakdown: '{"General":100,"Female":0}',
+    application_fee: '{"General":"500","SC/ST":"Nil"}',
+    age_relaxation: "{}",
+    title: "Untouched",
+  });
+  assert.equal(out.vacancy_breakdown, '{"General":100}');
+  assert.equal(out.application_fee, '{"General":500}');
+  assert.equal(out.age_relaxation, "");
+  assert.equal(out.title, "Untouched");
+});
+
+test("normaliseJobJsonFields blanks a fully-zero breakdown and leaves bad JSON alone", () => {
+  assert.equal(
+    normaliseJobJsonFields({ vacancy_breakdown: '{"Female":0,"EWS":0}' }).vacancy_breakdown,
+    "",
+  );
+  assert.equal(
+    normaliseJobJsonFields({ vacancy_breakdown: "oops" }).vacancy_breakdown,
+    "oops",
+  );
 });
