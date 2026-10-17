@@ -13,6 +13,23 @@ import { env, isSupabaseConfigured } from "@/lib/env";
  */
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Search Console (Oct 2026) reported /favicon.ico?favicon.<hash>.ico, a URL
+  // form an older Next.js used to emit for the file-convention icon. The file
+  // itself was deleted in W3 and public/favicon.ico is now canonical.
+  //
+  // This has to live in the proxy: /favicon.ico is a static file in public/, so
+  // it never reaches a page or a generateMetadata, and next.config redirects()
+  // cannot express "any query string" (the query has no `=`, so the whole token
+  // is the key, and the hash changes every build).
+  //
+  // 308 because permanentRedirect-equivalents are 308 and Google treats them as
+  // 301. Deliberately before the Supabase work below: a favicon fetch must never
+  // open an auth round-trip.
+  if (pathname === "/favicon.ico" && request.nextUrl.search) {
+    return NextResponse.redirect(new URL("/favicon.ico", request.url), 308);
+  }
+
   const response = NextResponse.next({ request });
 
   if (!isSupabaseConfigured) return response;
@@ -58,5 +75,14 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/profile/:path*", "/admin/:path*", "/login", "/signup", "/auth/:path*"],
+  matcher: [
+    "/profile/:path*",
+    "/admin/:path*",
+    "/login",
+    "/signup",
+    "/auth/:path*",
+    // Only for the query-string variant redirect above; the bare /favicon.ico
+    // is served statically and must not be intercepted.
+    "/favicon.ico",
+  ],
 };
