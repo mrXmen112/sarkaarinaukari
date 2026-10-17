@@ -143,6 +143,15 @@ export type Job = {
   verification_note: string | null;
   /** Evergreen exam hub this notification belongs to (Phase 8A.5). */
   exam_slug: string | null;
+  /**
+   * W5.1 freshness (migration 0021). `published_at` is when the row first went
+   * public; `content_changed_at` is when a real edit last changed page-visible
+   * content. Both are NULL until the migration runs / an edit happens, and both
+   * are deliberately NOT `updated_at` (which any link check or migration
+   * clobbers on every row at once).
+   */
+  published_at: string | null;
+  content_changed_at: string | null;
   created_at: string;
   updated_at: string;
 };
