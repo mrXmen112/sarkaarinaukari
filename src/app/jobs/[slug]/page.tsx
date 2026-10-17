@@ -144,6 +144,11 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
   // JobPosting structured data, because we cannot stand behind the claims yet.
   const verified = job.verification_status === "verified";
 
+  // Part C: one gate decides whether a JobPosting block is emitted at all.
+  // jobPostingSchema() returns null when the job fails it (unverified, closed,
+  // or missing a verified apply URL), so the condition is never duplicated here.
+  const jobPosting = jobPostingSchema(job, `${SITE.url}/jobs/${job.slug}`);
+
   const breadcrumbs = [
     { name: "Latest Jobs", path: "/jobs" },
     ...(job.job_categories?.slug
@@ -175,7 +180,7 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
 
   return (
       <PageContainer>
-      {verified ? <JsonLd data={jobPostingSchema(job, url)} /> : null}
+      {jobPosting ? <JsonLd data={jobPosting} /> : null}
       <JsonLd
         data={jobFAQSchema(job, url)}
       />

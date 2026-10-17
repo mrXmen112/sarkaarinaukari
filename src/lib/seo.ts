@@ -1,7 +1,7 @@
 import type { JobWithCategory } from "@/types/database";
 
 import { SITE } from "@/lib/site";
-import { toISODate } from "@/lib/date";
+import { buildJobPosting } from "@/lib/jobPosting";
 
 /**
  * schema.org builders. Every builder returns a plain object that JsonLd
@@ -137,48 +137,29 @@ export function articleSchema({
  * Dates are ISO; `application_end` drives validThrough.
  */
 export function jobPostingSchema(job: JobWithCategory, url: string) {
-  const eligibleRegion = job.state
-    ? { "@type": "Country", name: "IN" }
-    : { "@type": "Country", name: "IN" };
-
-  return {
-    "@context": "https://schema.org",
-    "@type": "JobPosting",
-    title: job.title,
-    description: job.short_description ?? `Apply for ${job.title}.`,
-    validThrough: toISODate(job.application_end),
-    hiringOrganization: {
-      "@type": "Organization",
-      name: job.department ?? job.job_categories?.name ?? "Government",
+  // Part C: the real builder lives in src/lib/jobPosting.ts so it can be unit
+  // tested without a database. This wrapper only adapts the row shape.
+  return buildJobPosting(
+    {
+      title: job.title,
+      short_description: job.short_description,
+      department: job.department,
+      category_name: job.job_categories?.name,
+      application_end: job.application_end,
+      application_start: job.application_start,
+      notification_date: job.notification_date,
+      created_at: job.created_at,
+      state: job.state,
+      vacancy_total: job.vacancy_total,
+      eligibility_education: job.eligibility_education,
+      pay_scale: job.pay_scale,
+      status: job.status,
+      verification_status: job.verification_status,
+      official_link: job.official_link,
+      link_http_status: job.link_http_status,
     },
-    employmentType: "FULL_TIME",
-    datePosted: toISODate(job.notification_date ?? job.created_at),
-    url,
-    jobLocation: {
-      "@type": "Place",
-      address: {
-        "@type": "PostalAddress",
-        addressCountry: "IN",
-        addressRegion: job.state ? stateName(job.state) : undefined,
-      },
-    },
-    applicantLocationRequirements: {
-      "@type": "Country",
-      name: "IN",
-    },
-    eligibleRegions: [eligibleRegion],
-    educationRequirements: job.eligibility_education
-      ? {
-          "@type": "EducationalOccupationalCredential",
-          credentialCategory: job.eligibility_education,
-        }
-      : undefined,
-    totalJobOpenings: job.vacancy_total ?? undefined,
-    qualifications: job.eligibility_education
-      ? job.eligibility_education
-      : undefined,
-    employmentTypeId: ["FULL_TIME"],
-  };
+    { url, regionName: stateName(job.state) },
+  );
 }
 
 /**
