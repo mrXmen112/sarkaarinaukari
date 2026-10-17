@@ -7,6 +7,10 @@ import { FAQSection } from "@/components/ui/FAQSection";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { Pagination } from "@/components/ui/Pagination";
 import { listJobs } from "@/lib/queries";
+import {
+  MIN_VERIFIED_OPEN_JOBS,
+  isLandingPageIndexable,
+} from "@/lib/indexable";
 import { breadcrumbSchema, faqSchema } from "@/lib/seo";
 import { PAGE_SIZE, SITE } from "@/lib/site";
 import type { LandingPage } from "@/lib/landingPages";
@@ -156,7 +160,20 @@ export async function LandingJobsPage({
 }
 
 /** Metadata for a landing page (self-referencing canonical, no brand suffix). */
-export function landingMetadata(config: LandingPage, path: string) {
+export function landingMetadata(
+  config: LandingPage,
+  path: string,
+  /**
+   * Verified + open jobs this hub currently holds.
+   *
+   * Phase 8A: a hub with fewer than MIN_VERIFIED_OPEN_JOBS verified open jobs is
+   * a near-empty page competing with /jobs for the same terms, so it goes
+   * noindex. Pass the count from `countVerifiedOpenJobs(config.filters)` —
+   * while the gate is off this makes no difference and the page stays indexable
+   * exactly as before.
+   */
+  verifiedOpenJobs = MIN_VERIFIED_OPEN_JOBS,
+) {
   return {
     title: { absolute: config.metaTitle },
     description: config.metaDescription,
@@ -166,6 +183,9 @@ export function landingMetadata(config: LandingPage, path: string) {
       description: config.metaDescription,
       url: `${SITE.url}${path}`,
     },
-    robots: { index: true, follow: true },
+    robots: {
+      index: isLandingPageIndexable(verifiedOpenJobs),
+      follow: true,
+    },
   };
 }

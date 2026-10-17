@@ -133,6 +133,23 @@ export function robotsFor(subject: IndexableSubject): Metadata["robots"] {
   return { index: indexable, follow: true };
 }
 
+/**
+ * A landing page is a hub for one slice of the catalogue ("Railway Jobs",
+ * "12th Pass Jobs", "Bihar Jobs"). With the gate on, a hub holding fewer than
+ * this many verified OPEN jobs is a near-empty page that competes with the
+ * /jobs listing for the same terms, so it goes noindex.
+ *
+ * While the gate is off every landing page keeps its pre-Phase-8A behaviour,
+ * which is the whole point of the flag: turning it on is one deploy that changes
+ * the index surface, not a series of content migrations.
+ */
+export const MIN_VERIFIED_OPEN_JOBS = 3;
+
+export function isLandingPageIndexable(verifiedOpenJobs: number): boolean {
+  if (!VERIFICATION_GATE_ENABLED) return true;
+  return verifiedOpenJobs >= MIN_VERIFIED_OPEN_JOBS;
+}
+
 /** `true` when the sitemap generator should emit this URL. */
 export function includeInSitemap(subject: IndexableSubject): boolean {
   return isIndexable(subject).indexable;

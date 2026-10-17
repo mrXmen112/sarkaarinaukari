@@ -1,4 +1,5 @@
 import { LandingJobsPage, landingMetadata } from "@/components/jobs/LandingJobsPage";
+import { countVerifiedOpenJobs } from "@/lib/queries";
 import { QUALIFICATION_PAGES_BY_SLUG } from "@/lib/landingPages";
 
 const CONFIG = QUALIFICATION_PAGES_BY_SLUG["iti"];
@@ -6,7 +7,9 @@ const PATH = "/jobs/iti";
 
 export const revalidate = 1800;
 
-export const metadata = landingMetadata(CONFIG, PATH);
+export async function generateMetadata() {
+  return landingMetadata(CONFIG, PATH, await countVerifiedOpenJobs(CONFIG.filters));
+}
 
 export default function Page() {
   return (

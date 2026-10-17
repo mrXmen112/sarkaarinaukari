@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { LandingJobsPage, landingMetadata } from "@/components/jobs/LandingJobsPage";
+import { countVerifiedOpenJobs } from "@/lib/queries";
 import { STATE_SLUGS, buildStatePage } from "@/lib/landingPagesState";
 
 export const revalidate = 1800;
@@ -16,7 +17,14 @@ export async function generateMetadata({
   const { state } = await params;
   const config = buildStatePage(state);
   if (!config) return { title: "State Jobs Not Found" };
-  return landingMetadata(config, `/jobs/state/${state}`);
+  // Phase 8A: state hubs follow the same >= 3 verified open jobs rule as every
+// other landing page, so a state with almost no verified vacancies drops out of
+// the index instead of competing with /jobs.
+return landingMetadata(
+    config,
+    `/jobs/state/${state}`,
+    await countVerifiedOpenJobs({ state }),
+  );
 }
 
 export default async function StateJobsPage({

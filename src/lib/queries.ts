@@ -2,6 +2,7 @@ import { createStaticClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
 import { isoDatePlusDays } from "@/lib/date";
 import { unslugify } from "@/lib/utils";
+import { MIN_VERIFIED_OPEN_JOBS } from "@/lib/indexable";
 import type {
   AdmitCard,
   AnswerKey,
@@ -331,6 +332,37 @@ export async function listCategories(): Promise<JobCategory[]> {
       .order("sort_order", { ascending: true });
     return (data ?? []) as JobCategory[];
   });
+}
+
+/**
+ * How many jobs a landing page slice currently shows, as VERIFIED AND OPEN.
+ *
+ * Drives the "no landing page with fewer than 3 verified open jobs stays
+ * indexable" rule.
+ *
+ * This delegates to listJobs() rather than writing its own query, on purpose:
+ * that is the only way the count can be guaranteed to match what the page
+ * actually renders. A hand-rolled count with subtly different filter semantics
+ * would be the exact class of bug this whole refactor exists to remove (the
+ * sitemap advertising things the page disagrees with).
+ *
+ * `status: "open"` maps to active + upcoming, and verifiedOnly() applies the
+ * Phase 8A gate, so with the gate off this returns the same figure the page
+ * shows today.
+ */
+export async function countVerifiedOpenJobs(
+  filters: Pick<JobListFilters, "categorySlug" | "state" | "qualification"> = {},
+): Promise<number> {
+  if (!isSupabaseConfigured) return 0;
+  try {
+    const { total } = await listJobs({ ...filters, status: "open", page: 1 });
+    return total ?? 0;
+  } catch (err) {
+    // Failing closed here would noindex a healthy page, so log and treat the
+    // page as indexable rather than silently shrinking the index.
+    console.error("[queries] countVerifiedOpenJobs threw:", err);
+    return MIN_VERIFIED_OPEN_JOBS;
+  }
 }
 
 /** Sitemap slugs — Phase 8A: unverified jobs must NOT be listed. */
