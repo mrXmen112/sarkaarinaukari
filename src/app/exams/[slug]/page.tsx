@@ -72,6 +72,15 @@ export default async function ExamDetailPage({
     ? await listJobsBySyllabus(exam.syllabus_id, 6)
     : [];
 
+  // Only papers the conducting body itself published, on an official URL.
+  // Anything else (coaching mirrors, paid material) is never counted, because
+  // it is not something we would link to even if it existed.
+  const officialPaperLinks = Array.isArray(exam.previous_year_papers)
+    ? exam.previous_year_papers.filter((p) =>
+        /^https?:\/\//i.test(p.link?.trim() ?? ""),
+      ).length
+    : 0;
+
   const faqs = (exam.faqs ?? []).map((f) => ({
     question: f.question,
     answer: f.answer,
@@ -141,14 +150,27 @@ export default async function ExamDetailPage({
         <p className="text-sm leading-relaxed whitespace-pre-line">
           {exam.overview ?? "Information coming soon."}
         </p>
-        <p className="mt-3">
-          <Link
-            href={`/previous-papers/${exam.slug}`}
-            className="inline-block rounded-sm border border-rule bg-surface px-3 py-2 text-sm font-semibold text-navy no-underline hover:border-navy-400 hover:bg-navy-50"
-          >
-            Previous Year Question Papers →
-          </Link>
-        </p>
+        {/* Only link the papers page when the conducting body has actually
+            published something. All 48 exams currently have zero official paper
+            links, so linking unconditionally would point every visitor at an
+            empty page and hand Google 48 noindexed-but-linked URLs. When there
+            is nothing to show, say so in plain text and link nothing. */}
+        {officialPaperLinks > 0 ? (
+          <p className="mt-3">
+            <Link
+              href={`/previous-papers/${exam.slug}`}
+              className="inline-block rounded-sm border border-rule bg-surface px-3 py-2 text-sm font-semibold text-navy no-underline hover:border-navy-400 hover:bg-navy-50"
+            >
+              Previous Year Question Papers →
+            </Link>
+          </p>
+        ) : (
+          <p className="mt-3 text-sm text-ink-muted">
+            Official previous year papers have not been published by{" "}
+            {exam.conducting_body ?? "the conducting body"} yet, so there is
+            nothing to link to here.
+          </p>
+        )}
       </Panel>
 
       <Panel title="Eligibility Criteria" className="mb-4">
