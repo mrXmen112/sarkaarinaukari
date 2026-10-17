@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { NavItem } from "@/lib/site";
 import { cn } from "@/lib/utils";
@@ -26,12 +26,15 @@ export function HeaderNav({
   tagline: string;
 }) {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  // The panel remembers the path it was opened on, so it closes itself when the
+  // route changes without an effect. A `useEffect(() => setOpen(false),
+  // [pathname])` did the same thing but set state during the effect, which React
+  // flags (cascading render) and which is unnecessary: the open state already
+  // depends on the route.
+  const [openPath, setOpenPath] = useState<string | null>(null);
+  const open = openPath === pathname;
 
-  // Close the panel whenever the route changes.
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  const close = () => setOpenPath(null);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -50,7 +53,7 @@ export function HeaderNav({
 
         <button
           type="button"
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => setOpenPath(open ? null : pathname)}
           aria-expanded={open}
           aria-controls="primary-nav"
           aria-label={open ? "Close menu" : "Open menu"}
@@ -90,6 +93,7 @@ export function HeaderNav({
             <li key={item.href} className="border-b border-navy-400 md:border-b-0">
               <Link
                 href={item.href}
+                onClick={close}
                 aria-current={isActive(item.href) ? "page" : undefined}
                 className={cn(
                   "block px-3.5 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-navy-700 hover:no-underline md:border-b-[3px] md:border-transparent md:py-2",
@@ -106,6 +110,7 @@ export function HeaderNav({
           <li className="border-b border-navy-400 md:hidden">
             <Link
               href="/login"
+              onClick={close}
               className="block px-3.5 py-2.5 text-sm font-semibold text-saffron no-underline hover:bg-navy-700 hover:no-underline"
             >
               <T k="loginRegister" />
