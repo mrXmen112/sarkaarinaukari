@@ -17,6 +17,7 @@ import { articleSchema, breadcrumbSchema, faqSchema } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 import { robotsFor, examContentChars } from "@/lib/indexable";
 import { FAQSection } from "@/components/ui/FAQSection";
+import { RecommendedBooks } from "@/components/exams/RecommendedBooks";
 import { ShareButtons } from "@/components/ui/ShareButtons";
 import { truncate } from "@/lib/utils";
 import type { ExamPatternStage } from "@/types/database";
@@ -294,6 +295,10 @@ export default async function ExamDetailPage({
           </p>
         )}
       </Panel>
+
+      {/* W5.7: affiliate books. Renders nothing when AMAZON_AFFILIATE_TAG is
+          unset, and carries the Associates disclosure when it is. */}
+      <RecommendedBooks books={exam.recommended_books} />
 
       <JsonLd
         data={breadcrumbSchema([
