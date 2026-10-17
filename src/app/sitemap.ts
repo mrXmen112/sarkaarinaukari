@@ -104,12 +104,45 @@ export default async function sitemap(props: {
   };
 
   const routeFor: Record<string, { table: string; columns: string }> = {
-    jobs: { table: "jobs", columns: "slug, updated_at" },
-    updates: { table: "admit_cards", columns: "slug, updated_at" },
-    prep: { table: "exams", columns: "slug, updated_at" },
+    jobs: { table: "jobs", columns: "slug, content_changed_at" },
+    updates: { table: "admit_cards", columns: "slug" },
+    prep: { table: "exams", columns: "slug" },
   };
 
-  type SlugRow = { slug: string; updated_at: string | null };
+  type SlugRow = {
+    slug: string;
+    content_changed_at?: string | null;
+    last_verified_at?: string | null;
+  };
+
+  /**
+   * W5.2 — lastmod comes only from a signal that actually means "the content
+   * changed", and is OMITTED when we do not have one.
+   *
+   * `updated_at` is NOT used anywhere in this file any more. On every content
+   * table it is maintained by a BEFORE UPDATE trigger, and the measured data
+   * shows it is a bulk stamp, not a per-page edit time:
+   *
+   *   jobs        124 rows /  2 distinct updated_at (85 share one second)
+   *   exams        48 rows /  7 distinct
+   *   admit_cards   8 rows /  2 distinct
+   *   results       4 rows /  1 distinct
+   *
+   * Emitting those as <lastmod> announced that the entire catalogue changed on
+   * one day, which is precisely the bulk-date lie W5.2 asks us to stop telling.
+   *
+   *   jobs                 -> content_changed_at  (real human edit; NULL today)
+   *   exams / yojana       -> last_verified_at    (a human check; NULL today)
+   *   everything else      -> omitted
+   *
+   * A sitemap with no <lastmod> is valid and simply lets Google choose its own
+   * crawl schedule. A wrong <lastmod> is worse than none.
+   */
+  function lastmod(value: string | null | undefined): Date | undefined {
+    if (!value) return undefined;
+    const d = new Date(value);
+    return Number.isFinite(d.getTime()) ? d : undefined;
+  }
 
   /**
    * Columns needed to decide indexability, per prep table. Reading only what
@@ -117,15 +150,18 @@ export default async function sitemap(props: {
    */
   const PREP_COLUMNS: Record<string, string> = {
     exams:
-      "slug, updated_at, overview, eligibility, exam_pattern, preparation_strategy, conducting_body, official_link, last_verified_at, previous_year_papers",
+      "slug, overview, eligibility, exam_pattern, preparation_strategy, conducting_body, official_link, last_verified_at, previous_year_papers",
     yojana:
-      "slug, updated_at, title, description, eligibility, how_to_apply, benefits_summary, benefits, official_link, last_verified_at",
-    syllabus: "slug, updated_at",
-    current_affairs: "slug, updated_at",
-    quizzes: "slug, updated_at",
+      "slug, title, description, eligibility, how_to_apply, benefits_summary, benefits, official_link, last_verified_at",
+    syllabus: "slug",
+    current_affairs: "slug",
+    quizzes: "slug",
   };
 
-  type PrepRow = Record<string, unknown> & { slug: string; updated_at: string | null };
+  type PrepRow = Record<string, unknown> & {
+    slug: string;
+    last_verified_at?: string | null;
+  };
 
   /**
    * Templates that are NOT content-gated today keep their previous behaviour:
@@ -196,11 +232,12 @@ export default async function sitemap(props: {
       const { data: jobs } = await (VERIFICATION_GATE_ENABLED
         ? jobQuery.eq("verification_status", "verified")
         : jobQuery
-      ).order("updated_at", { ascending: false });
+      ).order("content_changed_at", { ascending: false, nullsFirst: false });
       for (const row of (jobs ?? []) as unknown as SlugRow[]) {
         routes.push({
           url: `${base}/${tableForSlug.jobs}/${row.slug}`,
-          lastModified: row.updated_at ? new Date(row.updated_at) : undefined,
+          // W5.2: content_changed_at only. NULL today means no <lastmod> at all.
+          lastModified: lastmod(row.content_changed_at),
           changeFrequency: "weekly",
           priority: 0.8,
         });
@@ -219,13 +256,14 @@ export default async function sitemap(props: {
       for (const table of ["admit_cards", "results", "answer_keys"]) {
         const { data } = await supabase
           .from(table)
-          .select("slug, updated_at")
+          .select("slug")
           .eq("is_published", true)
-          .order("updated_at", { ascending: false });
+          .order("created_at", { ascending: false });
         for (const row of (data ?? []) as unknown as SlugRow[]) {
           routes.push({
             url: `${base}/${tableForSlug[table]}/${row.slug}`,
-            lastModified: row.updated_at ? new Date(row.updated_at) : undefined,
+            // W5.2: no trustworthy per-page edit time on these tables, so
+            // lastmod is omitted rather than stamped with a bulk date.
             changeFrequency: "weekly",
             priority: 0.7,
           });
@@ -257,7 +295,13 @@ export default async function sitemap(props: {
         .from(table)
         .select(PREP_COLUMNS[table])
         .eq("is_published", true)
-        .order("updated_at", { ascending: false });
+        .order("slug", { ascending: true });
+
+      // W5.2: exams and yojana carry a human `last_verified_at` (0020), which is
+      // the only trustworthy "this page was checked/updated" signal they have.
+      // NULL today -> no lastmod. The ungated tables have no such column at all.
+      const prepLastMod = (row: PrepRow) =>
+        PREP_KIND[table] === null ? undefined : lastmod(row.last_verified_at);
 
       for (const row of (data ?? []) as PrepRow[]) {
         const url = `${base}/${tableForSlug[table]}/${row.slug}`;
@@ -268,7 +312,7 @@ export default async function sitemap(props: {
         }
         routes.push({
           url,
-          lastModified: row.updated_at ? new Date(row.updated_at) : undefined,
+          lastModified: prepLastMod(row),
           changeFrequency: "weekly",
           priority: 0.7,
         });
@@ -287,7 +331,7 @@ export default async function sitemap(props: {
           }
           routes.push({
             url,
-            lastModified: row.updated_at ? new Date(row.updated_at) : undefined,
+            lastModified: prepLastMod(row),
             changeFrequency: "monthly",
             priority: 0.5,
           });
