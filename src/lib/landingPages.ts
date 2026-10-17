@@ -47,7 +47,7 @@ const QUALIFICATION_PAGES: LandingPage[] = [
     intro: [
       "A 10th pass qualification is the minimum for a large number of entry-level government jobs. Railway vacancies like RRB Group D Level 1, RPF Constable and ASM, state police constable and driver posts, Central Armed Police Forces constable recruitment, postal department multi-tasking staff and Class 4 / peon / chowkidar style local body work all accept matriculation or its equivalent.",
       "On this page we list every current vacancy that accepts a 10th pass candidate — with the post name, department, total vacancy, age limit, application fee, last date and the official notification and apply links. Every listing is verified against the recruiting body's own notification; where a notice does not mention a particular field we show nothing rather than guess.",
-      "Most of these posts prefer candidates who also hold a driving licence, aITI trade, or a computer certificate, and almost all of them have an age relaxation for SC, ST, OBC, EWS and PwBD candidates. Read the eligibility section of each notification before applying — age limits and cut-offs are set by the conducting body and change with every cycle.",
+      "Most of these posts prefer candidates who also hold a driving licence, an ITI trade, or a computer certificate, and almost all of them have an age relaxation for SC, ST, OBC, EWS and PwBD candidates. Read the eligibility section of each notification before applying — age limits and cut-offs are set by the conducting body and change with every cycle.",
     ],
     faqs: [
       {
@@ -63,7 +63,7 @@ const QUALIFICATION_PAGES: LandingPage[] = [
       {
         question: "10th pass ke liye koi graduation zaroori hai kya?",
         answer:
-          "No. Matriculation is sufficient for Group D, constable, driver, peon and peon-cum-chowkidar style posts. However, preferring aITI, a driving licence or a computer certificate can improve your chances in the document verification stage.",
+          "No. Matriculation is sufficient for Group D, constable, driver, peon and peon-cum-chowkidar style posts. However, preferring an ITI, a driving licence or a computer certificate can improve your chances in the document verification stage.",
       },
       {
         question: "Apply karne ke liye fees kitni lagti hai?",
@@ -127,7 +127,7 @@ const QUALIFICATION_PAGES: LandingPage[] = [
       "ITI pass sarkari naukri 2026 — supervisor, technician, lineman, electrician, welder and artisan posts in government departments. Check eligibility, age, fee and official apply links.",
     intro: [
       "An ITI (Industrial Training Institute) trade certificate, or a diploma in a technical stream, makes you eligible for a large number of government technician and supervisor posts: CPWD and PWD junior engineer and supervisor roles, electricity board lineman and technician selections, railway technician and signal posts, state public works department draftsman and surveyor roles, and artisan and welder recruitment in PSU plants.",
-      "The jobs listed here accept aITI certificate or a diploma in engineering or technology as the minimum qualification. Trade preference usually matters — posts that ask for a specific trade such as electrician, fitter, welder, turner or lineman want the matching ITI trade certificate.",
+      "The jobs listed here accept an ITI certificate or a diploma in engineering or technology as the minimum qualification. Trade preference usually matters — posts that ask for a specific trade such as electrician, fitter, welder, turner or lineman want the matching ITI trade certificate.",
       "Because technical recruitment is often conducted by state-level boards, keep an eye on this page as well as your state's engineering and technical department notifications. Every job here shows the official apply link and notification so you can verify the trade and qualification requirements yourself.",
     ],
     faqs: [
@@ -430,7 +430,7 @@ const CATEGORY_PAGES: LandingPage[] = [
     h1: "Railway Jobs 2026 — Indian Railways Government Recruitment",
     metaTitle: "Railway Jobs 2026: RRB Group D, ALP, JE & NTPC Govt Jobs",
     metaDescription:
-      "Latest Indian Railways jobs 2026 — RRB Group D, Assistant Loco Pilot, JE, Technician, NTPC, RPF andGRP. Eligibility, age, fee, last date and official apply links.",
+      "Latest Indian Railways jobs 2026 — RRB Group D, Assistant Loco Pilot, JE, Technician, NTPC, RPF and GRP. Eligibility, age, fee, last date and official apply links.",
     intro: [
       "Indian Railways recruits lakhs of candidates through the Railway Recruitment Boards (RRB) — central Railway Recruitment Board and its zonal boards. The main drives include RRB Group D Level 1, Assistant Loco Pilot, Junior Engineer, Technician, NTPC, Group C posts and Railway Protection Force constable recruitment.",
       "This page lists every current railway vacancy with the post name, zone or board, vacancies, age limit, category-wise fee, last date and the official notification and apply links. RRBs publish notifications on their own portals, and applications are accepted only there.",
@@ -562,7 +562,7 @@ const CATEGORY_PAGES: LandingPage[] = [
           "Constable recruitment typically requires a 10th pass (12th for some states or for driver roles), and sub-inspector posts usually require graduation. A driving licence is mandatory for vehicle-based constable posts.",
       },
     ],
-    filters: { categorySlug: "defence" },
+    filters: { q: "Police" },
     neighbours: [
       { label: "10th Pass Jobs", href: "/jobs/10th-pass" },
       { label: "12th Pass Jobs", href: "/jobs/12th-pass" },
@@ -623,7 +623,7 @@ const CATEGORY_PAGES: LandingPage[] = [
       {
         question: "PSU jobs ke liye qualification kya chahiye?",
         answer:
-          "GET posts require a degree in engineering (selected through GATE), management trainee posts accept any graduation with an MBA preferred, and technician/artisan posts accept ITI, diploma or aITI as applicable.",
+          "GET posts require a degree in engineering (selected through GATE), management trainee posts accept any graduation with an MBA preferred, and technician/artisan posts accept ITI, diploma or an ITI as applicable.",
       },
       {
         question: "GATE score se PSU mein apply kar sakte hain?",

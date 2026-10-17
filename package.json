@@ -12,6 +12,8 @@
     "audit:404": "node scripts/audit-404.mjs",
     "audit:seo": "node scripts/check-canonicals.mjs",
     "audit:index": "node scripts/seo-inventory.mjs",
+    "audit:meta": "node --experimental-strip-types scripts/check-meta-uniqueness.mjs",
+    "gate:simulate": "node --experimental-strip-types scripts/simulate-gate.mjs",
     "test": "node --test --experimental-strip-types src/lib/*.test.ts",
     "samples:jobposting": "node --experimental-strip-types scripts/sample-jobposting.mjs",
     "db:inventory": "node scripts/db-inventory.mjs",
