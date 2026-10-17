@@ -85,13 +85,25 @@ export function ClassResultHub({ cls }: { cls: "10" | "12" }) {
   );
 }
 
+/**
+ * Class result hub routes are /result/10th and /result/12th, but the `cls`
+ * prop is the board class code "10" / "12". Emitting the raw code produced a
+ * canonical pointing at /result/10, which does not exist — so the page
+ * canonicalised itself to a 404. Found by npm run audit:404.
+ */
+const CLASS_ROUTE_SLUG: Record<string, string> = {
+  "10": "10th",
+  "12": "12th",
+};
+
 export function classHubMetadata(cls: "10" | "12") {
+  const slug = CLASS_ROUTE_SLUG[cls] ?? cls;
   return {
     title: {
       absolute: `Class ${cls} Result 2026: Check Result on Official Board Websites`,
     },
     description: `Class ${cls} result 2026 for CBSE, BSEB, UP Board, MP, Rajasthan, Maharashtra, West Bengal, Karnataka, Tamil Nadu and more boards — verified official result portals, checking steps and re-evaluation info.`,
-    alternates: { canonical: `/result/${cls}` },
+    alternates: { canonical: `/result/${slug}` },
     robots: { index: true, follow: true },
   };
 }

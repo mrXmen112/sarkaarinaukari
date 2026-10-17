@@ -9,6 +9,9 @@
     "lint": "eslint",
     "icons": "node scripts/generate-icons.mjs",
     "test:ad-clicks": "node scripts/ad-click-safety.mjs",
+    "audit:404": "node scripts/audit-404.mjs",
+    "audit:seo": "node scripts/check-canonicals.mjs",
+    "audit:index": "node scripts/seo-inventory.mjs",
     "db:inventory": "node scripts/db-inventory.mjs",
     "export:unverified": "node scripts/export-unverified.mjs",
     "scraper": "node scripts/scraper/run.mjs"

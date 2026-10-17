@@ -60,16 +60,13 @@ export const FOOTER_NAV: {
     headingHi: "जॉब",
     items: [
       { label: "All Jobs", labelHi: "सभी जॉब", href: "/jobs" },
-      {
-        label: "Central Government",
-        labelHi: "केंद्र सरकार",
-        href: "/jobs?category=central",
-      },
-      {
-        label: "State Government",
-        labelHi: "राज्य सरकार",
-        href: "/jobs?category=state",
-      },
+      // These two used to be /jobs?category=central and /jobs?category=state.
+      // Filter URLs are Disallow'd in robots.txt and canonicalise to /jobs, so
+      // linking them from the footer fed Google a blocked-URL report for pages
+      // it was told not to crawl. They now point at real indexable category
+      // landing pages instead.
+      { label: "Railway Jobs", labelHi: "रेलवे जॉब", href: "/jobs/category/railway" },
+      { label: "Banking Jobs", labelHi: "बैंकिंग जॉब", href: "/jobs/category/banking" },
       { label: "Bihar Jobs", labelHi: "बिहार जॉब", href: "/bihar" },
       { label: "10th Pass Jobs", labelHi: "10th पास जॉब", href: "/jobs/10th-pass" },
       { label: "12th Pass Jobs", labelHi: "12th पास जॉब", href: "/jobs/12th-pass" },

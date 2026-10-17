@@ -210,6 +210,8 @@ export type Yojana = {
   benefits: string | null;
   how_to_apply: string | null;
   official_link: string | null;
+  /** Human verification stamp (migration 0020). NULL = unverified. */
+  last_verified_at: string | null;
   is_published: boolean;
   created_at: string;
   updated_at: string;
@@ -240,6 +242,9 @@ export type Exam = {
   previous_year_papers: PreviousYearPaper[] | null;
   cutoff_trends: CutoffTrend[] | null;
   faqs: Faq[] | null;
+  official_link: string | null;
+  /** Human verification stamp (migration 0020). NULL = unverified. */
+  last_verified_at: string | null;
   is_published: boolean;
   created_at: string;
   updated_at: string;
@@ -343,6 +348,17 @@ export type SiteSetting = {
   key: string;
   value: Json;
   updated_at: string;
+};
+
+/** Legacy job slug -> current target. Read on the public job page by
+ * src/lib/slugRedirects.ts so old URLs redirect instead of 404ing. */
+export type SlugRedirect = {
+  from_slug: string;
+  /** Bare slug for target_kind='job', in-repo path for 'path', null for 'gone'. */
+  to_slug: string | null;
+  target_kind: "job" | "path" | "gone";
+  reason: string | null;
+  created_at: string;
 };
 
 export type RawScrape = {
@@ -518,11 +534,24 @@ export type Database = {
       scrape_logs: Table<ScrapeLog, []>;
       site_settings: Table<SiteSetting, []>;
       archived_jobs: Table<Job, []>;
+      slug_redirects: Table<SlugRedirect, []>;
     };
     Views: Record<string, never>;
     Functions: {
       is_admin: { Args: Record<string, never>; Returns: boolean };
       refresh_job_statuses: { Args: Record<string, never>; Returns: undefined };
+      mark_job_verified: {
+        Args: { job_id: string; approver?: string | null; note?: string | null };
+        Returns: undefined;
+      };
+      bulk_set_job_verification: {
+        Args: {
+          statuses: string[];
+          new_status: string;
+          approver?: string | null;
+        };
+        Returns: number;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

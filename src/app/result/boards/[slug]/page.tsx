@@ -32,6 +32,21 @@ export async function generateMetadata({
   };
 }
 
+/**
+ * Board class codes are "10" / "12", but the class result hubs are routes at
+ * /result/10th and /result/12th. Interpolating the raw code produced
+ * /result/10 and /result/12, which do not exist — found by npm run audit:404
+ * and surfaced by Google as 404s. Map explicitly rather than string-building.
+ */
+const CLASS_ROUTE: Record<string, string> = {
+  "10": "/result/10th",
+  "12": "/result/12th",
+};
+
+function classRoute(code: string): string {
+  return CLASS_ROUTE[code] ?? "/result";
+}
+
 export default async function BoardResultPage({
   params,
 }: PageProps<"/result/boards/[slug]">) {
@@ -68,7 +83,7 @@ export default async function BoardResultPage({
       <JsonLd
         data={breadcrumbSchema([
           { name: "Result", path: "/result" },
-          { name: `Class ${board.classes[0]}`, path: `/result/${board.classes[0]}` },
+          { name: `Class ${board.classes[0]}`, path: classRoute(board.classes[0]) },
           { name: board.name, path: `/result/boards/${board.slug}` },
         ])}
       />
@@ -77,7 +92,7 @@ export default async function BoardResultPage({
       <Breadcrumbs
         items={[
           { label: "Result", href: "/result" },
-          { label: `Class ${board.classes[0]}`, href: `/result/${board.classes[0]}` },
+          { label: `Class ${board.classes[0]}`, href: classRoute(board.classes[0]) },
           { label: board.name },
         ]}
       />

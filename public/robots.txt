@@ -1,16 +1,27 @@
 User-agent: *
 Allow: /
 Disallow: /admin/
+# No trailing slash: "Disallow: /profile/" does NOT match "/profile", which is
+# the URL users actually hit. Search Console reported /profile as crawlable.
+Disallow: /profile
 Disallow: /profile/
 Disallow: /login
 Disallow: /auth/
 Disallow: /api/
-# Filtered / search URLs with query params should not be crawled
+
+# Filtered / sorted listing URLs. These stay usable for visitors but are not
+# worth indexing: every one of them canonicalises to /jobs (or to the matching
+# /jobs/state/<slug> and /jobs/category/<slug> landing page), so indexing them
+# would only create duplicate URLs competing with the landing page.
+# Nothing links to them from navigation, the footer or breadcrumbs.
 Disallow: /*?*category=
 Disallow: /*?*state=
 Disallow: /*?*status=
 Disallow: /*?*qualification=
 Disallow: /*?*department=
+Disallow: /*?*sort=
 Disallow: /*?*page=
+Disallow: /*?*search=
+Disallow: /*?*q=
 
 Sitemap: https://www.sarkaarinaukri.online/sitemap.xml

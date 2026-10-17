@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { CountdownBadge } from "@/components/ui/CountdownBadge";
@@ -18,6 +18,10 @@ import { T } from "@/components/i18n/T";
 const JOB_PAGE_IN_CONTENT_SLOT = process.env.NEXT_PUBLIC_ADSENSE_SLOT_JOB ?? "";
 import { hasBrokenLink } from "@/lib/url";
 import { formatDate } from "@/lib/date";
+import { resolveSlug } from "@/lib/slugRedirects";
+import { robotsFor } from "@/lib/indexable";
+import { CATEGORY_PAGES_BY_SLUG } from "@/lib/landingPages";
+import { STATE_SLUGS } from "@/lib/landingPagesState";
 import { categoryLabel as fmtCategoryLabel, formatIndianNumber, formatRupees, truncate } from "@/lib/utils";
 import {
   getAllJobSlugs,
@@ -45,8 +49,6 @@ export async function generateMetadata({
   const job = await getJobBySlug(slug);
 
   if (!job) return { title: "Job Not Found" };
-
-  const verified = job.verification_status === "verified";
 
   const end = new Date(job.application_end);
   const year = end.getUTCFullYear();
@@ -95,9 +97,16 @@ export async function generateMetadata({
       images: ["/opengraph-image"],
     },
     // Phase 8A: a job nobody has checked against the official notification is
-    // kept out of the index. It stays reachable on a direct URL so the visitor
-    // can see it, but it must not compete in search results.
-    robots: { index: verified, follow: verified },
+    // kept out of the index once NEXT_PUBLIC_VERIFICATION_GATE=on. Until then it
+    // behaves exactly as it did before Phase 8A. This is the SAME function the
+    // sitemap uses (src/app/sitemap.ts), which is why it must not be computed
+    // here from verification_status directly — that produced 124 pages which the
+    // sitemap advertised while their own robots tag said noindex.
+    robots: robotsFor({
+      kind: "job",
+      verificationStatus: job.verification_status,
+      isPublished: job.is_published,
+    }),
   };
 }
 
@@ -108,7 +117,23 @@ export async function generateMetadata({
 export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]">) {
   const { slug } = await params;
   const job = await getJobBySlug(slug);
-  if (!job) notFound();
+  if (!job) {
+    // A slug that no longer resolves may still be a URL Google already knows.
+    // Resolving it here keeps those old links out of the 404 report instead of
+    // discarding whatever ranking they had. If nothing matches, this falls
+    // through to the real 404 -- there is no catch-all route and no soft 404.
+    const resolution = await resolveSlug(slug);
+    if (resolution?.kind === "redirect") {
+      permanentRedirect(resolution.to);
+    }
+    // A "gone" row marks a permanently withdrawn slug. It currently surfaces as
+    // 404, because the App Router has no page primitive that sets 410 — a page
+    // returns HTML with an implicit 200/404, and permanentRedirect only emits
+    // 308. Serving a real 410 needs a Route Handler or a proxy rule, which
+    // would put a lookup on every job request. No "gone" rows are seeded, so
+    // this branch is dormant; 404 is still the correct "do not index" answer.
+    notFound();
+  }
 
   const related = await getRelatedJobs(job, 6);
   const timeline = await getJobTimeline(job.id);
@@ -122,10 +147,28 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
   const breadcrumbs = [
     { name: "Latest Jobs", path: "/jobs" },
     ...(job.job_categories?.slug
-      ? [{ name: job.job_categories.name, path: `/jobs?category=${job.job_categories.slug}` }]
+      ? [
+          {
+            name: job.job_categories.name,
+            // Prefer the indexable category landing page. Only ssc/railway/
+            // banking/defence/police/teaching/psu have one, so anything else
+            // falls back to /jobs rather than linking a blocked ?category= URL.
+            path: CATEGORY_PAGES_BY_SLUG[job.job_categories.slug]
+              ? `/jobs/category/${job.job_categories.slug}`
+              : "/jobs",
+          },
+        ]
       : []),
     ...(job.state
-      ? [{ name: stateLabel(job.state), path: `/jobs?state=${job.state}` }]
+      ? [
+          {
+            name: stateLabel(job.state),
+            // Same reasoning: /jobs/state/<slug> is indexable, ?state= is not.
+            path: STATE_SLUGS.includes(job.state)
+              ? `/jobs/state/${job.state}`
+              : "/jobs",
+          },
+        ]
       : []),
     { name: job.title, path: `/jobs/${job.slug}` },
   ];
