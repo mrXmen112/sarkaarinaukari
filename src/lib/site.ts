@@ -216,3 +216,11 @@ export const REVALIDATE = {
 
 /** Rows per page on listings (pagination, not infinite scroll — SEO). */
 export const PAGE_SIZE = 25;
+
+/**
+ * W5.8 — how many live verified jobs the homepage must have before its "Latest
+ * Government Jobs" table stands on its own. Below this the page also surfaces
+ * admit cards, results, answer keys, exam hubs and result-checking guides, so a
+ * thin job list never leaves the homepage looking empty.
+ */
+export const HOMEPAGE_TARGET_JOBS = 10;

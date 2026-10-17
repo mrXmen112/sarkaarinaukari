@@ -7,9 +7,9 @@ import { BIHAR_ORG_PAGES } from "@/lib/landingPagesState";
 import { LANDING_LABELS } from "@/lib/landingPages";
 import { PageContainer, PageHeader } from "@/components/layout/PageContainer";
 import { JobTable } from "@/components/jobs/JobTable";
-import { listJobs, listRecentUpdates, type RecentUpdate } from "@/lib/queries";
+import { RecentUpdatesPanel } from "@/components/updates/RecentUpdatesPanel";
+import { listJobs, listRecentUpdates } from "@/lib/queries";
 import { breadcrumbSchema } from "@/lib/seo";
-import { formatDate } from "@/lib/date";
 import { firstParam, formatIndianNumber } from "@/lib/utils";
 import { BIHAR_DEPARTMENTS } from "@/lib/site";
 
@@ -59,7 +59,10 @@ export default async function BiharHubPage({
   return (
     <PageContainer
       aside={
-        <UpdatesRail updates={updates} ariaLabel="Recent Bihar & central exam updates" />
+          <RecentUpdatesPanel
+            updates={updates}
+            ariaLabel="Recent Bihar & central exam updates"
+          />
       }
     >
       <JsonLd data={breadcrumbSchema([{ name: "Bihar Jobs", path: "/bihar" }])} />
@@ -117,60 +120,5 @@ function DepartmentChip({
     >
       {label}
     </Link>
-  );
-}
-
-function UpdatesRail({
-  updates,
-  ariaLabel,
-}: {
-  updates: Awaited<ReturnType<typeof listRecentUpdates>>;
-  ariaLabel: string;
-}) {
-  const base: Record<RecentUpdate["kind"], string> = {
-    "admit-card": "admit-card",
-    result: "result",
-    "answer-key": "answer-key",
-  };
-  const label: Record<RecentUpdate["kind"], string> = {
-    "admit-card": "Admit Card",
-    result: "Result",
-    "answer-key": "Answer Key",
-  };
-
-  return (
-    <section aria-label={ariaLabel} className="gov-panel">
-      <div className="gov-panel-title">
-        <h2 className="font-serif text-base font-bold text-white">
-          Recent Exam Updates
-        </h2>
-      </div>
-      <ul className="divide-y divide-rule p-2">
-        {updates.map((u) => (
-          <li key={u.slug} className="py-2">
-            <p className="mb-0.5 text-[0.6875rem] font-bold tracking-wide uppercase text-ingreen">
-              {label[u.kind]}
-            </p>
-            <Link
-              href={`/${base[u.kind]}/${u.slug}`}
-              className="font-semibold text-navy no-underline hover:text-alert hover:underline"
-            >
-              {u.title}
-            </Link>
-            <p className="mt-0.5 text-xs text-ink-faint">
-              {u.date ? formatDate(u.date) : ""}
-            </p>
-          </li>
-        ))}
-      </ul>
-      <div className="border-t border-rule p-2">
-        <Link
-          href="/admit-card"
-          className="text-xs font-semibold text-navy no-underline hover:text-alert hover:underline"
-        >
-          View all admit cards & results →
-        </Link>
-      </div>
-    </section>
   );
 }
