@@ -58,6 +58,15 @@ const FIELD_DOCS = {
   "download_link": string | null,
   "official_link": string | null
 }`,
+  answer_key: `{
+  "title": string,
+  "description": string | null,
+  "type": "provisional" | "final" | null,
+  "release_date": "YYYY-MM-DD" | null,
+  "objection_last_date": "YYYY-MM-DD" | null,
+  "download_link": string | null,
+  "official_link": string | null
+}`,
 };
 
 /**
@@ -81,6 +90,8 @@ const TASK_LINE = {
     "You are extracting structured data from an official Indian government exam result notice.",
   admit_card:
     "You are extracting structured data from an official Indian government admit-card notice.",
+  answer_key:
+    "You are extracting structured data from an official Indian government answer-key notice.",
 };
 
 export function buildPrompt(targetType, meta, sourceText, { garbled = false } = {}) {
@@ -113,6 +124,7 @@ const FLAGGABLE = {
   ],
   result: ["result_date", "cutoff_data", "merit_list_link"],
   admit_card: ["release_date", "exam_date", "download_link"],
+  answer_key: ["release_date", "objection_last_date", "download_link"],
 };
 
 export function flaggableFields(targetType) {

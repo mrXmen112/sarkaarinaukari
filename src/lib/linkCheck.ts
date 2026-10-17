@@ -52,6 +52,24 @@ export type UrlCheckResult = {
   reason: string;
 };
 
+/**
+ * Validate one URL under the same rules the sweep uses, but in a single call.
+ *
+ * Only a provable death (HTTP 404/410, or an NXDOMAIN domain) returns ok:false.
+ * A timeout, bot-block (403) or TLS error is stored but treated as passable —
+ * the same "never flag on an unprovable failure" rule as runLinkCheck, so a
+ * gov server blocking our bot can't stop a legitimate publish.
+ */
+export async function validateOfficialUrl(url: string): Promise<UrlCheckResult> {
+  const result = await checkOneUrl(url);
+  if (result.ok) return result;
+  if (DEAD_STATUSES.has(result.status ?? 0)) return result;
+  if (await domainIsNxdomain(url)) {
+    return { url, ok: false, status: null, reason: "domain does not resolve" };
+  }
+  return { ...result, ok: true, reason: `unverified (${result.reason})` };
+}
+
 async function checkOneUrl(url: string): Promise<UrlCheckResult> {
   let lastResult: UrlCheckResult = { url, ok: false, status: null, reason: "unchecked" };
   for (let attempt = 1; attempt <= RETRIES; attempt++) {
