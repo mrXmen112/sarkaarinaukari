@@ -12,6 +12,7 @@ import {
 } from "@/lib/queries";
 import { articleSchema, breadcrumbSchema } from "@/lib/seo";
 import { SITE } from "@/lib/site";
+import { robotsFor, yojanaContentChars } from "@/lib/indexable";
 import { FAQSection } from "@/components/ui/FAQSection";
 import { ShareButtons } from "@/components/ui/ShareButtons";
 import { formatDate } from "@/lib/date";
@@ -47,7 +48,14 @@ export async function generateMetadata({
       url: `${SITE.url}/yojana/${yojana.slug}`,
       publishedTime: yojana.updated_at,
     },
-    robots: { index: true, follow: true },
+    // B4: shared with the sitemap via src/lib/indexable.ts.
+    robots: robotsFor({
+      kind: "yojana",
+      contentChars: yojanaContentChars(yojana),
+      officialSourceUrl: yojana.official_link,
+      lastVerifiedAt: yojana.last_verified_at,
+      isPublished: yojana.is_published,
+    }),
   };
 }
 

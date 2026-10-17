@@ -15,6 +15,7 @@ import {
 } from "@/lib/queries";
 import { articleSchema, breadcrumbSchema, faqSchema } from "@/lib/seo";
 import { SITE } from "@/lib/site";
+import { robotsFor, examContentChars } from "@/lib/indexable";
 import { FAQSection } from "@/components/ui/FAQSection";
 import { ShareButtons } from "@/components/ui/ShareButtons";
 import { truncate } from "@/lib/utils";
@@ -49,7 +50,14 @@ export async function generateMetadata({
       description: truncate(exam.overview ?? "", 158),
       url: `${SITE.url}/exams/${exam.slug}`,
     },
-    robots: { index: true, follow: true },
+    // B4: shared with the sitemap via src/lib/indexable.ts.
+    robots: robotsFor({
+      kind: "exam",
+      contentChars: examContentChars(exam),
+      officialSourceUrl: exam.official_link,
+      lastVerifiedAt: exam.last_verified_at,
+      isPublished: exam.is_published,
+    }),
   };
 }
 

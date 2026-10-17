@@ -8,6 +8,7 @@ import { getExamBySlug } from "@/lib/queries";
 import { breadcrumbSchema, faqSchema } from "@/lib/seo";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { SITE } from "@/lib/site";
+import { robotsFor, examContentChars } from "@/lib/indexable";
 
 export const revalidate = 86400;
 
@@ -17,13 +18,32 @@ export async function generateMetadata({
   const { exam } = await params;
   const record = await getExamBySlug(exam);
   if (!record) return { title: "Exam Not Found" };
+
+  // B4: this template exists to host official paper PDFs. With none present it
+  // is an empty shell, so it must not compete for "previous year papers" terms.
+  // The same verdict drives the robots tag here and the sitemap in
+  // src/app/sitemap.ts, via src/lib/indexable.ts.
+  const papers = Array.isArray(record.previous_year_papers)
+    ? record.previous_year_papers
+    : [];
+  const officialLinks = papers.filter((p) =>
+    /^https?:\/\//i.test(p.link?.trim() ?? ""),
+  ).length;
+
   return {
     title: {
       absolute: `${record.name} Previous Year Question Papers — Official PDFs`,
     },
     description: `Previous year question papers for ${record.name}: official question paper PDFs released by the conducting body, with links to the syllabus and exam pattern. Papers are linked from official sources only.`,
     alternates: { canonical: `/previous-papers/${exam}` },
-    robots: { index: true, follow: true },
+    robots: robotsFor({
+      kind: "previousPapers",
+      contentChars: examContentChars(record),
+      officialSourceUrl: record.official_link,
+      lastVerifiedAt: record.last_verified_at,
+      officialPaperLinks: officialLinks,
+      isPublished: record.is_published,
+    }),
   };
 }
 

@@ -10,6 +10,11 @@ import {
 import { BIHAR_ORG_PAGES, STATE_SLUGS } from "@/lib/landingPagesState";
 import { BOARDS } from "@/lib/boards";
 import { VERIFICATION_GATE_ENABLED } from "@/lib/queries";
+import {
+  isIndexable,
+  examContentChars,
+  yojanaContentChars,
+} from "@/lib/indexable";
 
 /**
  * Sitemap index (Phase 2): each id below becomes /sitemap/<id>.xml, with the
@@ -106,6 +111,71 @@ export default async function sitemap(props: {
 
   type SlugRow = { slug: string; updated_at: string | null };
 
+  /**
+   * Columns needed to decide indexability, per prep table. Reading only what
+   * the gate needs keeps this cheap; the sitemap is on the ISR hot path.
+   */
+  const PREP_COLUMNS: Record<string, string> = {
+    exams:
+      "slug, updated_at, overview, eligibility, exam_pattern, preparation_strategy, conducting_body, official_link, last_verified_at, previous_year_papers",
+    yojana:
+      "slug, updated_at, title, description, eligibility, how_to_apply, benefits_summary, benefits, official_link, last_verified_at",
+    syllabus: "slug, updated_at",
+    current_affairs: "slug, updated_at",
+    quizzes: "slug, updated_at",
+  };
+
+  type PrepRow = Record<string, unknown> & { slug: string; updated_at: string | null };
+
+  /**
+   * Templates that are NOT content-gated today keep their previous behaviour:
+   * syllabus, current_affairs and quizzes have no official_link or
+   * last_verified_at column (migration 0020 deliberately did not add them), so
+   * applying the full rule would noindex all of them without a way to ever
+   * pass it. They are flagged in the inventory as "not gated".
+   */
+  const PREP_KIND: Record<string, "exam" | "yojana" | null> = {
+    exams: "exam",
+    yojana: "yojana",
+    syllabus: null,
+    current_affairs: null,
+    quizzes: null,
+  };
+
+  function prepIndexVerdict(table: string, row: PrepRow) {
+    const kind = PREP_KIND[table];
+    if (kind === null) {
+      return { indexable: true, reasons: [] as string[] };
+    }
+    return isIndexable({
+      kind,
+      contentChars:
+        kind === "exam"
+          ? examContentChars(row as Parameters<typeof examContentChars>[0])
+          : yojanaContentChars(row as Parameters<typeof yojanaContentChars>[0]),
+      officialSourceUrl: (row.official_link as string | null) ?? null,
+      lastVerifiedAt: (row.last_verified_at as string | null) ?? null,
+      isPublished: true,
+    });
+  }
+
+  function previousPapersVerdict(row: PrepRow) {
+    const papers = Array.isArray(row.previous_year_papers)
+      ? (row.previous_year_papers as { link?: string }[])
+      : [];
+    const officialLinks = papers.filter((p) =>
+      /^https?:\/\//i.test(p?.link?.trim() ?? ""),
+    ).length;
+    return isIndexable({
+      kind: "previousPapers",
+      contentChars: examContentChars(row as Parameters<typeof examContentChars>[0]),
+      officialSourceUrl: (row.official_link as string | null) ?? null,
+      lastVerifiedAt: (row.last_verified_at as string | null) ?? null,
+      officialPaperLinks: officialLinks,
+      isPublished: true,
+    });
+  }
+
   const routes: MetadataRoute.Sitemap = [];
 
   try {
@@ -165,6 +235,13 @@ export default async function sitemap(props: {
     }
 
     // prep: exams, syllabus, quiz, current-affairs, yojana + their listings
+    //
+    // B4: the listings themselves stay (they are real hub pages with their own
+    // canonical), but individual detail rows are only emitted when
+    // src/lib/indexable.ts says they may be indexed — the SAME function that
+    // writes their robots meta tag. Previously this loop emitted every
+    // published row unconditionally, which is how a noindexed page ends up
+    // advertised in a sitemap.
     const prepListings: MetadataRoute.Sitemap = [
       { url: `${base}/exams`, changeFrequency: "daily" },
       { url: `${base}/quiz`, changeFrequency: "weekly" },
@@ -173,25 +250,43 @@ export default async function sitemap(props: {
     ];
     routes.push(...prepListings);
 
+    const excluded: { url: string; reasons: string[] }[] = [];
+
     for (const table of ["exams", "syllabus", "current_affairs", "quizzes", "yojana"]) {
       const { data } = await supabase
         .from(table)
-        .select("slug, updated_at")
+        .select(PREP_COLUMNS[table])
         .eq("is_published", true)
         .order("updated_at", { ascending: false });
-      for (const row of (data ?? []) as SlugRow[]) {
+
+      for (const row of (data ?? []) as PrepRow[]) {
+        const url = `${base}/${tableForSlug[table]}/${row.slug}`;
+        const verdict = prepIndexVerdict(table, row);
+        if (!verdict.indexable) {
+          excluded.push({ url, reasons: verdict.reasons });
+          continue;
+        }
         routes.push({
-          url: `${base}/${tableForSlug[table]}/${row.slug}`,
+          url,
           lastModified: row.updated_at ? new Date(row.updated_at) : undefined,
           changeFrequency: "weekly",
           priority: 0.7,
         });
       }
-      // Phase 4B — one previous-papers page per published exam.
+
+      // Phase 4B — one previous-papers page per published exam. Gated on the
+      // exam actually having officially published papers; without at least one
+      // it is an empty shell and must stay out of the sitemap.
       if (table === "exams") {
-        for (const row of (data ?? []) as SlugRow[]) {
+        for (const row of (data ?? []) as PrepRow[]) {
+          const url = `${base}/previous-papers/${row.slug}`;
+          const verdict = previousPapersVerdict(row);
+          if (!verdict.indexable) {
+            excluded.push({ url, reasons: verdict.reasons });
+            continue;
+          }
           routes.push({
-            url: `${base}/previous-papers/${row.slug}`,
+            url,
             lastModified: row.updated_at ? new Date(row.updated_at) : undefined,
             changeFrequency: "monthly",
             priority: 0.5,
@@ -199,6 +294,17 @@ export default async function sitemap(props: {
         }
       }
     }
+
+    if (excluded.length > 0) {
+      console.warn(
+        `[sitemap] ${id}: excluded ${excluded.length} noindexed URL(s), e.g. ` +
+          excluded
+            .slice(0, 3)
+            .map((e) => `${new URL(e.url).pathname} (${e.reasons.join("; ")})`)
+            .join(", "),
+      );
+    }
+
     return routes;
   } catch {
     return routes;
