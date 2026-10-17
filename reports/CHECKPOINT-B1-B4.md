@@ -3,7 +3,7 @@
 Written 2026-10-17, updated after W5. Read this first in a fresh session.
 
 Project: `sarkaarinaukari` · ref `saalgaxbsxzmejxbzmbw` · PostgreSQL 17.6
-Branch `main`, pushed to `origin/main` at **`174ed7b`**. **Nothing is uncommitted
+Branch `main`, pushed to `origin/main` at **`be0ae74`**. **Nothing is uncommitted
 except two generated files under `reports/`.**
 
 ## Commits (all pushed)
@@ -24,6 +24,10 @@ except two generated files under `reports/`.**
 | `81c8183` | W5.6 the two remaining lint errors |
 | `9edd8c3` | W5.7 Amazon Associates tag → env |
 | `174ed7b` | W5.8 homepage fallback when jobs are thin |
+| `c4c1adc` | pipeline: CSBC date fix, skip non-recruitment notices, staged-JSON sanity |
+| `b155c9e` | W5.4 save-side: normalise + validate category JSON on approve |
+| `a29c36b` | Phase 7D Quick Publish (admin paste + LLM extract + gated publish) |
+| `be0ae74` | W4: Employment News + IBPS adapters, transient-fetch retry, activate sources (`0022`) |
 
 ## Commands
 
@@ -304,11 +308,17 @@ is fixed. Remaining untouched warnings live in `current-affairs/page.tsx`,
   every action, service-role client for the SECURITY DEFINER RPCs, exam/yojana
   verification included so B4 rows can ever become indexable.
 - **Landing hub rule — DONE** (`4b1d861`). `MIN_VERIFIED_OPEN_JOBS = 3`.
-- **W5 — DONE** (`6fccf96`..`174ed7b`, see §3c). Display-side sanity only; the
-  admin form still accepts messy JSON (W5.4 save-side open).
-- **W4 — PREP DONE, live run NOT authorised.** Official recruitment/notice URLs
-  for the Tier 1 sources were located and checked read-only (URL + robots.txt
-  stance + page title); see §8. Do not run `--live` scraping without a fresh yes.
+- **W5 — DONE** (`6fccf96`..`174ed7b`, see §3c) **including W5.4 save-side**
+  (`b155c9e`): approve now normalises + validates job category JSON
+  (`parseNumberMap` / `duplicateCategoryKeys` / `normaliseJobJsonFields`) and uses
+  the cleaned fields for build/Telegram/IndexNow. 56 tests pass.
+- **Phase 7D Quick Publish — DONE** (`a29c36b`): `/admin/quick-publish` pastes an
+  official link, extracts a draft via the LLM, and publishes only once the official
+  link validates. Jobs publish `verification_status='unverified'`; admit cards /
+  results / answer keys publish as-is. UPSC / PIB / RRB will be published this way.
+- **W4 — DONE** (see §9). CSBC live-tested; Employment News + IBPS adapters added,
+  verified and activated (migration `0022`). UPSC / PIB / RRB are manual sources
+  (bot/WAF-blocked); cron stays off.
 - **W6** — real Central/State job hubs (from the footer decision above).
 - **BLOCKER for the gate**: 0 jobs verified. `simulate-gate` shows that flipping
   `NEXT_PUBLIC_VERIFICATION_GATE=on` now empties the homepage job table. Verify
@@ -356,3 +366,40 @@ Two hazards to plan around before any live scrape:
 Nine of ten have no blocking robots rules; none disallows the recruitment paths.
 That is **permission to fetch, not authorisation to scrape** — hold for an
 explicit yes before running `--live`, and rate-limit regardless.
+
+---
+
+## 9. W4 source adapters (done 2026-10-17, commit `be0ae74`)
+
+Four sources were taken through read-only recon, then two were built out as
+adapters. Verified against live HTML before wiring up (read-only harness in
+`D:\DevCache\temp\opencode\`):
+
+| Source | Finding | Outcome |
+|---|---|---|
+| **Employment News** `employmentnews.gov.in` | `NewEmp/MoreContentS.aspx?n=WebAdvertisement` is a server-rendered list of vacancy advert PDFs under `/writereaddata/<DDMMYYYY>...pdf`; the filename prefix is the publication date | **Adapter live** — 48 items extracted; `--live --limit 2` → `found=48 new=2 success` |
+| **IBPS CRP** `ibps.in` | `index.php/recruitment` lists registration/notice rows with `DD-Mon-YYYY` windows; `/robots.txt` 404 (allow) | **Adapter live** — 8 items extracted; `--live --limit 2` → `found=8 new=2 success` |
+| **PIB** `pib.gov.in` | **403 Akamai "Access Denied"** on homepage *and* `RssMain.aspx` — same class as UPSC | **Manual** (no adapter) |
+| **RRB Patna** `rrbpatna.gov.in` | redirects to `rrb.indianrailways.gov.in/patna`; notices only exist behind `getdata?...` XHR endpoints that return **WAF "Request Rejected"** (247-byte stub) | **Manual** (no adapter) |
+
+New/changed files: `sources/employmentnews.mjs`, `sources/ibps.mjs`,
+`sources/index.mjs` (registry), `lib/net.mjs` (new), and `fetchWithRetry` wired
+into `lib/scrape.mjs`, `lib/robots.mjs`, `lib/structure.mjs`. Migration
+**`0022_scrape_source_activation`** sets `is_active=true` for the two verified
+sources and pins UPSC / PIB / RRB inactive. `auto_publish` remains `false` — all
+scraped rows still go to the review queue.
+
+**Two hazards recorded here:**
+
+1. **IBPS serves an incomplete TLS chain** (no intermediate), so a fresh Node
+   runtime fails with `UNABLE_TO_VERIFY_LEAF_SIGNATURE`. Locally fixed with
+   `NODE_OPTIONS=--use-system-ca`; production needs that env set **or** an undici
+   CA agent, else treat IBPS as manual too.
+2. **IBPS's edge intermittently aborts the handshake**
+   (`ERR_SSL_UNEXPECTED_MESSAGE`, and once a 3× burst). `lib/net.mjs` now retries
+   transient TLS/network errors 3× with backoff; a failed run is logged and simply
+   retried next cycle (no partial writes).
+
+Verification after the change: `npm test` 56/56 · `npm run lint` 0 errors /
+24 pre-existing warnings · `npm run build` clean · dedup confirmed (repeat IBPS
+run `new=0`).
