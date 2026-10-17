@@ -20,6 +20,7 @@ import { RateLimiter } from "./rateLimit.mjs";
 import { fetchRobotsTxt, parseRobotsTxt, isAllowed } from "./robots.mjs";
 import { htmlToCleanText } from "./text.mjs";
 import { sha256Hex } from "./hash.mjs";
+import { fetchWithRetry } from "./net.mjs";
 
 /** Keep staging rows small and LLM-friendly. */
 const MAX_CONTENT_CHARS = 20000;
@@ -44,7 +45,7 @@ async function fetchText(url, limiter, minDelayMs) {
   await limiter.wait(new URL(url).host);
   // Reuse one limiter instance per process; minDelayMs is fixed at construction.
   void minDelayMs;
-  const res = await fetch(url, {
+  const res = await fetchWithRetry(url, {
     headers: { "User-Agent": USER_AGENT },
     redirect: "follow",
     signal: AbortSignal.timeout(45000),

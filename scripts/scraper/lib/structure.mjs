@@ -15,6 +15,7 @@
 
 import { USER_AGENT } from "./config.mjs";
 import { htmlToCleanText } from "./text.mjs";
+import { fetchWithRetry } from "./net.mjs";
 import { buildPrompt, flaggableFields, requiredFields } from "./prompts.mjs";
 import { callLLM, cleanJsonResponse } from "./llm.mjs";
 import {
@@ -104,7 +105,7 @@ export async function getFullText(raw, { limiter, pdfParse, refetch = true }) {
   }
   if (body.includes(PDF_MARKER) && meta.url) {
     await limiter.wait(new URL(meta.url).host);
-    const res = await fetch(meta.url, {
+    const res = await fetchWithRetry(meta.url, {
       headers: { "User-Agent": USER_AGENT },
       redirect: "follow",
       signal: AbortSignal.timeout(60000),

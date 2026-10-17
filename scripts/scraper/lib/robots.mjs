@@ -7,6 +7,8 @@
  * scrape_sources.robots_txt_checked_at.
  */
 
+import { fetchWithRetry } from "./net.mjs";
+
 /**
  * Parse robots.txt into a list of { agents: string[], rules: { allow|disallow: path }[] }.
  * Only Allow/Disallow/User-agent lines are honoured; everything else ignored.
@@ -65,7 +67,7 @@ export function isAllowed(groups, userAgent, path) {
 
 export async function fetchRobotsTxt(baseUrl, userAgent) {
   const robotsUrl = new URL("/robots.txt", baseUrl).toString();
-  const res = await fetch(robotsUrl, {
+  const res = await fetchWithRetry(robotsUrl, {
     headers: { "User-Agent": userAgent },
     redirect: "follow",
   });
