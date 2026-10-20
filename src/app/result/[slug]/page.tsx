@@ -13,9 +13,9 @@ import {
 } from "@/components/updates/UpdatePanels";
 import { formatDate, toISODate } from "@/lib/date";
 import { getAllResultSlugs, getResultBySlug } from "@/lib/queries";
-import { articleSchema, breadcrumbSchema } from "@/lib/seo";
+import { articleSchema, breadcrumbSchema, buildMeta } from "@/lib/seo";
 import { SITE } from "@/lib/site";
-import { categoryLabel, truncate } from "@/lib/utils";
+import { categoryLabel } from "@/lib/utils";
 import type { ResultCutoff } from "@/types/database";
 
 export const revalidate = 10800; // 3 hours
@@ -32,24 +32,24 @@ export async function generateMetadata({
   const result = await getResultBySlug(slug);
   if (!result) return { title: "Result Not Found" };
 
-  const title = `${result.title} — Sarkari Result`;
-  return {
+  const released = result.status === "released";
+  const title = released
+    ? `${result.title} — Sarkari Result`
+    : `${result.title} — Expected Result`;
+  const description =
+    result.description ??
+    (released
+      ? `Result details and category-wise cutoff marks for ${result.title}.`
+      : `Expected result date for ${result.title}. The result has not been declared yet.`);
+
+  return buildMeta({
+    kind: "result",
     title,
-    description: truncate(
-      result.description ??
-        `Result details and category-wise cutoff marks for ${result.title}.`,
-      158,
-    ),
-    alternates: { canonical: `/result/${result.slug}` },
-    openGraph: {
-      type: "article",
-      title,
-      description: truncate(result.description ?? "", 158),
-      url: `${SITE.url}/result/${result.slug}`,
-      publishedTime: result.result_date ?? undefined,
-    },
-    robots: { index: true, follow: true },
-  };
+    description,
+    path: `/result/${result.slug}`,
+    publishedTime: released ? (result.result_date ?? undefined) : undefined,
+    robots: { index: released, follow: true },
+  });
 }
 
 export default async function ResultDetailPage({
@@ -60,17 +60,20 @@ export default async function ResultDetailPage({
   if (!result) notFound();
 
   const url = `${SITE.url}/result/${result.slug}`;
+  const released = result.status === "released";
   const cutoff = normalizeCutoff(result.cutoff_data);
 
   return (
     <PageContainer>
-      <JsonLd data={articleSchema({
-        headline: result.title,
-        description: result.description ?? undefined,
-        datePublished: toISODate(result.result_date),
-        dateModified: toISODate(result.updated_at),
-        url,
-      })} />
+      {released ? (
+        <JsonLd data={articleSchema({
+          headline: result.title,
+          description: result.description ?? undefined,
+          datePublished: toISODate(result.result_date),
+          dateModified: toISODate(result.updated_at),
+          url,
+        })} />
+      ) : null}
       <JsonLd
         data={breadcrumbSchema([
           { name: "Result", path: "/result" },
@@ -86,17 +89,33 @@ export default async function ResultDetailPage({
         <div className="min-w-0">
           <h1 className="text-2xl md:text-3xl">{result.title}</h1>
           <p className="mt-1 text-sm text-ink-muted">
-            Declared {formatDate(result.result_date)}
+            {released ? "Declared" : "Expected Result Date"}{" "}
+            {formatDate(result.result_date)}
           </p>
+          {!released ? (
+            <span className="mt-2 inline-block rounded-sm bg-alert-bg px-2 py-0.5 text-xs font-bold text-alert">
+              Expected — not declared yet
+            </span>
+          ) : null}
         </div>
         <div className="shrink-0">
           <UpdateDeadlineBadge
-            label="Result Date"
+            label={released ? "Result Date" : "Expected Result Date"}
             date={result.result_date}
             fallback="—"
           />
         </div>
       </header>
+
+      {!released ? (
+        <Panel title="Result Not Declared Yet" className="mb-4">
+          <p className="text-sm leading-relaxed">
+            The official result has not been declared yet. The date shown is an
+            expected date; confirm the actual result and download link on the
+            official website.
+          </p>
+        </Panel>
+      ) : null}
 
       {result.description ? (
         <Panel title="Important Update Details" className="mb-4">
@@ -123,12 +142,15 @@ export default async function ResultDetailPage({
                 "—"
               ),
             },
-            { label: "Result Date", value: formatDate(result.result_date) },
+            {
+              label: released ? "Result Date" : "Expected Result Date",
+              value: formatDate(result.result_date),
+            },
           ]}
         />
       </Panel>
 
-      {cutoff.length > 0 ? (
+      {released && cutoff.length > 0 ? (
         <Panel title="Cutoff Marks (Category-wise)" className="mb-4">
           <CutoffTable rows={cutoff} />
         </Panel>
@@ -136,7 +158,7 @@ export default async function ResultDetailPage({
 
       <Panel title="Important Links" className="mb-4">
         <ul className="divide-y divide-rule">
-          {result.merit_list_link ? (
+          {released && result.merit_list_link ? (
             <ExternalLinkRow
               href={result.merit_list_link}
               label="Download Merit List / Check Result"

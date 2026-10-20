@@ -126,7 +126,8 @@ export async function listJobs({
     createStaticClient()
       .from("jobs")
       .select(JOB_SELECT, { count: "exact" })
-      .eq("is_published", true),
+      .eq("is_published", true)
+      .eq("type", "job"),
   );
 
   if (status && status !== "all") {
@@ -221,6 +222,7 @@ export async function getRelatedJobs(
       .from("jobs")
       .select(JOB_SELECT)
       .eq("is_published", true)
+      .eq("type", "job")
       .eq("status", "active")
       .neq("slug", job.slug),
   );
@@ -240,6 +242,7 @@ export async function getRelatedJobs(
         .from("jobs")
         .select(JOB_SELECT)
         .eq("is_published", true)
+        .eq("type", "job")
         .eq("status", "active")
         .eq("state", job.state)
         .not("slug", "in", `(${[...seen].join(",")})`),
@@ -260,6 +263,7 @@ export async function getLatestJobs(limit = 8): Promise<JobWithCategory[]> {
         .from("jobs")
         .select(JOB_SELECT)
         .eq("is_published", true)
+        .eq("type", "job")
         .eq("status", "active")
         .gte("application_end", isoDatePlusDays(0)),
     )
@@ -277,6 +281,7 @@ export async function getClosingJobs(limit = 8): Promise<JobWithCategory[]> {
         .from("jobs")
         .select(JOB_SELECT)
         .eq("is_published", true)
+        .eq("type", "job")
         .eq("status", "active")
         .gte("application_end", isoDatePlusDays(-1)),
     )
@@ -294,6 +299,7 @@ export async function getRecentlyClosedJobs(limit = 8): Promise<JobWithCategory[
         .from("jobs")
         .select(JOB_SELECT)
         .eq("is_published", true)
+        .eq("type", "job")
         .eq("status", "closed")
         .lt("application_end", isoDatePlusDays(0))
         .gte("application_end", isoDatePlusDays(-30)),
@@ -315,6 +321,7 @@ export async function listArchivedJobs(limit = 100): Promise<JobWithCategory[]> 
         .from("jobs")
         .select(JOB_SELECT)
         .eq("is_published", true)
+        .eq("type", "job")
         .eq("status", "closed")
         .lt("application_end", isoDatePlusDays(-90)),
     )
@@ -372,7 +379,8 @@ export async function getAllJobSlugs(): Promise<string[]> {
       createStaticClient()
         .from("jobs")
         .select("slug")
-        .eq("is_published", true),
+        .eq("is_published", true)
+        .eq("type", "job"),
     ).order("created_at", { ascending: false });
     return ((data ?? []) as Pick<Job, "slug">[]).map((d) => d.slug);
   });
@@ -591,6 +599,7 @@ export async function listAdmitCards(limit = 200): Promise<AdmitCardWithJob[]> {
       .from("admit_cards")
       .select(UPDATE_JOB_SELECT)
       .eq("is_published", true)
+      .eq("status", "released")
       .order("release_date", { ascending: false, nullsFirst: false })
       .limit(limit);
     return (data ?? []) as AdmitCardWithJob[];
@@ -652,6 +661,7 @@ export async function listResults(limit = 200): Promise<ResultWithJob[]> {
       .from("results")
       .select(UPDATE_JOB_SELECT)
       .eq("is_published", true)
+      .eq("status", "released")
       .order("result_date", { ascending: false, nullsFirst: false })
       .limit(limit);
     return (data ?? []) as ResultWithJob[];
@@ -697,6 +707,7 @@ export async function listAnswerKeys(limit = 200): Promise<AnswerKeyWithJob[]> {
       .from("answer_keys")
       .select(UPDATE_JOB_SELECT)
       .eq("is_published", true)
+      .eq("status", "released")
       .order("release_date", { ascending: false, nullsFirst: false })
       .limit(limit);
     return (data ?? []) as AnswerKeyWithJob[];
@@ -748,18 +759,21 @@ export async function getJobTimeline(jobId: string): Promise<JobTimeline> {
         .select("title, slug, release_date, exam_date")
         .eq("job_id", jobId)
         .eq("is_published", true)
+        .eq("status", "released")
         .order("release_date", { ascending: false }),
       createStaticClient()
         .from("results")
         .select("title, slug, result_date")
         .eq("job_id", jobId)
         .eq("is_published", true)
+        .eq("status", "released")
         .order("result_date", { ascending: false, nullsFirst: false }),
       createStaticClient()
         .from("answer_keys")
         .select("title, slug, release_date")
         .eq("job_id", jobId)
         .eq("is_published", true)
+        .eq("status", "released")
         .order("release_date", { ascending: false, nullsFirst: false }),
     ]);
     return {

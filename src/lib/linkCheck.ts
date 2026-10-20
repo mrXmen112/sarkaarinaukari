@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import { isHomepageUrl } from "@/lib/applyLink";
 
 /**
  * HTTP link validation for published jobs (Phase 1).
@@ -50,6 +51,7 @@ export type UrlCheckResult = {
   ok: boolean;
   status: number | null;
   reason: string;
+  contentType: string | null;
 };
 
 /**
@@ -65,13 +67,25 @@ export async function validateOfficialUrl(url: string): Promise<UrlCheckResult> 
   if (result.ok) return result;
   if (DEAD_STATUSES.has(result.status ?? 0)) return result;
   if (await domainIsNxdomain(url)) {
-    return { url, ok: false, status: null, reason: "domain does not resolve" };
+    return {
+      url,
+      ok: false,
+      status: null,
+      reason: "domain does not resolve",
+      contentType: null,
+    };
   }
   return { ...result, ok: true, reason: `unverified (${result.reason})` };
 }
 
 async function checkOneUrl(url: string): Promise<UrlCheckResult> {
-  let lastResult: UrlCheckResult = { url, ok: false, status: null, reason: "unchecked" };
+  let lastResult: UrlCheckResult = {
+    url,
+    ok: false,
+    status: null,
+    reason: "unchecked",
+    contentType: null,
+  };
   for (let attempt = 1; attempt <= RETRIES; attempt++) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -97,6 +111,7 @@ async function checkOneUrl(url: string): Promise<UrlCheckResult> {
         ok: res.status < 400 || blocked,
         status: res.status,
         reason: res.status < 400 ? "ok" : blocked ? `blocked (HTTP ${res.status})` : `HTTP ${res.status}`,
+        contentType: res.headers.get("content-type"),
       };
     } catch (error) {
       const aborted = error instanceof Error && error.name === "AbortError";
@@ -105,6 +120,7 @@ async function checkOneUrl(url: string): Promise<UrlCheckResult> {
         ok: false,
         status: null,
         reason: aborted ? `timeout after ${TIMEOUT_MS}ms` : "network error",
+        contentType: null,
       };
       if (attempt < RETRIES) {
         await new Promise((r) => setTimeout(r, 1000));
@@ -119,6 +135,7 @@ async function checkOneUrl(url: string): Promise<UrlCheckResult> {
 export type LinkCheckReport = {
   processed: number;
   checked: number;
+  verifiedApply: number;
   flagged: {
     slug: string;
     title: string;
@@ -128,23 +145,42 @@ export type LinkCheckReport = {
   }[];
 };
 
+/** A PDF is a notification, not an application page. */
+function isPdfDestination(url: string, contentType: string | null): boolean {
+  if (contentType?.toLowerCase().includes("application/pdf")) return true;
+  try {
+    return new URL(url).pathname.toLowerCase().endsWith(".pdf");
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Validate links for the published jobs whose check is oldest (nulls first).
  * Bounded batch so one cron invocation always finishes inside the function
  * duration limit; repeated invocations sweep the whole table over time.
+ *
+ * `verifyApply` (default on) marks `apply_link_verified` only when the apply
+ * URL resolves 2xx/3xx and is a real HTML page - never a PDF, a homepage, a
+ * bot-block (403) or an unprovable timeout. A provable death (404/410/NXDOMAIN)
+ * clears it.
  */
 export async function runLinkCheck({
   limit = 25,
   onlyFlagged = false,
+  verifyApply = true,
 }: {
   limit?: number;
   onlyFlagged?: boolean;
+  verifyApply?: boolean;
 } = {}): Promise<LinkCheckReport> {
   const supabase = createAdminClient();
 
   let query = supabase
     .from("jobs")
-    .select("id, slug, title, official_link, notification_pdf_link")
+    .select(
+      "id, slug, title, official_link, notification_pdf_link, official_apply_url, official_notification_url, apply_link_verified, last_verified_at",
+    )
     .eq("is_published", true);
   if (onlyFlagged) query = query.eq("link_flagged", true);
   const { data: jobs } = await query
@@ -157,43 +193,105 @@ export async function runLinkCheck({
     title: string;
     official_link: string;
     notification_pdf_link: string | null;
+    official_apply_url: string | null;
+    official_notification_url: string | null;
+    apply_link_verified: boolean;
+    last_verified_at: string | null;
   }[];
 
-  const report: LinkCheckReport = { processed: 0, checked: 0, flagged: [] };
+  const report: LinkCheckReport = {
+    processed: 0,
+    checked: 0,
+    verifiedApply: 0,
+    flagged: [],
+  };
 
   for (const job of rows) {
     report.processed += 1;
-    const links = [job.official_link, job.notification_pdf_link].filter(
-      (u): u is string => !!u && u.trim().length > 0,
-    );
+
+    const applyUrl = job.official_apply_url?.trim() || job.official_link;
+    const notificationUrl =
+      job.official_notification_url?.trim() || job.notification_pdf_link;
+
+    const links: { url: string; kind: "apply" | "notification" }[] = [];
+    if (applyUrl?.trim()) links.push({ url: applyUrl, kind: "apply" });
+    if (notificationUrl?.trim() && notificationUrl !== applyUrl) {
+      links.push({ url: notificationUrl, kind: "notification" });
+    }
 
     let worst: UrlCheckResult | null = null;
     let provablyDead: string | null = null;
-    for (const url of links) {
-      const result = await checkOneUrl(url);
+    let applyResult: UrlCheckResult | null = null;
+    let applyDead = false;
+
+    for (const link of links) {
+      const result = await checkOneUrl(link.url);
       report.checked += 1;
+      if (link.kind === "apply") applyResult = result;
+
       if (result.ok) continue;
       if (DEAD_STATUSES.has(result.status ?? 0)) {
         worst = result;
-        provablyDead = url;
+        provablyDead = link.url;
+        if (link.kind === "apply") applyDead = true;
         continue;
       }
-      if (!(await domainIsNxdomain(url))) {
+      if (!(await domainIsNxdomain(link.url))) {
         // Unprovable (timeout, block, TLS error) — store, never flag.
         if (!worst) worst = result;
         continue;
       }
-      worst = { url, ok: false, status: null, reason: "domain does not resolve" };
-      provablyDead = url;
+      const deadResult: UrlCheckResult = {
+        url: link.url,
+        ok: false,
+        status: null,
+        reason: "domain does not resolve",
+        contentType: null,
+      };
+      worst = deadResult;
+      provablyDead = link.url;
+      if (link.kind === "apply") {
+        applyResult = deadResult;
+        applyDead = true;
+      }
+    }
+
+    const now = new Date().toISOString();
+    const applyUsable =
+      applyResult !== null &&
+      applyResult.status !== null &&
+      applyResult.status >= 200 &&
+      applyResult.status < 400 &&
+      !isPdfDestination(applyUrl, applyResult.contentType) &&
+      !isHomepageUrl(applyUrl);
+
+    const update: {
+      link_last_checked_at: string;
+      link_http_status: number;
+      link_flagged: boolean;
+      apply_link_verified?: boolean;
+      last_verified_at?: string;
+    } = {
+      link_last_checked_at: now,
+      link_http_status: worst ? (worst.status ?? 0) : 200,
+      link_flagged: provablyDead !== null,
+    };
+
+    if (verifyApply && applyResult) {
+      if (applyUsable) {
+        update.apply_link_verified = true;
+        update.last_verified_at = now;
+        report.verifiedApply += 1;
+      } else if (applyDead) {
+        // A provable death is the only automatic downgrade. Blocks/timeouts
+        // keep whatever a human previously established.
+        update.apply_link_verified = false;
+      }
     }
 
     const { error } = await supabase
       .from("jobs")
-      .update({
-        link_last_checked_at: new Date().toISOString(),
-        link_http_status: worst ? (worst.status ?? 0) : 200,
-        link_flagged: provablyDead !== null,
-      })
+      .update(update)
       .eq("id", job.id);
 
     if (error) {

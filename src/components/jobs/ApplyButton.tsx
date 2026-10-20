@@ -26,15 +26,15 @@ export function ApplyButton({ href, title }: ApplyButtonProps) {
 }
 
 /**
- * W5.5 — the whole Apply call-to-action for a job, on the detail page.
+ * 2026-10 audit — the whole Apply call-to-action for a job, on the detail page.
  *
  * Uses the SAME classifier as the listing table, so a job can never show
  * "Apply" in the table and "under verification" on its own page. Renders:
  *
  *   closed  -> a "Closed" label (no link at all)
- *   details -> "Apply link under verification" (nothing to send them to)
- *   website -> "Official Website": the URL resolves but is only a homepage
- *   apply   -> "Apply Online"
+ *   apply   -> "Apply Online" (only a verified official apply URL)
+ *   website -> one notice + "Official Website" (never labelled Apply)
+ *   details -> one notice only (nothing safe to send them to)
  */
 export function ApplyCta({
   job,
@@ -53,27 +53,36 @@ export function ApplyCta({
     );
   }
 
-  if (link.kind === "details") {
+  if (link.kind === "apply") {
     return (
-      <span className="inline-block rounded-sm border border-alert px-3 py-2 text-sm font-bold text-alert">
-        <T k="applyLinkUnderVerification" />
-      </span>
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer nofollow"
+        className="gov-btn whitespace-nowrap"
+        aria-label={`Apply online for ${title} on the official website (opens in a new tab)`}
+      >
+        <T k="applyOnline" />
+      </a>
     );
   }
 
   return (
-    <a
-      href={link.href}
-      target="_blank"
-      rel="noopener noreferrer nofollow"
-      className="gov-btn whitespace-nowrap"
-      aria-label={
-        link.kind === "website"
-          ? `Visit the official website for ${title} (opens in a new tab)`
-          : `Apply online for ${title} on the official website (opens in a new tab)`
-      }
-    >
-      <T k={link.kind === "website" ? "officialWebsite" : "applyOnline"} />
-    </a>
+    <div className="flex flex-col items-start gap-2">
+      <span className="inline-block rounded-sm border border-alert px-3 py-2 text-sm font-bold text-alert">
+        <T k="applyLinkUnderVerification" />
+      </span>
+      {link.kind === "website" ? (
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+          className="gov-btn whitespace-nowrap"
+          aria-label={`Visit the official website for ${title} (opens in a new tab)`}
+        >
+          <T k="officialWebsite" />
+        </a>
+      ) : null}
+    </div>
   );
 }

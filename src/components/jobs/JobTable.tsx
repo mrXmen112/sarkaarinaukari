@@ -5,6 +5,7 @@ import { DataTable, type Column } from "@/components/ui/DataTable";
 import { stateLabel } from "@/lib/queries";
 import { freshnessOf } from "@/lib/freshness";
 import { classifyApplyLink } from "@/lib/applyLink";
+import { auditJob } from "@/lib/jobAudit";
 import { formatIndianNumber } from "@/lib/utils";
 import { T } from "@/components/i18n/T";
 import type { JobWithCategory } from "@/types/database";
@@ -94,11 +95,24 @@ export function JobTable({
       key: "vacancy",
       header: <T k="vacancy" />,
       hideBelow: "md",
-      cell: (job) => (
-        <span className="font-semibold tabular-nums">
-          {formatIndianNumber(job.vacancy_total)}
-        </span>
-      ),
+      cell: (job) => {
+        const audit = auditJob(job);
+        if (audit.vacancyWithheld) {
+          return (
+            <span
+              className="text-xs font-semibold text-alert"
+              title="Vacancy figures are withheld pending verification against the official notification"
+            >
+              Under review
+            </span>
+          );
+        }
+        return (
+          <span className="font-semibold tabular-nums">
+            {formatIndianNumber(job.vacancy_total)}
+          </span>
+        );
+      },
     },
     ...extraColumns,
     {
@@ -122,10 +136,10 @@ export function JobTable({
           );
         }
 
-        if (link.kind === "details") {
+        if (link.kind === "details" || link.kind === "website") {
           return (
             <Link
-              href={link.href}
+              href={`/jobs/${job.slug}`}
               className="gov-btn whitespace-nowrap"
               aria-label={`View details for ${job.title} — apply link under verification`}
             >
@@ -134,21 +148,16 @@ export function JobTable({
           );
         }
 
-        // apply | website — both outbound, but labelled honestly.
-        const label = link.kind === "website" ? "officialWebsite" : "apply";
-        const aria =
-          link.kind === "website"
-            ? `Visit the official website for ${job.title} (opens in a new tab)`
-            : `Apply online for ${job.title} on the official website (opens in a new tab)`;
+        // Only a verified apply destination reaches this branch.
         return (
           <a
             href={link.href}
             target="_blank"
             rel="noopener noreferrer nofollow"
             className="gov-btn whitespace-nowrap"
-            aria-label={aria}
+            aria-label={`Apply online for ${job.title} on the official website (opens in a new tab)`}
           >
-            <T k={label} />
+            <T k="apply" />
           </a>
         );
       },

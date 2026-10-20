@@ -1,0 +1,16 @@
+{
+  "base": "http://localhost:3100",
+  "startedAt": "2026-10-17T06:59:47.094Z",
+  "checked": 235,
+  "failures": [],
+  "warnings": [],
+  "linksChecked": 374,
+  "finishedAt": "2026-10-17T07:00:18.739Z",
+  "summary": {
+    "sitemapUrls": 235,
+    "pagesFetched": 235,
+    "linksChecked": 374,
+    "failures": 0,
+    "warnings": 0
+  }
+}

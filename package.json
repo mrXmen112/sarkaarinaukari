@@ -13,9 +13,11 @@
     "audit:seo": "node scripts/check-canonicals.mjs",
     "audit:index": "node scripts/seo-inventory.mjs",
     "audit:meta": "node --experimental-strip-types scripts/check-meta-uniqueness.mjs",
+    "audit:jobs": "node --experimental-strip-types scripts/audit-jobs.ts",
+    "check:links": "node scripts/check-links.mjs",
+    "submit:indexnow": "node scripts/indexnow-submit.mjs",
     "gate:simulate": "node --experimental-strip-types scripts/simulate-gate.mjs",
     "test": "node --test --experimental-strip-types src/lib/*.test.ts",
-    "samples:jobposting": "node --experimental-strip-types scripts/sample-jobposting.mjs",
     "db:inventory": "node scripts/db-inventory.mjs",
     "export:unverified": "node scripts/export-unverified.mjs",
     "scraper": "node scripts/scraper/run.mjs"

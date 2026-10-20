@@ -1,0 +1,162 @@
+{
+  "base": "http://localhost:3100",
+  "generatedAt": "2026-10-17T06:59:24.950Z",
+  "sitemapUrls": 235,
+  "inspected": 235,
+  "totals": {
+    "total": 235,
+    "indexable": 235,
+    "noindexed": 0
+  },
+  "contradictions": 0,
+  "notInSitemap": {
+    "/exams/[param]": {
+      "indexable": 0,
+      "noindexed": 48
+    },
+    "/yojana/[param]": {
+      "indexable": 0,
+      "noindexed": 18
+    }
+  },
+  "templates": {
+    "/": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/bihar": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/about": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/contact": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/privacy": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/terms": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/disclaimer": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/editorial-policy": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/result/[param]": {
+      "total": 24,
+      "indexable": 24,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/jobs/[param]": {
+      "total": 170,
+      "indexable": 170,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/bihar/[param]": {
+      "total": 8,
+      "indexable": 8,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/jobs": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/admit-card": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/result": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/answer-key": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/admit-card/[param]": {
+      "total": 8,
+      "indexable": 8,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/answer-key/[param]": {
+      "total": 3,
+      "indexable": 3,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/exams": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/quiz": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/current-affairs": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/yojana": {
+      "total": 1,
+      "indexable": 1,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/current-affairs/[param]": {
+      "total": 4,
+      "indexable": 4,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    },
+    "/quiz/[param]": {
+      "total": 2,
+      "indexable": 2,
+      "noindexed": 0,
+      "noindexInSitemap": []
+    }
+  }
+}

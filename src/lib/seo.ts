@@ -1,7 +1,8 @@
+import type { Metadata } from "next";
+
 import type { JobWithCategory } from "@/types/database";
 
-import { SITE } from "@/lib/site";
-import { buildJobPosting } from "@/lib/jobPosting";
+import { SITE } from "./site.ts";
 
 /**
  * schema.org builders. Every builder returns a plain object that JsonLd
@@ -9,17 +10,118 @@ import { buildJobPosting } from "@/lib/jobPosting";
  * raw script component.
  */
 
-/**
- * Resolve a state slug (e.g. "bihar") to its display name for schema.org
- * addressRegion. `STATE_NAMES` is declared later in this module; the lookup
- * only runs at call time, so the forward reference is safe.
- */
-function stateName(code: string | null | undefined): string | undefined {
-  if (!code) return undefined;
-  return STATE_NAMES[code];
+export type Breadcrumb = { name: string; path: string };
+
+/* ------------------------------------------------------------------ */
+/* Shared page metadata                                                */
+/* ------------------------------------------------------------------ */
+
+export const SEO_TITLE_MAX = 60;
+export const SEO_DESCRIPTION_MIN = 140;
+export const SEO_DESCRIPTION_MAX = 160;
+
+const DESCRIPTION_FILLER =
+  " Check eligibility, important dates, application fee and the official link before applying. Read the official notification for category-wise details and verify every date before you apply.";
+
+/** Collapse whitespace and cap a title at 60 characters without cutting a word. */
+export function clampSeoTitle(value: string): string {
+  const title = value.replace(/\s+/g, " ").trim();
+  if (title.length <= SEO_TITLE_MAX) return title;
+
+  const hardCut = title.slice(0, SEO_TITLE_MAX - 1);
+  const lastSpace = hardCut.lastIndexOf(" ");
+  const wordCut = lastSpace >= 30 ? hardCut.slice(0, lastSpace) : hardCut;
+  return `${wordCut.replace(/[\s—:,-]+$/, "")}…`;
 }
 
-export type Breadcrumb = { name: string; path: string };
+/**
+ * Keep descriptions inside the 140-160 character window. Short copy is padded
+ * with a factual, site-wide instruction rather than invented vacancy detail.
+ */
+export function clampSeoDescription(value: string): string {
+  let text = value.replace(/\s+/g, " ").trim();
+  if (text.length < SEO_DESCRIPTION_MIN) text += DESCRIPTION_FILLER;
+
+  if (text.length > SEO_DESCRIPTION_MAX) {
+    const hardCut = text.slice(0, SEO_DESCRIPTION_MAX - 3);
+    const lastSpace = hardCut.lastIndexOf(" ");
+    const wordCut = lastSpace >= 100 ? hardCut.slice(0, lastSpace) : hardCut;
+    text = `${wordCut.replace(/[\s,;:—]+$/, "")}…`;
+  }
+
+  return text;
+}
+
+export type SeoPageKind =
+  | "job"
+  | "admit-card"
+  | "result"
+  | "answer-key"
+  | "exam"
+  | "landing"
+  | "page";
+
+export type BuildMetaInput = {
+  kind: SeoPageKind;
+  title: string;
+  description?: string | null;
+  /** Site-relative path, e.g. `/jobs/bihar-jail-sepoy-2026`. */
+  path: string;
+  robots?: Metadata["robots"];
+  publishedTime?: string;
+  modifiedTime?: string;
+  image?: string;
+};
+
+/**
+ * The single metadata builder for content pages.
+ *
+ * Keyword-first titles are capped at 60 characters, descriptions at 140-160,
+ * and every page gets a self-referencing canonical plus matching Open Graph and
+ * Twitter cards. Page templates only supply the copy; this function owns the
+ * shape.
+ */
+export function buildMeta({
+  kind,
+  title,
+  description,
+  path,
+  robots,
+  publishedTime,
+  modifiedTime,
+  image = "/opengraph-image",
+}: BuildMetaInput): Metadata {
+  const cleanTitle = clampSeoTitle(title);
+  const cleanDescription = clampSeoDescription(description ?? "");
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  const canonical = `${SITE.url.replace(/\/+$/, "")}${cleanPath}`;
+  const ogType: "article" | "website" =
+    kind === "landing" || kind === "page" ? "website" : "article";
+
+  return {
+    title: { absolute: cleanTitle },
+    description: cleanDescription,
+    alternates: { canonical },
+    openGraph: {
+      type: ogType,
+      title: cleanTitle,
+      description: cleanDescription,
+      url: canonical,
+      siteName: SITE.name,
+      locale: SITE.locale,
+      images: [image],
+      ...(publishedTime ? { publishedTime } : {}),
+      ...(modifiedTime ? { modifiedTime } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: cleanTitle,
+      description: cleanDescription,
+      images: [image],
+    },
+    ...(robots ? { robots } : {}),
+  };
+}
 
 /**
  * Organization (Phase 2) — rendered once in the root layout. Honest
@@ -133,36 +235,6 @@ export function articleSchema({
 }
 
 /**
- * JobPosting (Section 5 — required on every job detail page).
- * Dates are ISO; `application_end` drives validThrough.
- */
-export function jobPostingSchema(job: JobWithCategory, url: string) {
-  // Part C: the real builder lives in src/lib/jobPosting.ts so it can be unit
-  // tested without a database. This wrapper only adapts the row shape.
-  return buildJobPosting(
-    {
-      title: job.title,
-      short_description: job.short_description,
-      department: job.department,
-      category_name: job.job_categories?.name,
-      application_end: job.application_end,
-      application_start: job.application_start,
-      notification_date: job.notification_date,
-      created_at: job.created_at,
-      state: job.state,
-      vacancy_total: job.vacancy_total,
-      eligibility_education: job.eligibility_education,
-      pay_scale: job.pay_scale,
-      status: job.status,
-      verification_status: job.verification_status,
-      official_link: job.official_link,
-      link_http_status: job.link_http_status,
-    },
-    { url, regionName: stateName(job.state) },
-  );
-}
-
-/**
  * Generate FAQs from job data for schema.org FAQPage.
  */
 export function jobFAQSchema(job: JobWithCategory, url: string) {
@@ -229,11 +301,3 @@ export function faqSchema({
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
   };
 }
-
-const STATE_NAMES: Record<string, string> = {
-  bihar: "Bihar",
-  "uttar-pradesh": "Uttar Pradesh",
-  delhi: "Delhi",
-  jharkhand: "Jharkhand",
-  "madhya-pradesh": "Madhya Pradesh",
-};

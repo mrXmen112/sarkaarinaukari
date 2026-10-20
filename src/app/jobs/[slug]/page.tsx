@@ -20,9 +20,10 @@ import { hasBrokenLink } from "@/lib/url";
 import { formatDate } from "@/lib/date";
 import { resolveSlug } from "@/lib/slugRedirects";
 import { robotsFor } from "@/lib/indexable";
+import { auditJob } from "@/lib/jobAudit";
 import { CATEGORY_PAGES_BY_SLUG } from "@/lib/landingPages";
 import { STATE_SLUGS } from "@/lib/landingPagesState";
-import { categoryLabel as fmtCategoryLabel, formatIndianNumber, formatRupees, truncate } from "@/lib/utils";
+import { categoryLabel as fmtCategoryLabel, formatIndianNumber, formatRupees } from "@/lib/utils";
 import {
   cleanAgeRelaxation,
   cleanFees,
@@ -36,7 +37,14 @@ import {
   getRelatedJobs,
   stateLabel,
 } from "@/lib/queries";
-import { breadcrumbSchema, jobPostingSchema, jobFAQSchema } from "@/lib/seo";
+import {
+  SEO_DESCRIPTION_MAX,
+  SEO_DESCRIPTION_MIN,
+  SEO_TITLE_MAX,
+  breadcrumbSchema,
+  buildMeta,
+  jobFAQSchema,
+} from "@/lib/seo";
 import { SITE } from "@/lib/site";
 import { FAQSection } from "@/components/ui/FAQSection";
 import { ShareButtons } from "@/components/ui/ShareButtons";
@@ -56,6 +64,7 @@ export async function generateMetadata({
 
   if (!job) return { title: "Job Not Found" };
 
+  const audit = auditJob(job);
   const end = new Date(job.application_end);
   const year = end.getUTCFullYear();
   const lastDateShort = end.toLocaleDateString("en-IN", {
@@ -67,43 +76,54 @@ export async function generateMetadata({
   // Titles like "Bihar Home Guard 2026" must not become "...2026 2026".
   const cleanedTitle = job.title.replace(/\s+20\d{2}\s*$/, "").trim() || job.title;
 
-  const vacancyPart = job.vacancy_total
-    ? `${formatIndianNumber(job.vacancy_total)} Posts, `
-    : "";
+  const vacancyPart =
+    job.vacancy_total && !audit.failsAudit
+      ? `${formatIndianNumber(job.vacancy_total)} Posts, `
+      : "";
 
+  // Parenthetical post names ("(Warder)") push the useful last-date part past
+  // 60 characters, so the SEO title keeps the searchable name without them.
+  const seoName =
+    cleanedTitle
+      .replace(/\s*\([^)]*\)\s*/g, " ")
+      .replace(/\bCombined Competitive Examination\b/gi, "CCE")
+      .replace(/\s+/g, " ")
+      .trim() || cleanedTitle;
+
+  const openTitle = `${seoName} ${year}: ${vacancyPart}Apply ${lastDateShort}`;
+  const openTitleWithoutVacancy = `${seoName} ${year}: Apply ${lastDateShort}`;
   const title =
     job.status === "closed"
-      ? `${cleanedTitle} ${year} — Application Closed, Details & Notification`
-      : `${cleanedTitle} ${year}: ${vacancyPart}Last Date ${lastDateShort}, Apply Online`;
+      ? `${seoName} ${year} — Application Closed, Details`
+      : openTitle.length <= SEO_TITLE_MAX
+        ? openTitle
+        : openTitleWithoutVacancy;
 
-  const vacancySentence = job.vacancy_total
-    ? `${formatIndianNumber(job.vacancy_total)} vacancies.`
-    : "";
-  const educationSentence = job.eligibility_education
-    ? ` Eligibility: ${job.eligibility_education}.`
-    : "";
-  const description = truncate(
-    `${job.title}: ${vacancySentence} Last date ${formatDate(job.application_end)}.${educationSentence} Application fee, selection process, official notification PDF and apply link.`,
-    158,
-  );
+  const vacancySentence =
+    job.vacancy_total && !audit.failsAudit
+      ? `${formatIndianNumber(job.vacancy_total)} vacancies.`
+      : "";
+  const dateSentence = `Last date ${formatDate(job.application_end)}.`;
+  const checkSentence =
+    "Check eligibility, age limit, application fee, selection process and how to apply online.";
+  const descriptionWithVacancy = `${seoName} ${year}: ${vacancySentence ? `${vacancySentence} ` : ""}${dateSentence} ${checkSentence}`;
+  const descriptionWithoutVacancy = `${seoName} ${year}: ${dateSentence} ${checkSentence}`;
+  const description =
+    [descriptionWithVacancy, descriptionWithoutVacancy].find(
+      (value) =>
+        value.length >= SEO_DESCRIPTION_MIN && value.length <= SEO_DESCRIPTION_MAX,
+    ) ??
+    (descriptionWithVacancy.length <= SEO_DESCRIPTION_MAX
+      ? descriptionWithVacancy
+      : descriptionWithoutVacancy);
 
-  return {
-    // Absolute: these long, keyword-aware titles should not also carry the
-    // "%s | SarkaariNaukri" suffix from the root layout template.
-    title: { absolute: title },
+  // buildMeta owns the static shape: keyword-first absolute title (max 60),
+  // 140-160 character description, canonical and matching OG/Twitter cards.
+  return buildMeta({
+    kind: "job",
+    title,
     description,
-    alternates: { canonical: `/jobs/${slug}` },
-    openGraph: {
-      type: "article",
-      title,
-      description,
-      url: `${SITE.url}/jobs/${slug}`,
-      publishedTime: job.notification_date ?? job.published_at ?? undefined,
-      // W5.1: content_changed_at, never updated_at (a link check or migration
-      // clobbers updated_at on every row). Omitted when there is no real edit.
-      modifiedTime: job.content_changed_at ?? undefined,
-      images: ["/opengraph-image"],
-    },
+    path: `/jobs/${slug}`,
     // Phase 8A: a job nobody has checked against the official notification is
     // kept out of the index once NEXT_PUBLIC_VERIFICATION_GATE=on. Until then it
     // behaves exactly as it did before Phase 8A. This is the SAME function the
@@ -115,7 +135,11 @@ export async function generateMetadata({
       verificationStatus: job.verification_status,
       isPublished: job.is_published,
     }),
-  };
+    publishedTime: job.notification_date ?? job.published_at ?? undefined,
+    // W5.1: content_changed_at, never updated_at (a link check or migration
+    // clobbers updated_at on every row). Omitted when there is no real edit.
+    modifiedTime: job.content_changed_at ?? undefined,
+  });
 }
 
 /**
@@ -147,15 +171,37 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
   const timeline = await getJobTimeline(job.id);
   const url = `${SITE.url}/jobs/${job.slug}`;
 
-  // Phase 8A — a bulk-seeded job we have not yet matched to an official
-  // notification. It renders, but it is clearly labelled and carries no
-  // JobPosting structured data, because we cannot stand behind the claims yet.
-  const verified = job.verification_status === "verified";
+  const accepts12th = /12th|intermediate|higher secondary/i.test(
+    job.eligibility_education ?? "",
+  );
+  const guideLinks = [
+    ...(job.state === "bihar"
+      ? [
+          { label: "All Bihar Government Jobs", href: "/bihar" },
+          ...(accepts12th
+            ? [{ label: "Bihar 12th Pass Jobs", href: "/bihar/12th-pass-jobs" }]
+            : []),
+          { label: "Bihar Police Jobs", href: "/bihar/bihar-police" },
+          { label: "Bihar TRE Teacher Jobs", href: "/bihar/bihar-tre" },
+        ]
+      : accepts12th
+        ? [{ label: "All 12th Pass Government Jobs", href: "/jobs/12th-pass" }]
+        : []),
+    ...(job.job_categories?.slug && CATEGORY_PAGES_BY_SLUG[job.job_categories.slug]
+      ? [
+          {
+            label: `${job.job_categories.name} Jobs`,
+            href: `/jobs/category/${job.job_categories.slug}`,
+          },
+        ]
+      : []),
+  ];
 
-  // Part C: one gate decides whether a JobPosting block is emitted at all.
-  // jobPostingSchema() returns null when the job fails it (unverified, closed,
-  // or missing a verified apply URL), so the condition is never duplicated here.
-  const jobPosting = jobPostingSchema(job, `${SITE.url}/jobs/${job.slug}`);
+  // Phase 8A — a bulk-seeded job we have not yet matched to an official
+  // notification. It renders, but it is clearly labelled. Per the 2026-10 audit
+  // this site does not emit JobPosting structured data at all.
+  const verified = job.verification_status === "verified";
+  const audit = auditJob(job);
 
   const breadcrumbs = [
     { name: "Latest Jobs", path: "/jobs" },
@@ -188,7 +234,6 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
 
   return (
       <PageContainer>
-      {jobPosting ? <JsonLd data={jobPosting} /> : null}
       <JsonLd
         data={jobFAQSchema(job, url)}
       />
@@ -226,6 +271,30 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
               यह सूची अभी आधिकारिक अधिसूचना से मिलाई नहीं गई है, इसलिए यहाँ दी गई तारीखें
               और पदों की संख्या पुरानी हो सकती हैं। आवेदन से पहले कृपया संबंधित
               संस्थान की आधिकारिक वेबसाइट से सब कुछ जाँच लें।
+            </span>
+          </p>
+        </div>
+      ) : null}
+
+      {audit.failsAudit ? (
+        <div
+          role="alert"
+          className="mb-4 rounded-sm border-2 border-alert bg-alert-bg px-4 py-3"
+        >
+          <p className="text-sm font-bold text-alert">
+            <span className="lang-en">Vacancy and salary figures under review</span>
+            <span className="lang-hi">पद और वेतन के आंकड़े समीक्षा में हैं</span>
+          </p>
+          <p className="mt-1 text-xs text-navy">
+            <span className="lang-en">
+              Our audit found a discrepancy in this listing, so the vacancy count
+              and pay scale are withheld. Please confirm both in the official
+              notification before applying.
+            </span>
+            <span className="lang-hi">
+              हमारी जाँच में इस सूची में अंतर मिला है, इसलिए पदों की संख्या और
+              वेतन नहीं दिखाया गया है। आवेदन से पहले कृपया आधिकारिक अधिसूचना में
+              दोनों की पुष्टि करें।
             </span>
           </p>
         </div>
@@ -269,7 +338,11 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
             },
             {
               label: <T k="totalVacancy" />,
-              value: formatIndianNumber(job.vacancy_total),
+              value: audit.vacancyWithheld ? (
+                "Under review"
+              ) : (
+                formatIndianNumber(job.vacancy_total)
+              ),
             },
             {
               label: "Application Dates",
@@ -287,6 +360,18 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
             },
           ]}
         />
+        {!audit.failsAudit && !job.source_verified ? (
+          <p className="mt-2 text-xs text-ink-faint">
+            <span className="lang-en">
+              Vacancy and pay figures are shown as published. Confirm them on
+              the official notification before applying.
+            </span>
+            <span className="lang-hi">
+              पद और वेतन के आंकड़े प्रकाशित जानकारी के अनुसार हैं। आवेदन से पहले
+              आधिकारिक अधिसूचना में पुष्टि करें।
+            </span>
+          </p>
+        ) : null}
       </Panel>
 
       {/* Section 2b — Quick summary + sticky Apply (Phase 4D/4E) */}
@@ -301,9 +386,13 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
               { label: <T k="post" />, value: job.title },
               {
                 label: <T k="totalVacancy" />,
-                value: job.vacancy_total
-                  ? formatIndianNumber(job.vacancy_total)
-                  : <T k="notNotified" />,
+                value: audit.vacancyWithheld ? (
+                  "Under review"
+                ) : job.vacancy_total ? (
+                  formatIndianNumber(job.vacancy_total)
+                ) : (
+                  <T k="notNotified" />
+                ),
               },
               {
                 label: <T k="lastDate" />,
@@ -339,7 +428,10 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
             <ApplyCta
               job={{
                 slug: job.slug,
+                official_apply_url: job.official_apply_url,
+                official_site_url: job.official_site_url,
                 official_link: job.official_link,
+                apply_link_verified: job.apply_link_verified,
                 link_flagged: job.link_flagged,
                 status: job.status,
                 application_end: job.application_end,
@@ -396,6 +488,7 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       {/* Section 5 — Vacancy Breakdown. W5.4: withheld entirely when the parts do
           not add up to the stated total, so it can never contradict the total. */}
       {(() => {
+        if (audit.vacancyWithheld) return null;
         const rows = cleanVacancyBreakdown(job.vacancy_breakdown, job.vacancy_total);
         return rows ? (
           <Panel title="Vacancy Details (Category-wise)" className="mb-4">
@@ -442,10 +535,23 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
 
       {/* Section 6c — Salary details: only what the notification states. */}
       <Panel title={<T k="salaryDetails" />} className="mb-4">
-        {job.pay_scale ? (
-          <p className="text-sm text-ink">
-            <strong className="text-navy">Pay scale:</strong> {job.pay_scale}
+        {audit.salaryWithheld ? (
+          <p className="text-sm text-alert">
+            Pay scale withheld while our audit checks this listing against the
+            official notification.
           </p>
+        ) : job.pay_scale ? (
+          <>
+            <p className="text-sm text-ink">
+              <strong className="text-navy">Pay scale:</strong> {job.pay_scale}
+            </p>
+            {!job.source_verified ? (
+              <p className="mt-2 text-xs text-ink-faint">
+                Shown as published. Confirm the pay scale in the official
+                notification before applying.
+              </p>
+            ) : null}
+          </>
         ) : (
           <p className="text-sm text-ink-muted">
             Pay scale not notified yet — it appears in the official advertisement
@@ -509,16 +615,15 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       {/* Section 8 — How to Apply */}
       <Panel title={<T k="howToApply" />} className="mb-4">
         <Steps items={job.how_to_apply ?? []} />
-        {job.status === "closed" ? null : job.link_flagged ? (
-<p className="mt-3 rounded-sm bg-alert-bg px-2.5 py-2 text-sm font-semibold text-alert">
-            <T k="applyLinkUnderVerification" />
-          </p>
-        ) : (
+        {job.status === "closed" ? null : (
           <div className="mt-3">
             <ApplyCta
               job={{
                 slug: job.slug,
+                official_apply_url: job.official_apply_url,
+                official_site_url: job.official_site_url,
                 official_link: job.official_link,
+                apply_link_verified: job.apply_link_verified,
                 link_flagged: job.link_flagged,
                 status: job.status,
                 application_end: job.application_end,
@@ -616,6 +721,29 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
         url={url}
         headline={job.title}
       />
+
+      {guideLinks.length > 0 ? (
+        <nav aria-labelledby="explore-more" className="mb-4">
+          <h2
+            id="explore-more"
+            className="mb-2 font-serif text-base font-bold text-navy"
+          >
+            Explore More Government Jobs
+          </h2>
+          <ul className="flex flex-wrap gap-2">
+            {guideLinks.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="inline-block rounded-sm border border-rule bg-surface px-3 py-1.5 text-sm font-semibold text-navy no-underline hover:border-navy-400 hover:bg-navy-50"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
 
       {/* Section 11 — Related jobs (internal linking for SEO); closed jobs
           point readers to similar open vacancies instead of a dead end. */}

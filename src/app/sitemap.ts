@@ -7,7 +7,11 @@ import {
   CATEGORY_PAGES,
   QUALIFICATION_PAGES,
 } from "@/lib/landingPages";
-import { BIHAR_ORG_PAGES, STATE_SLUGS } from "@/lib/landingPagesState";
+import {
+  BIHAR_GUIDE_PAGES,
+  BIHAR_ORG_PAGES,
+  STATE_SLUGS,
+} from "@/lib/landingPagesState";
 import { BOARDS } from "@/lib/boards";
 import { VERIFICATION_GATE_ENABLED } from "@/lib/queries";
 import {
@@ -73,6 +77,13 @@ export default async function sitemap(props: {
       });
     }
     for (const page of BIHAR_ORG_PAGES) {
+      routes.push({
+        url: `${base}/bihar/${page.slug}`,
+        changeFrequency: "daily",
+        priority: 0.8,
+      });
+    }
+    for (const page of BIHAR_GUIDE_PAGES) {
       routes.push({
         url: `${base}/bihar/${page.slug}`,
         changeFrequency: "daily",
@@ -228,7 +239,8 @@ export default async function sitemap(props: {
       const jobQuery = supabase
         .from("jobs")
         .select(routeFor.jobs.columns)
-        .eq("is_published", true);
+        .eq("is_published", true)
+        .eq("type", "job");
       const { data: jobs } = await (VERIFICATION_GATE_ENABLED
         ? jobQuery.eq("verification_status", "verified")
         : jobQuery
@@ -258,6 +270,7 @@ export default async function sitemap(props: {
           .from(table)
           .select("slug")
           .eq("is_published", true)
+          .eq("status", "released")
           .order("created_at", { ascending: false });
         for (const row of (data ?? []) as unknown as SlugRow[]) {
           routes.push({

@@ -92,30 +92,30 @@ export const BIHAR_ORG_PAGES: LandingPage[] = [
   {
     kind: "bihar-org",
     slug: "bihar-police",
-    h1: "Bihar Police Jobs 2026 — CSBC Constable, SI & Driver Vacancies",
-    metaTitle: "Bihar Police Jobs 2026: Constable, SI, Driver & Apply Online",
+    h1: "Bihar Police SI 2026 — Notification, Vacancy, Eligibility & Apply",
+    metaTitle: "Bihar Police SI 2026: Vacancy, Eligibility & Apply Online",
     metaDescription:
-      "Latest Bihar Police government jobs 2026 — CSBC constable, sub-inspector, driver, fireman and prohibition posts. Eligibility, age, physical test, fee and official apply links.",
+      "Bihar Police SI 2026 recruitment by CSBC — check notification status, vacancy, eligibility, physical test, fee and official apply link. No 2026 SI notice confirmed yet.",
     intro: [
-      "Bihar Police recruitment is conducted by the Central Security and Bombastile Commission (CSBC) on behalf of the Bihar Police and related uniformed services — constables, sub-inspectors, drivers, firemen, jail sepoys, home guards and prohibition staff are all recruited through CSBC notifications.",
-      "This page lists every current Bihar Police vacancy with the post name, service, vacancies, age limit, fee, last date and the official notification and apply link. CSBC publishes its notifications on its official portal, and applications are accepted only there.",
-      "Beyond the written examination, Bihar Police recruitment includes a Physical Standard Test and Physical Efficiency Test with prescribed standards, and driving-licence requirements for vehicle posts. Prepare for the physical standards along with the syllabus — that is the usual reason strong candidates are screened out.",
+      "Bihar Police Sub-Inspector (SI) recruitment is conducted by the Central Selection Board of Constable (CSBC) on behalf of the Bihar Police. CSBC publishes the official advertisement, application window, vacancy matrix and physical standards on csbc.bihar.gov.in. At the last audit no 2026 SI notification had been published, so dates and vacancy figures circulating on unofficial sites should be treated as unconfirmed.",
+      "This page tracks the Bihar Police SI 2026 cycle and also lists current CSBC constable, driver, fireman, jail warder and prohibition constable vacancies. Every listing shows the post name, service, vacancies, age limit, fee, last date and the official source link so you can confirm the details before applying.",
+      "Bihar Police selection normally includes a written examination followed by a Physical Standard Test and Physical Efficiency Test. Prepare for the physical standards alongside the syllabus — height, chest and running requirements are a common reason candidates are screened out — and apply only through the official CSBC portal.",
     ],
     faqs: [
       {
-        question: "Bihar Police constable ki age limit kya hai?",
+        question: "Has CSBC released the Bihar Police SI 2026 notification?",
         answer:
-          "Constable recruitment usually allows 18-23 years (with relaxation for reserved categories), while sub-inspector posts allow up to 28-30 years. The official CSBC notification sets the final limits.",
+          "No official 2026 Sub-Inspector notification was found on the CSBC website at the last audit. Check csbc.bihar.gov.in for the current advertisement before relying on any date or vacancy figure.",
       },
       {
-        question: "Bihar Police constable ke liye physical test hota hai kya?",
+        question: "Bihar Police SI ke liye qualification aur age kya hai?",
         answer:
-          "Yes — candidates must clear the Physical Standard Test (height/chest/weight) and the Physical Efficiency Test with state-prescribed standards, with relaxation for reserved categories.",
+          "Sub-Inspector recruitment generally requires a bachelor's degree and an age within the range prescribed in the CSBC advertisement, with relaxation for reserved categories. The official notice sets the final eligibility.",
       },
       {
-        question: "CSBC ki form kahan se bharein?",
+        question: "Bihar Police SI ki form kahan se bharein?",
         answer:
-          "Bihar Police applications are submitted only through the official CSBC portal linked in the notification. Fake form links circulate during recruitment season — verify the URL before paying any fee.",
+          "Applications are submitted only through the official CSBC portal linked in the advertisement. Fake form links circulate during recruitment season — verify the URL before paying any fee.",
       },
     ],
     filters: { department: "bihar-police" },
@@ -129,30 +129,35 @@ export const BIHAR_ORG_PAGES: LandingPage[] = [
   {
     kind: "bihar-org",
     slug: "bihar-tre",
-    h1: "Bihar TRE Jobs 2026 — Teacher Recruitment Examination 4.0, 5.0 Vacancies",
-    metaTitle: "Bihar TRE Jobs 2026: Bihar Teacher Recruitment 4.0/5.0 Details",
+    h1: "Bihar TRE 4.0 2026 — 33,320 Vacancy, Apply Online & Admit Card",
+    metaTitle: "Bihar TRE 4.0 2026: Vacancy, Apply Online, Admit Card",
     metaDescription:
-      "Latest Bihar TRE teacher recruitment 2026 — TRE 4.0, TRE 5 primary and upper primary teacher posts. Eligibility, CTET, age, fee, last date and official apply links.",
+      "BPSC Bihar TRE 4.0 2026: 33,320 teacher posts, apply online from 25 September to 26 October 2026. Check eligibility, fee, exam pattern and official notice.",
     intro: [
-      "The Bihar Teacher Recruitment Examination (TRE) is the state's large-scale drive to fill primary and upper-primary teacher vacancies across government and aided schools. Each TRE cycle announces thousands of posts for Language, Mathematics, Science, Social Science, Art, Music and Physical Education subject teachers, and is conducted by the Bihar Education Department.",
-      "This page lists every current TRE vacancy with the post name, subject, vacancies, age band, category-wise fee, last date and the official notification and apply link. TRE applications are made only through the official Bihar Education Department recruitment portal.",
-      "Eligibility for TRE cycles typically requires a B.Ed or D.El.Ed with a CTET (or equivalent state certification) and a relevant subject qualification for the posts you apply to. Read the reservation and subject-eligibility clauses of the specific cycle notification carefully — they change with each phase.",
+      "Bihar TRE 4.0 is the fourth Bihar School Teacher Recruitment Examination, conducted by the Bihar Public Service Commission (BPSC) for the Education Department. Under Advertisement No. 15/2026 dated 22 September 2026, BPSC notified 32,388 posts and later added 932, taking the total to 33,320 vacancies for Primary, Middle, Secondary and Senior Secondary teachers.",
+      "The online application window is 25 September to 26 October 2026. The application fee is ₹100 for all candidates; a biometric fee of ₹200 applies only to candidates without a national identity document, plus bank transaction charges. Complete the fee payment before submitting the form and check the BPSC notice for the exact cut-off. The exam date has not been announced in the advertisement.",
+      "This page tracks the TRE 4.0 vacancy, eligibility, selection process, application link and admit card updates from BPSC. Applications are accepted only on bpsconline.bihar.gov.in. Read the official advertisement and any corrigendum before applying, because BPSC can revise the vacancy matrix or schedule.",
     ],
     faqs: [
       {
-        question: "Bihar TRE mein apply karne ke liye kya chahiye?",
+        question: "Bihar TRE 4.0 mein kitne post hain?",
         answer:
-          "A B.Ed or D.El.Ed with a CTET/SET certificate is required for primary and upper primary teacher posts. Subject-specific qualifications may apply for Science, Mathematics and Language posts.",
+          "BPSC notified 32,388 posts in Advertisement No. 15/2026 and added 932 posts, taking the total to 33,320. The level-wise split is in the official advertisement.",
       },
       {
-        question: "Bihar TRE ki age limit kitni hai?",
+        question: "Bihar TRE 4.0 ki last date kya hai?",
         answer:
-          "TRE cycles generally allow candidates aged 18-40 years with relaxation for reserved categories and additional concessions for female and differently-abled candidates, as set in the specific cycle notification.",
+          "The online application closes on 26 October 2026. Check the BPSC notice for the exact fee-payment cut-off and pay before submitting the form.",
       },
       {
-        question: "TRE 4.0 aur TRE 5 mein kya antar hai?",
+        question: "Bihar TRE 4.0 kis board conduct kar raha hai?",
         answer:
-          "Each TRE cycle is a fresh notification with its own vacancy count, reservation matrix and application window. Everything that matters is in the official notification for the specific cycle you are applying to.",
+          "The Bihar Public Service Commission (BPSC) is conducting TRE 4.0. Applications are made through the BPSC online portal, not the BSSC portal.",
+      },
+      {
+        question: "TRE 4.0 ka exam date kab hai?",
+        answer:
+          "The exam date has not been announced in the advertisement. Check the official BPSC website and notice board for the examination programme and admit card.",
       },
     ],
     filters: { department: "bihar-tre" },
@@ -315,6 +320,60 @@ export const BIHAR_ORG_PAGES: LandingPage[] = [
 
 export const BIHAR_ORG_PAGES_BY_SLUG: Record<string, LandingPage> =
   Object.fromEntries(BIHAR_ORG_PAGES.map((p) => [p.slug, p]));
+
+/* ------------------------------------------------------------------ */
+/* Bihar cross-section guides — /bihar/[guide]                         */
+/* ------------------------------------------------------------------ */
+
+export const BIHAR_GUIDE_PAGES: LandingPage[] = [
+  {
+    kind: "qualification",
+    slug: "12th-pass-jobs",
+    h1: "Bihar 12th Pass Jobs 2026 — Intermediate Government Vacancies",
+    metaTitle: "Bihar 12th Pass Jobs 2026: Latest Government Vacancies",
+    metaDescription:
+      "Bihar 12th pass government jobs 2026 with post name, vacancy, eligibility, age limit, last date and application fee. Check official details before applying.",
+    intro: [
+      "Bihar recruits intermediate-pass candidates into several state services every year. The biggest routes are the BSSC Inter Level examination, CSBC constable and excise constable recruitment, Bihar Home Guard, Gram Rozgar Sevak, Gram Kachahari clerk, health worker posts and Bihar State Road Transport conductor recruitment. Each drive has its own eligibility, physical standard or skill requirement, so a 12th pass certificate alone does not make every post open to you.",
+      "This page collects current Bihar government vacancies whose official eligibility accepts 12th pass or intermediate. For each post we show the recruiting body, post name and last date, plus the application source we hold; vacancy, age and fee figures appear only when the official notification publishes them. Where a notification does not publish a figure, the page shows nothing rather than filling the gap with a guess.",
+      "Read the qualification clause carefully before applying. Police and Home Guard posts usually add height, chest, running and document requirements; conductor and clerk posts may require a driving licence or computer knowledge; health worker posts can require MPHW training. Age relaxation and local-residence rules are set by the recruiting body and change with every cycle.",
+    ],
+    faqs: [
+      {
+        question: "Bihar 12th pass jobs ke liye minimum qualification kya hai?",
+        answer:
+          "A 12th pass or intermediate certificate from a recognised board is the baseline for these posts. Some vacancies also require physical standards, a driving licence, computer knowledge, MPHW training or a Bihar domicile certificate, as stated in the official notification.",
+      },
+      {
+        question: "Bihar mein 12th pass ke baad kaunsi sarkari naukri hoti hai?",
+        answer:
+          "Common routes include BSSC Inter Level, Bihar Police constable, excise constable, Home Guard, Gram Rozgar Sevak, Gram Kachahari clerk, health worker and BSRTC conductor recruitment. Availability changes with each recruitment cycle.",
+      },
+      {
+        question: "Bihar 12th pass jobs ki age limit kitni hoti hai?",
+        answer:
+          "Age limits differ by post and recruiting body. Many entry-level posts use an 18-37 year band with relaxation for SC, ST, OBC, EWS, women and PwBD candidates under state rules. The exact limit is printed in the official advertisement.",
+      },
+      {
+        question: "Bihar 12th pass job ke liye form kahan se bharein?",
+        answer:
+          "Apply only on the official portal named in the notification — for example the BSSC or CSBC website for their respective drives. This page links each job to its own official source and never collects an application fee.",
+      },
+    ],
+    filters: { state: "bihar", qualification: "12th" },
+    neighbours: [
+      { label: "All Bihar Jobs", href: "/bihar" },
+      { label: "All 12th Pass Jobs", href: "/jobs/12th-pass" },
+      { label: "BPSC Jobs", href: "/bihar/bpsc" },
+      { label: "BSSC Jobs", href: "/bihar/bssc" },
+      { label: "Bihar Police Jobs", href: "/bihar/bihar-police" },
+      { label: "Bihar Home Guard Jobs", href: "/bihar/bihar-home-guard" },
+    ],
+  },
+];
+
+export const BIHAR_GUIDE_PAGES_BY_SLUG: Record<string, LandingPage> =
+  Object.fromEntries(BIHAR_GUIDE_PAGES.map((p) => [p.slug, p]));
 
 /* ------------------------------------------------------------------ */
 /* State pages — /jobs/state/[state]                                   */

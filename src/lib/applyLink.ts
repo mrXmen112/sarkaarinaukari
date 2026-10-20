@@ -1,19 +1,19 @@
 /**
- * W5.5 — where the "Apply" cell and the detail-page button point.
+ * W5.5 + 2026-10 audit — where the "Apply" cell and the detail-page button point.
  *
  * One function decides, so the table and the detail page cannot disagree (the
  * same principle as src/lib/indexable.ts driving both the robots meta and the
  * sitemap).
  *
  * Decision order:
- *   1. closed  - applications have ended. Show a "Closed" label, never a link.
- *   2. details - the official URL is missing or the link checker flagged it
- *                dead, so we cannot send anyone to it. Go to our own page.
- *   3. website - the official URL resolves but is only the commission's
- *                HOMEPAGE. Linking "Apply" to a homepage is misleading: there is
- *                no application form there. Label it "Official Website".
- *   4. apply   - a real, unflagged, non-homepage official URL. This is the only
- *                case that earns an "Apply" button.
+ *   1. closed   - applications have ended. Show a "Closed" label, never a link.
+ *   2. apply    - ONLY when a human/automated check marked the dedicated
+ *                 `official_apply_url` verified, the link is not flagged, and it
+ *                 is a real page (not a homepage or a PDF). This is the only case
+ *                 that earns the word "Apply".
+ *   3. website  - no verified apply destination, but we know the official site.
+ *                 Label it "Official Website"; never imply it is an application.
+ *   4. details  - nothing safe to send the visitor to. Go to our own page.
  *
  * Everything outbound is noopener/noreferrer/nofollow at the call site: no
  * user or ranking signal should be attributed to us for someone else's form.
@@ -32,11 +32,42 @@ export type ApplyLink = {
 /** Shapes the classifier needs; keeps it usable from any caller's row type. */
 export type ApplyLinkJob = {
   slug: string;
+  official_apply_url?: string | null;
+  official_site_url?: string | null;
   official_link?: string | null;
+  apply_link_verified?: boolean | null;
   link_flagged?: boolean | null;
   status?: string | null;
   application_end?: string | null;
 };
+
+function isPdfUrl(url: string): boolean {
+  try {
+    return new URL(url).pathname.toLowerCase().endsWith(".pdf");
+  } catch {
+    return false;
+  }
+}
+
+function isHttpUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+/** `https://host/path` -> `https://host` (empty on invalid/non-http input). */
+function siteRoot(url: string | null | undefined): string {
+  if (!url || !isHttpUrl(url)) return "";
+  try {
+    const parsed = new URL(url);
+    return `${parsed.protocol}//${parsed.host}`;
+  } catch {
+    return "";
+  }
+}
 
 /**
  * A URL that lands on a site root rather than a specific page. Covers `""`,
@@ -79,12 +110,29 @@ export function classifyApplyLink(
     return { kind: "closed", href: `/jobs/${job.slug}`, external: false };
   }
 
-  const url = (job.official_link ?? "").trim();
-  if (!url || job.link_flagged) return details;
-
-  if (isHomepageUrl(url)) {
-    return { kind: "website", href: url, external: true };
+  const applyUrl = (job.official_apply_url ?? "").trim();
+  if (
+    job.apply_link_verified === true &&
+    applyUrl.length > 0 &&
+    isHttpUrl(applyUrl) &&
+    !job.link_flagged &&
+    !isHomepageUrl(applyUrl) &&
+    !isPdfUrl(applyUrl)
+  ) {
+    return { kind: "apply", href: applyUrl, external: true };
   }
 
-  return { kind: "apply", href: url, external: true };
+  // Fallback is a website, never an unverified application form. Prefer the
+  // dedicated site URL; otherwise use the origin of a not-flagged apply/link.
+  const explicitSite = (job.official_site_url ?? "").trim();
+  const fallbackSource = (job.official_apply_url ?? job.official_link ?? "").trim();
+  const website =
+    explicitSite ||
+    (!job.link_flagged ? siteRoot(fallbackSource) : "");
+
+  if (website) {
+    return { kind: "website", href: website, external: true };
+  }
+
+  return details;
 }

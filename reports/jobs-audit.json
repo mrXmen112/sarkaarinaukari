@@ -1,0 +1,715 @@
+{
+  "generatedAt": "2026-10-20T07:48:10.362Z",
+  "rows": 123,
+  "failing": 37,
+  "flagCounts": {
+    "vacancy_unverified": 122,
+    "salary_unverified": 122,
+    "vacancy_sum_mismatch": 37
+  },
+  "failingRows": [
+    {
+      "slug": "bihar-cho-2026",
+      "title": "Bihar Community Health Officer (CHO) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 1500,
+      "pay_scale": "Contractual remuneration Rs 25,000 to 35,000 per month",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "bihar-high-court-clerk-2026",
+      "title": "Patna High Court Clerk 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 700,
+      "pay_scale": "Level 6 pay matrix (Rs 35,400 to Rs 1,12,400)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "bihar-jal-nigam-je-2026",
+      "title": "Bihar Jal Nigam Junior Engineer 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 1500,
+      "pay_scale": "Level 6 pay matrix (Rs 35,400 to Rs 1,12,400)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "bihar-panchayat-secretary-2026",
+      "title": "Bihar Panchayat Secretary (Sachiv) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 8500,
+      "pay_scale": "Level 6 to 7 pay matrix (Rs 35,400 to Rs 1,42,400)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "bihar-state-cooperative-bank-2026",
+      "title": "Bihar State Cooperative Bank (Officer & Clerk) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 560,
+      "pay_scale": "Level 6 to 9 pay matrix (Rs 35,400 to Rs 1,67,800)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "bihar-train-conductor-2026",
+      "title": "Bihar Roadways Train Conductor 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 700,
+      "pay_scale": "Level 3 pay matrix (Rs 21,700 to Rs 69,100)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "bihar-vidhan-sabha-2026",
+      "title": "Bihar Vidhan Sabha (Attendant/Guard/Clerk) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 300,
+      "pay_scale": "Level 2 to 6 pay matrix (Rs 19,900 to Rs 1,12,400)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "bpsc-ae-2026",
+      "title": "BPSC Assistant Engineer (Civil/Mechanical/Electrical) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 900,
+      "pay_scale": "Level 9 to 10 pay matrix (Rs 53,100 to Rs 1,67,800)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "bssc-graduate-level-2026",
+      "title": "BSSC Graduate Level Examination 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 8500,
+      "pay_scale": "Level 4 to 7 pay matrix (Rs 25,500 to Rs 1,42,400)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "bssc-inter-level-ii-2026",
+      "title": "BSSC Combined Intermediate Level (New Cycle) 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 26475,
+      "pay_scale": "Level 4 to 6 pay matrix (Rs 25,500 to Rs 1,12,400)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "bssc-stenographer-2026",
+      "title": "BSSC Stenographer (Hindi/English) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 900,
+      "pay_scale": "Level 4 to 6 pay matrix (Rs 25,500 to Rs 1,12,400)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "dakshin-bihar-gramin-bank-2026",
+      "title": "Dakshin Bihar Gramin Bank (Officer/Clerk) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 420,
+      "pay_scale": "Scale I Rs 8 LPA CTC; Office Assistant Rs 4.5 LPA",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "esic-various-2026",
+      "title": "ESIC Various Posts (UDC/MTS/Steno) 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 500,
+      "pay_scale": "Level 2 to 8 as per post (Rs 19,900 to Rs 1,42,400)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "gpsc-class1-2-2026",
+      "title": "GPSC Class I and II 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 150,
+      "pay_scale": "Level 9 to 12 (Rs 53,100 to Rs 1,67,800)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "hpsc-hcs-2026",
+      "title": "Haryana Civil Services (HCS) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 120,
+      "pay_scale": "Level 9 to 14 (Rs 53,100 to Rs 1,82,200)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "ibps-so-2026",
+      "title": "IBPS Specialist Officer (CRP SO) 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 900,
+      "pay_scale": "Scale I - Rs 8 to 10 LPA CTC",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "india-post-mts-2026",
+      "title": "India Post Multi Tasking Staff 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 4500,
+      "pay_scale": "Level 2 to 3 pay matrix (Rs 19,900 to Rs 69,100)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "india-post-pa-sa-2026",
+      "title": "India Post PA/SA (Postal Assistant) 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 2500,
+      "pay_scale": "Level 4 to 6 pay matrix (Rs 25,500 to Rs 1,12,400)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "india-post-postman-2026",
+      "title": "India Post Postman (GDS-Departmental) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 6500,
+      "pay_scale": "Level 3 to 4 pay matrix (Rs 21,700 to Rs 81,100)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "isro-technical-assistant-2026",
+      "title": "ISRO Technical Assistant 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 350,
+      "pay_scale": "Level 6 to 7 pay matrix (Rs 35,400 to Rs 1,42,400)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "jpsc-cces-2026",
+      "title": "JPSC Combined Civil Services 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 300,
+      "pay_scale": "Level 9 to 12 (Rs 53,100 to Rs 1,67,800)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "lic-aao-2026",
+      "title": "LIC AAO (Assistant Administrative Officer) 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 300,
+      "pay_scale": "Officer Scale - Rs 32,795 to Rs 76,183 (approx CTC Rs 14 LPA)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "lic-assistant-2026",
+      "title": "LIC Assistant (AAO) Prelims 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 2500,
+      "pay_scale": "Level 3 to 6 pay matrix (Rs 23,800 to Rs 85,000)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "mpsc-rajyaseva-2026",
+      "title": "MPSC Rajyaseva & Other Services 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 300,
+      "pay_scale": "Level 9 to 14 (Rs 53,100 to Rs 1,82,200)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "nabard-grade-a-2026",
+      "title": "NABARD Grade A (Assistant Manager) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 120,
+      "pay_scale": "Grade A - Rs 44,500 to Rs 89,150",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "rbi-assistant-2026",
+      "title": "RBI Assistant 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 900,
+      "pay_scale": "Level 3 - Rs 21,700 to Rs 69,100",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "rpf-si-2026",
+      "title": "RPF SI (Sub Inspector) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 850,
+      "pay_scale": "Level 6 pay matrix (Rs 35,400 to Rs 1,12,400)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "rpsc-ras-2026",
+      "title": "RPSC RAS (Rajasthan Administrative Services) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 900,
+      "pay_scale": "Level 9 to 14 (Rs 53,100 to Rs 1,82,200)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "rrb-alp-2026",
+      "title": "RRB Assistant Loco Pilot 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 5500,
+      "pay_scale": "Pay matrix Level 2 to 4 (Rs 19,900 to Rs 63,200)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "sbi-po-2026",
+      "title": "SBI Probationary Officer 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 2500,
+      "pay_scale": "Scale I - CTC Rs 8.5 to 9.5 LPA",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "sebi-grade-a-2026",
+      "title": "SEBI Grade A Officer 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 80,
+      "pay_scale": "Grade A - Rs 44,500 to Rs 89,150 (approx CTC Rs 15 LPA)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "ssc-mts-2026",
+      "title": "SSC Multi Tasking Staff 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 11500,
+      "pay_scale": "Pay level 1 to 2 (Rs 18,000 to Rs 56,900)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "ssc-steno-2026",
+      "title": "SSC Stenographer Grade C & D 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 2100,
+      "pay_scale": "Level 4 to 6 pay matrix (Rs 25,500 to Rs 81,100)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "ukpsc-pcs-2026",
+      "title": "UKPSC Combined State (PCS) 2026",
+      "status": "upcoming",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 80,
+      "pay_scale": "Level 9 to 12 (Rs 53,100 to Rs 1,67,800)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "upsc-capf-2026",
+      "title": "UPSC CAPF (Assistant Commandant) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 350,
+      "pay_scale": "Assistant Commandant - Level 8 (Rs 47,600 to Rs 1,51,100)",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "upsc-cds-2026",
+      "title": "UPSC CDS (II) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "needs_review",
+      "vacancy_total": 450,
+      "pay_scale": "Lieutenant - Rs 56,100 to Rs 1,77,500 + military allowances",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    },
+    {
+      "slug": "uttar-bihar-gramin-bank-2026",
+      "title": "Uttar Bihar Gramin Bank (Officer/Clerk) 2026",
+      "status": "active",
+      "link_flagged": false,
+      "verification_status": "unverified",
+      "vacancy_total": 390,
+      "pay_scale": "Scale I Rs 8 LPA CTC; Office Assistant Rs 4.5 LPA",
+      "blocking": [
+        "vacancy_sum_mismatch"
+      ],
+      "warnings": [
+        "vacancy_unverified",
+        "salary_unverified"
+      ],
+      "failsAudit": true,
+      "vacancyWithheld": true,
+      "salaryWithheld": true
+    }
+  ]
+}

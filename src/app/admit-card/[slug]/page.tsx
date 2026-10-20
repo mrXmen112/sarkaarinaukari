@@ -15,9 +15,8 @@ import {
   getAllAdmitCardSlugs,
   getAdmitCardBySlug,
 } from "@/lib/queries";
-import { articleSchema, breadcrumbSchema } from "@/lib/seo";
+import { articleSchema, breadcrumbSchema, buildMeta } from "@/lib/seo";
 import { SITE } from "@/lib/site";
-import { truncate } from "@/lib/utils";
 
 export const revalidate = 10800; // 3 hours
 
@@ -33,24 +32,24 @@ export async function generateMetadata({
   const card = await getAdmitCardBySlug(slug);
   if (!card) return { title: "Admit Card Not Found" };
 
-  const title = `${card.title} — Sarkari Admit Card`;
-  return {
+  const released = card.status === "released";
+  const title = released
+    ? `${card.title} — Sarkari Admit Card`
+    : `${card.title} — Expected Admit Card`;
+  const description =
+    card.description ??
+    (released
+      ? `Download admit card for ${card.title}. Release date and exam date details.`
+      : `Expected release date and exam date for ${card.title}. The admit card has not been released yet.`);
+
+  return buildMeta({
+    kind: "admit-card",
     title,
-    description: truncate(
-      card.description ??
-        `Download admit card for ${card.title}. Release date and exam date details.`,
-      158,
-    ),
-    alternates: { canonical: `/admit-card/${card.slug}` },
-    openGraph: {
-      type: "article",
-      title,
-      description: truncate(card.description ?? "", 158),
-      url: `${SITE.url}/admit-card/${card.slug}`,
-      publishedTime: card.release_date ?? undefined,
-    },
-    robots: { index: true, follow: true },
-  };
+    description,
+    path: `/admit-card/${card.slug}`,
+    publishedTime: released ? (card.release_date ?? undefined) : undefined,
+    robots: { index: released, follow: true },
+  });
 }
 
 export default async function AdmitCardDetailPage({
@@ -61,16 +60,19 @@ export default async function AdmitCardDetailPage({
   if (!card) notFound();
 
   const url = `${SITE.url}/admit-card/${card.slug}`;
+  const released = card.status === "released";
 
   return (
     <PageContainer>
-      <JsonLd data={articleSchema({
-        headline: card.title,
-        description: card.description ?? undefined,
-        datePublished: toISODate(card.release_date),
-        dateModified: toISODate(card.updated_at),
-        url,
-      })} />
+      {released ? (
+        <JsonLd data={articleSchema({
+          headline: card.title,
+          description: card.description ?? undefined,
+          datePublished: toISODate(card.release_date),
+          dateModified: toISODate(card.updated_at),
+          url,
+        })} />
+      ) : null}
       <JsonLd
         data={breadcrumbSchema([
           { name: "Admit Card", path: "/admit-card" },
@@ -89,13 +91,29 @@ export default async function AdmitCardDetailPage({
         <div className="min-w-0">
           <h1 className="text-2xl md:text-3xl">{card.title}</h1>
           <p className="mt-1 text-sm text-ink-muted">
-            Release Date {formatDate(card.release_date)}
+            {released ? "Release Date" : "Expected Release Date"}{" "}
+            {formatDate(card.release_date)}
           </p>
+          {!released ? (
+            <span className="mt-2 inline-block rounded-sm bg-alert-bg px-2 py-0.5 text-xs font-bold text-alert">
+              Expected — not released yet
+            </span>
+          ) : null}
         </div>
         <div className="shrink-0">
           <UpdateDeadlineBadge label="Exam Date" date={card.exam_date} />
         </div>
       </header>
+
+      {!released ? (
+        <Panel title="Admit Card Not Released Yet" className="mb-4">
+          <p className="text-sm leading-relaxed">
+            The official admit card has not been released yet. The date shown is
+            an expected date; confirm the actual release and download link on the
+            official website.
+          </p>
+        </Panel>
+      ) : null}
 
       {card.description ? (
         <Panel title="Important Update Details" className="mb-4">
@@ -122,7 +140,10 @@ export default async function AdmitCardDetailPage({
                 "—"
               ),
             },
-            { label: "Release Date", value: formatDate(card.release_date) },
+            {
+              label: released ? "Release Date" : "Expected Release Date",
+              value: formatDate(card.release_date),
+            },
             {
               label: "Exam Date",
               value: card.exam_date
@@ -131,7 +152,11 @@ export default async function AdmitCardDetailPage({
             },
             {
               label: "Download Status",
-              value: card.download_link ? "Available" : "Yet to release",
+              value: released
+                ? card.download_link
+                  ? "Available"
+                  : "Yet to release"
+                : "Not released yet",
             },
           ]}
         />
@@ -139,7 +164,7 @@ export default async function AdmitCardDetailPage({
 
       <Panel title="Important Links" className="mb-4">
         <ul className="divide-y divide-rule">
-          {card.download_link ? (
+          {released && card.download_link ? (
             <ExternalLinkRow
               href={card.download_link}
               label="Download Admit Card (PDF)"

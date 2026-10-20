@@ -3,24 +3,26 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { DetailTable } from "@/components/ui/DataTable";
 import { JsonLd } from "@/components/ui/JsonLd";
-import { PageContainer, PageHeader, Panel } from "@/components/layout/PageContainer";
-import { ExternalLinkRow, JobLinkPanel } from "@/components/updates/UpdatePanels";
-import { formatDate, toISODate } from "@/lib/date";
+import { PageContainer, Panel } from "@/components/layout/PageContainer";
+import { toISODate } from "@/lib/date";
 import {
   getAllExamSlugs,
   getExamBySlug,
   listJobsBySyllabus,
 } from "@/lib/queries";
-import { articleSchema, breadcrumbSchema, faqSchema } from "@/lib/seo";
+import {
+  SEO_TITLE_MAX,
+  articleSchema,
+  breadcrumbSchema,
+  buildMeta,
+  faqSchema,
+} from "@/lib/seo";
 import { SITE } from "@/lib/site";
 import { robotsFor, examContentChars } from "@/lib/indexable";
 import { FAQSection } from "@/components/ui/FAQSection";
 import { RecommendedBooks } from "@/components/exams/RecommendedBooks";
 import { ShareButtons } from "@/components/ui/ShareButtons";
-import { truncate } from "@/lib/utils";
-import type { ExamPatternStage } from "@/types/database";
 
 export const revalidate = 10800; // 3h — books/FAQs rarely change but links do
 
@@ -36,21 +38,23 @@ export async function generateMetadata({
   const exam = await getExamBySlug(slug);
   if (!exam) return { title: "Exam Not Found" };
 
-  const title = `${exam.name} 2026 — ${exam.conducting_body ?? "Preparation Guide"}`;
-  return {
+  const cleanName = exam.name.replace(/\s+20\d{2}\s*$/, "").trim() || exam.name;
+  const body = exam.conducting_body ?? "Preparation Guide";
+  const shortBody = body.match(/\(([^)]+)\)\s*$/)?.[1] ?? body;
+  const fullTitle = `${cleanName} 2026 — ${body}`;
+  const title =
+    fullTitle.length <= SEO_TITLE_MAX
+      ? fullTitle
+      : `${cleanName} 2026 — ${shortBody}`;
+  const description =
+    exam.overview ??
+    `Complete preparation guide for ${exam.name}: eligibility, exam pattern, syllabus, books, previous year papers and FAQs.`;
+
+  return buildMeta({
+    kind: "exam",
     title,
-    description: truncate(
-      exam.overview ??
-        `Complete preparation guide for ${exam.name}: eligibility, exam pattern, syllabus, books, previous year papers and FAQs.`,
-      158,
-    ),
-    alternates: { canonical: `/exams/${exam.slug}` },
-    openGraph: {
-      type: "article",
-      title,
-      description: truncate(exam.overview ?? "", 158),
-      url: `${SITE.url}/exams/${exam.slug}`,
-    },
+    description,
+    path: `/exams/${exam.slug}`,
     // B4: shared with the sitemap via src/lib/indexable.ts.
     robots: robotsFor({
       kind: "exam",
@@ -59,7 +63,7 @@ export async function generateMetadata({
       lastVerifiedAt: exam.last_verified_at,
       isPublished: exam.is_published,
     }),
-  };
+  });
 }
 
 export default async function ExamDetailPage({
@@ -299,6 +303,23 @@ export default async function ExamDetailPage({
       {/* W5.7: affiliate books. Renders nothing when AMAZON_AFFILIATE_TAG is
           unset, and carries the Associates disclosure when it is. */}
       <RecommendedBooks books={exam.recommended_books} />
+
+      {relatedJobs.length > 0 ? (
+        <Panel title="Recruitment Linked to This Exam" className="mb-4">
+          <ul className="space-y-2">
+            {relatedJobs.map((job) => (
+              <li key={job.slug}>
+                <Link
+                  href={`/jobs/${job.slug}`}
+                  className="text-sm font-semibold text-navy no-underline hover:text-alert hover:underline"
+                >
+                  {job.title}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      ) : null}
 
       <JsonLd
         data={breadcrumbSchema([

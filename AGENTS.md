@@ -29,7 +29,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
   - `createAdminClient()` (service role, server-only — admin panel)
   - Never import service-role key into client components.
 - DB types are hand-maintained in `src/types/database.ts` — keep in sync with `supabase/migrations/`.
-- SEO: every data page gets unique `<title>` + description via `generateMetadata`, `JobPosting` JSON-LD on job pages, dynamic sitemap.xml. See Section 5 of the PRD.
+- SEO: every data page gets unique `<title>` + description via `generateMetadata`, `Article`/`FAQPage`/`BreadcrumbList` JSON-LD (do **not** emit `JobPosting`), dynamic sitemap.xml. See Section 5 of the PRD.
 - Design system: SEE `src/lib/site.ts` + `src/app/globals.css`. No gradients, no glassmorphism, minimal shadows. Navy `#0B3D6E`, saffron `#FF9933`, green `#138808`, page bg `#F4F6F8`, table borders `#CBD5E1`.
 - `middleware.ts` is **deprecated** in Next 16 — auth cookie refresh lives in `src/proxy.ts` (narrow matcher + Node runtime).
 - Build phases in the PRD; Phase 2 starts referencing Supabase. When Supabase env vars are absent, pages must render empty states, not crash (see `isSupabaseConfigured`).

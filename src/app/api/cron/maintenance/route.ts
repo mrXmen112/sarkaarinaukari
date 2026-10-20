@@ -31,12 +31,22 @@ export async function GET(req: NextRequest) {
 
   // ?only_flagged=true re-checks currently flagged jobs (e.g. after a checker
   // improvement or a suspected false positive batch). Default sweeps oldest.
-  const onlyFlagged =
-    new URL(req.url).searchParams.get("only_flagged") === "true";
+  const params = new URL(req.url).searchParams;
+  const onlyFlagged = params.get("only_flagged") === "true";
+
+  // Bounded batch. The audit's verified-apply sweep uses ?limit=25 and calls
+  // this until every row has been seen; 50 is the hard ceiling so one request
+  // cannot exceed the function duration limit.
+  const requestedLimit = Number(params.get("limit"));
+  const limit =
+    Number.isFinite(requestedLimit) && requestedLimit > 0
+      ? Math.min(Math.floor(requestedLimit), 50)
+      : 20;
+  const verifyApply = params.get("verify_apply") !== "0";
 
   let linkCheck = null;
   try {
-    linkCheck = await runLinkCheck({ limit: 20, onlyFlagged });
+    linkCheck = await runLinkCheck({ limit, onlyFlagged, verifyApply });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     linkCheck = { error: message };

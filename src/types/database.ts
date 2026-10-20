@@ -15,6 +15,10 @@ export type Json =
   | Json[];
 
 export type JobStatus = "active" | "closed" | "upcoming";
+/** Audit 2026-10 (migration 0023). Non-job rows must not enter job counts/lists. */
+export type JobType = "job" | "entrance" | "admission" | "scholarship";
+/** Audit 2026-10 (migration 0023). Admit cards, results and answer keys. */
+export type StageStatus = "upcoming" | "released";
 /** Phase 8A. See migration 0017. */
 export type VerificationStatus = "verified" | "unverified" | "needs_review";
 export type SocialCategory = "general" | "obc" | "sc" | "st" | "ews";
@@ -123,8 +127,20 @@ export type Job = {
   application_end: string;
   exam_date: string | null;
   official_link: string;
+  /** Audit 2026-10 (0023): separate destinations, never inferred from each other. */
+  official_apply_url: string | null;
+  official_notification_url: string | null;
+  official_site_url: string | null;
+  /** True only after the apply destination was confirmed to be the official page. */
+  apply_link_verified: boolean;
+  /** Human/automated link verification stamp for the apply destination. */
+  last_verified_at: string | null;
+  /** True only when vacancy/fee/salary/dates were checked against the notification. */
+  source_verified: boolean;
   syllabus_id: string | null;
   status: JobStatus;
+  /** Audit 2026-10 (0023): job vs entrance/admission/scholarship. */
+  type: JobType;
   source_url: string | null;
   is_published: boolean;
   /** Link validation (0016): 0 = unreachable; null = not checked yet. */
@@ -168,6 +184,9 @@ export type AdmitCard = {
   slug: string;
   description: string | null;
   release_date: string | null;
+  /** Audit 2026-10 (0023): future-dated cards stay out of lists/sitemap. */
+  status: StageStatus;
+  released_at: string | null;
   exam_date: string | null;
   download_link: string | null;
   official_link: string | null;
@@ -183,6 +202,9 @@ export type ResultRow = {
   slug: string;
   description: string | null;
   result_date: string | null;
+  /** Audit 2026-10 (0023): future-dated results stay out of lists/sitemap. */
+  status: StageStatus;
+  released_at: string | null;
   cutoff_data: ResultCutoff | null;
   merit_list_link: string | null;
   official_link: string | null;
@@ -199,6 +221,9 @@ export type AnswerKey = {
   description: string | null;
   type: AnswerKeyType | null;
   release_date: string | null;
+  /** Audit 2026-10 (0023): future-dated keys stay out of lists/sitemap. */
+  status: StageStatus;
+  released_at: string | null;
   objection_last_date: string | null;
   download_link: string | null;
   official_link: string | null;

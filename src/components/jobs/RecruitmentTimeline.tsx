@@ -28,7 +28,7 @@ export function RecruitmentTimeline({
   const rows: { label: string; value: React.ReactNode }[] = [];
 
   rows.push({
-    label: "1. Notification",
+    label: "Notification",
     value: job.notification_pdf_link ? (
       <Link
         href={job.notification_pdf_link}
@@ -46,7 +46,7 @@ export function RecruitmentTimeline({
   });
 
   rows.push({
-    label: "2. Apply Window",
+    label: "Apply Window",
     value:
       job.status === "closed"
         ? `${formatDate(job.application_start)} to ${formatDate(job.application_end)} — closed`
@@ -55,7 +55,7 @@ export function RecruitmentTimeline({
 
   for (const card of timeline.admitCards) {
     rows.push({
-      label: "3. Admit Card",
+      label: "Admit Card",
       value: (
         <Link
           href={`/admit-card/${card.slug}`}
@@ -68,12 +68,12 @@ export function RecruitmentTimeline({
   }
 
   if (job.exam_date) {
-    rows.push({ label: "4. Exam Date", value: formatDate(job.exam_date) });
+    rows.push({ label: "Exam Date", value: formatDate(job.exam_date) });
   }
 
   for (const key of timeline.answerKeys) {
     rows.push({
-      label: "5. Answer Key",
+      label: "Answer Key",
       value: (
         <Link
           href={`/answer-key/${key.slug}`}
@@ -87,7 +87,7 @@ export function RecruitmentTimeline({
 
   for (const result of timeline.results) {
     rows.push({
-      label: "6. Result",
+      label: "Result",
       value: (
         <Link
           href={`/result/${result.slug}`}
@@ -105,7 +105,18 @@ export function RecruitmentTimeline({
         <T k="recruitmentTimeline" />
       </div>
       <div className="p-3">
-        <DetailTable caption="Recruitment timeline for this vacancy" rows={rows} />
+        <p className="mb-3 text-xs leading-relaxed text-ink-muted">
+          Stages are numbered in the order they appear. A stage is shown only
+          when the recruiting body has published it; missing stages are not
+          assumed.
+        </p>
+        <DetailTable
+          caption="Recruitment timeline for this vacancy"
+          rows={rows.map((row, index) => ({
+            label: `${index + 1}. ${row.label}`,
+            value: row.value,
+          }))}
+        />
       </div>
     </section>
   );

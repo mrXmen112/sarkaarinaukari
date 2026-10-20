@@ -28,7 +28,7 @@ Status after Phase 0 + Phase 1. Everything marked **DONE** is in the code;
    - existing Supabase keys + `LLM_API_KEY` if not already set
 3. **Google Search Console**: add the property `https://www.sarkaarinaukri.online`, submit `https://www.sarkaarinaukri.online/sitemap.xml`, then use "Removals" only if the old apex URL is indexed.
 4. **Bing Webmaster Tools**: add site + submit sitemap (import from GSC is fastest).
-5. **Rich Results Test**: verify one job page (JobPosting + FAQPage JSON-LD) after deploy.
+5. **Rich Results Test**: verify one job page (Article + FAQPage JSON-LD) after deploy. Do not expect `JobPosting`; it is intentionally not emitted.
 
 ### YOU DO — icons (PNG set)
 The SVG icon is wired. Drop your PNGs into `/public` when ready and re-add to
@@ -101,7 +101,7 @@ The SVG icon is wired. Drop your PNGs into `/public` when ready and re-add to
 | Performance: `next/image`, no layout shift | mostly N/A — the site is table/HTML-first with almost no raster assets |
 
 ### YOU DO — after deploy
-1. Rich Results Test a job page (JobPosting + FAQPage) and a result page (Article).
+1. Rich Results Test a job page (Article + FAQPage) and a result page (Article). `JobPosting` is intentionally absent.
 2. Set `GOOGLE_SITE_VERIFICATION` + `BING_SITE_VERIFICATION` envs in Vercel after adding the properties.
 3. Submit `https://www.sarkaarinaukri.online/sitemap.xml` in GSC + Bing (the index references 4 section files).
 4. IndexNow: `INDEXNOW_KEY` env is already set locally; set it in Vercel too (the key file is committed at `public/2755f80bfa9ee945ffd84d887a043a4c.txt`).

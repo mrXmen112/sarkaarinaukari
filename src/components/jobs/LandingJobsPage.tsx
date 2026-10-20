@@ -11,7 +11,7 @@ import {
   MIN_VERIFIED_OPEN_JOBS,
   isLandingPageIndexable,
 } from "@/lib/indexable";
-import { breadcrumbSchema, faqSchema } from "@/lib/seo";
+import { breadcrumbSchema, buildMeta, faqSchema } from "@/lib/seo";
 import { PAGE_SIZE, SITE } from "@/lib/site";
 import type { LandingPage } from "@/lib/landingPages";
 import { T } from "@/components/i18n/T";
@@ -174,18 +174,14 @@ export function landingMetadata(
    */
   verifiedOpenJobs = MIN_VERIFIED_OPEN_JOBS,
 ) {
-  return {
-    title: { absolute: config.metaTitle },
+  return buildMeta({
+    kind: "landing",
+    title: config.metaTitle,
     description: config.metaDescription,
-    alternates: { canonical: path },
-    openGraph: {
-      title: config.metaTitle,
-      description: config.metaDescription,
-      url: `${SITE.url}${path}`,
-    },
+    path,
     robots: {
       index: isLandingPageIndexable(verifiedOpenJobs),
       follow: true,
     },
-  };
+  });
 }

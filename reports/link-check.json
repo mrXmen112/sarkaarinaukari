@@ -1,0 +1,1101 @@
+{
+  "generatedAt": "2026-10-20T07:56:57.435Z",
+  "jobs": 123,
+  "urls": 115,
+  "ok": 51,
+  "unverified": 64,
+  "dead": 0,
+  "deadRows": [],
+  "results": [
+    {
+      "url": "https://careerairforce.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "url": "https://joinindianarmy.nic.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://joinindianarmy.nic.in/Authentication.aspx",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://joinindianarmy.nic.in/Agniveer-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://joinindianarmy.nic.in/error.aspx",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://assamrifles.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "url": "https://assamrifles.gov.in/Advt/Constable-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "url": "https://bpsc.bihar.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://bpsconline.bihar.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://bpsconline.bihar.gov.in/candidate/login",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://lrc.bih.nic.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "url": "https://lrc.bih.nic.in/Advt/Amin-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "url": "https://icds.bih.nic.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://icds.bih.nic.in/Advt/Anganwadi-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://statehealthsocietybihar.org/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://courts.bihar.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://csbc.bihar.gov.in/",
+      "status": 206,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://csbc.bihar.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://panchayat.bihar.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://rdd.bihar.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://patnahighcourt.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://patnahighcourt.gov.in/",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://jalparishad.bih.nic.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://prd.bih.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://statehealthsocietybihar.org/Advt/Nurse-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://biharstatecooperativebank.com/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://bsrtc.bihar.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://bsrtc.bihar.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://bpsc.bihar.gov.in/advertisement",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://bpsc.bihar.gov.in/wp-content/uploads/BPSC_content/Notices/Important-Notice-152026-TRE-4.0-Advertisement_BPSC-20260922-vn0ekm.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://education.bihar.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://education.bihar.gov.in/Advt/TRE-5-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://vidhansabha.bihar.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://vidhansabha.bihar.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://bsf.nic.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://bsf.nic.in/Advt/Constable-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://bssc.bihar.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://cisf.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://cisf.mha.gov.in/",
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "url": "https://crpf.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://crpf.mha.gov.in/",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://dbgbonline.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://csd.delhipolice.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://ssc.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://ssc.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://ssc.gov.in/Advt/Delhi-Police-SI-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://ssc.gov.in/Advt/Delhi-Police-SI-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://drdo.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://xn--m1b0a2bb8esed.xn--11b7cb3a6a.xn--h2brj9c/drdo/hi/",
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "url": "https://dsssb.delhi.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://dsssb.delhi.gov.in/",
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "url": "https://epfindia.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "url": "https://epfindia.gov.in/careers/SSA-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "url": "https://esic.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://esic.gov.in/",
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "url": "https://esic.gov.in/careers/Various-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://esic.gov.in/careers/Various-2026.pdf",
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "url": "https://fci.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://fci.gov.in/",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://fci.gov.in/Advt/AG3-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://fci.gov.in/Advt/AG3-2026.pdf",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://fci.gov.in/Advt/Watchman-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://fci.gov.in/Advt/Watchman-2026.pdf",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://gpsc.gujarat.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://gpsc.gujarat.gov.in/",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://hpsc.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://hpsc.gov.in/en-us/",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://hssc.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://hssc.gov.in/",
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "url": "https://agnipathvayu.cdac.in/",
+      "status": 503,
+      "ok": false,
+      "dead": false,
+      "blocked": true,
+      "finalUrl": "https://agnipathvayu.cdac.in/AV",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://agnipathvayu.cdac.in/Advt/Vayu-2026.pdf",
+      "status": 503,
+      "ok": false,
+      "dead": false,
+      "blocked": true,
+      "finalUrl": "https://agnipathvayu.cdac.in/Advt/Vayu-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://www.ibps.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://www.ibps.in/wp-content/uploads/IBPS-Clerk-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://www.ibps.in/wp-content/uploads/IBPS-PO-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://www.ibps.in/wp-content/uploads/IBPS-RRB-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://www.ibps.in/wp-content/uploads/IBPS-SO-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://indiapost.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://www.indiapost.gov.in/",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://joinindianarmy.nic.in/Advt/NA-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://joinindianarmy.nic.in/error.aspx",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://joinindianarmy.nic.in/Advt/GD-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://joinindianarmy.nic.in/error.aspx",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://joinindianarmy.nic.in/Advt/ST-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://joinindianarmy.nic.in/error.aspx",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://joinindianarmy.nic.in/Advt/Tradesman-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://joinindianarmy.nic.in/error.aspx",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://joinindiannavy.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://joinindiannavy.gov.in/Advt/SSR-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://joinindiannavy.gov.in/Advt/TradesmanMate-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://isro.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://isro.gov.in/Advt/TA-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://itbpolice.nic.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://itbpolice.nic.in/Advt/Constable-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://jpsc.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://jpsc.gov.in/",
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "url": "https://kpsc.kar.nic.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "url": "https://kpsc.kar.nic.in/KAS-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "url": "https://kvs.ac.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "url": "https://kvs.ac.in/recruitment/Teaching-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "url": "https://licindia.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "The operation was aborted due to timeout"
+    },
+    {
+      "url": "https://mppeb.mp.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://mppsc.mp.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://mppsc.mp.gov.in/",
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "url": "https://mppsc.mp.gov.in/SSE-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://mppsc.mp.gov.in/Errors",
+      "contentType": "text/html; charset=UTF-8"
+    },
+    {
+      "url": "https://mpsc.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://mpsc.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://mpsc.gov.in/Advt/Rajyaseva-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://mpsc.gov.in/Advt/Rajyaseva-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://www.nabard.org/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://www.nabard.org/Hindi/Default.aspx",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://careers.ntpc.co.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://careers.ntpc.co.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://careers.ntpc.co.in/Advt/NTPC-ET-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://careers.ntpc.co.in/Advt/NTPC-ET-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://navodaya.gov.in/",
+      "status": 206,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://navodaya.gov.in/nvs/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://navodaya.gov.in/recruitment/Teaching-2026.pdf",
+      "status": 206,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://navodaya.gov.in/recruitment/Teaching-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://psssb.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://police.rajasthan.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://police.rajasthan.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://rbi.org.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://rbi.org.in/",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://railways.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://rpsc.rajasthan.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://rpsc.rajasthan.gov.in/",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://rsmssb.rajasthan.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://rsmssb.rajasthan.gov.in/Advt/GroupD-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://sbi.co.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://sbi.co.in/redirect/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://sebi.gov.in/",
+      "status": 505,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://sebi.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://sebi.gov.in/careers/GradeA-2026.pdf",
+      "status": 505,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://sebi.gov.in/careers/GradeA-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://ssb.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://ssc.gov.in/Advt/SSC-CGL-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://ssc.gov.in/Advt/SSC-CGL-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://ssc.gov.in/Advt/SSC-CHSL-2025.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://ssc.gov.in/Advt/SSC-CHSL-2025.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://ssc.gov.in/Advt/SSC-CHSL-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://ssc.gov.in/Advt/SSC-CHSL-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://ssc.gov.in/Advt/SSC-CPO-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://ssc.gov.in/Advt/SSC-CPO-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://ssc.gov.in/Advt/SSC-GD-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://ssc.gov.in/Advt/SSC-GD-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://ssc.gov.in/Advt/SSC-JE-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://ssc.gov.in/Advt/SSC-JE-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://ssc.gov.in/Advt/SSC-MTS-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://ssc.gov.in/Advt/SSC-MTS-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://ssc.gov.in/Advt/SSC-Steno-2026.pdf",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://ssc.gov.in/Advt/SSC-Steno-2026.pdf",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://tnpsc.gov.in/",
+      "status": 206,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://tnpsc.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://ukpsc.net/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://uppbpb.gov.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://uppbpb.gov.in/",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://uppsc.up.nic.in/",
+      "status": 200,
+      "ok": true,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": "https://uppsc.up.nic.in/",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "url": "https://upsc.gov.in/",
+      "status": 403,
+      "ok": false,
+      "dead": false,
+      "blocked": true,
+      "finalUrl": "https://www.upsc.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://upsc.gov.in/CAPF-AC-2026.pdf",
+      "status": 403,
+      "ok": false,
+      "dead": false,
+      "blocked": true,
+      "finalUrl": "https://www.upsc.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://upsc.gov.in/CDS-II-2026.pdf",
+      "status": 403,
+      "ok": false,
+      "dead": false,
+      "blocked": true,
+      "finalUrl": "https://www.upsc.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://upsc.gov.in/sites/default/files/CSE-2027-Notification.pdf",
+      "status": 403,
+      "ok": false,
+      "dead": false,
+      "blocked": true,
+      "finalUrl": "https://www.upsc.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://upsc.gov.in/NDA-II-2026.pdf",
+      "status": 403,
+      "ok": false,
+      "dead": false,
+      "blocked": true,
+      "finalUrl": "https://www.upsc.gov.in/",
+      "contentType": "text/html"
+    },
+    {
+      "url": "https://upsssc.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://upsssc.gov.in/Advt/Various-2026.pdf",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://uppbgbonline.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    },
+    {
+      "url": "https://pscwb.gov.in/",
+      "status": null,
+      "ok": false,
+      "dead": false,
+      "blocked": false,
+      "finalUrl": null,
+      "contentType": null,
+      "error": "fetch failed"
+    }
+  ]
+}

@@ -1,45 +1,50 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 
 import { JobTable } from "@/components/jobs/JobTable";
 import { NoticeBar } from "@/components/layout/NoticeBar";
 import { PageContainer, Panel } from "@/components/layout/PageContainer";
 import { RecentlyClosedSection } from "@/components/jobs/RecentlyClosedSection";
 import { BrokenLinkReport } from "@/components/jobs/BrokenLinkReport";
-import { RecentUpdatesPanel } from "@/components/updates/RecentUpdatesPanel";
+import { HomeStages } from "@/components/updates/HomeStages";
 import { isSupabaseConfigured } from "@/lib/env";
 import {
   getClosingJobs,
   getLatestJobs,
   getRecentlyClosedJobs,
+  listAdmitCards,
+  listAnswerKeys,
   listExams,
   listJobs,
-  listRecentUpdates,
+  listResults,
 } from "@/lib/queries";
 import { BOARDS } from "@/lib/boards";
-import { HOMEPAGE_TARGET_JOBS, QUICK_LINKS } from "@/lib/site";
+import { HOMEPAGE_TARGET_JOBS, QUICK_LINKS, TRENDING_LINKS } from "@/lib/site";
+import { buildMeta } from "@/lib/seo";
 
 export const revalidate = 1800; // 30 min — listings change often
 
-export const metadata: Metadata = {
-  title: "Latest Sarkari Naukri 2026 — Govt Jobs, Admit Card, Result & Yojana",
+export const metadata = buildMeta({
+  kind: "page",
+  title: "Sarkari Naukri 2026: Govt Jobs, Admit Card & Result",
   description:
-    "SarkaariNaukri.online: latest central & state government job notifications, Bihar jobs (BPSC, BSSC, Bihar Police, TRE), admit cards, results, answer keys, syllabus and Sarkari Yojana updates.",
-  alternates: { canonical: "/" },
-};
+    "Latest central and Bihar government jobs 2026, plus admit cards, results, answer keys, syllabus and Sarkari Yojana updates. Check eligibility and apply online.",
+  path: "/",
+});
 
 /**
  * Homepage. Live data (latest jobs + closing-soon ticker) when Supabase is
  * configured; a clear setup panel otherwise so the page never breaks.
  */
 export default async function HomePage() {
-  const [latest, closing, recentlyClosed, bihar, updates, exams] =
+  const [latest, closing, recentlyClosed, bihar, admits, results, keys, exams] =
     await Promise.all([
       getLatestJobs(8),
       getClosingJobs(6),
       getRecentlyClosedJobs(6),
       listJobs({ state: "bihar", status: "open", pageSize: 6 }),
-      listRecentUpdates(6),
+      listAdmitCards(5),
+      listResults(5),
+      listAnswerKeys(5),
       listExams(8),
     ]);
 
@@ -104,6 +109,27 @@ export default async function HomePage() {
           </ul>
         </section>
 
+        <nav aria-labelledby="trending-bihar" className="mb-6">
+          <h2
+            id="trending-bihar"
+            className="mb-2 font-serif text-base font-bold text-navy"
+          >
+            Trending in Bihar
+          </h2>
+          <ul className="flex flex-wrap gap-2">
+            {TRENDING_LINKS.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="inline-block rounded-sm border border-rule bg-surface px-3 py-1.5 text-sm font-semibold text-navy no-underline hover:border-navy-400 hover:bg-navy-50 hover:no-underline"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
         {!isSupabaseConfigured ? (
           <Panel title="Setup Required" className="mb-5">
             <p className="text-sm text-ink">
@@ -141,11 +167,28 @@ export default async function HomePage() {
           </section>
         ) : null}
 
+        <HomeStages
+          admitCards={admits.map((item) => ({
+            title: item.title,
+            slug: item.slug,
+            date: item.release_date,
+          }))}
+          results={results.map((item) => ({
+            title: item.title,
+            slug: item.slug,
+            date: item.result_date,
+          }))}
+          answerKeys={keys.map((item) => ({
+            title: item.title,
+            slug: item.slug,
+            date: item.release_date,
+          }))}
+        />
+
         {needsFallback ? (
           <HomeFallback
             biharJobs={bihar.jobs}
             biharTotal={bihar.total}
-            updates={updates}
             exams={exams}
           />
         ) : null}
@@ -169,21 +212,17 @@ export default async function HomePage() {
 function HomeFallback({
   biharJobs,
   biharTotal,
-  updates,
   exams,
 }: {
   biharJobs: Awaited<ReturnType<typeof listJobs>>["jobs"];
   biharTotal: number;
-  updates: Awaited<ReturnType<typeof listRecentUpdates>>;
   exams: Awaited<ReturnType<typeof listExams>>;
 }) {
   return (
     <div className="mt-6">
       <h2 className="mb-3 font-serif text-lg font-bold text-navy">
-        Notifications, Admit Cards, Results &amp; Exam Guides
+        Bihar Jobs &amp; Exam Guides
       </h2>
-
-      <RecentUpdatesPanel updates={updates} />
 
       {biharJobs.length > 0 ? (
         <section aria-labelledby="bihar-jobs" className="gov-panel mb-4">

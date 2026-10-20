@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { JsonLd } from "@/components/ui/JsonLd";
-import { BIHAR_ORG_PAGES } from "@/lib/landingPagesState";
+import { BIHAR_GUIDE_PAGES, BIHAR_ORG_PAGES } from "@/lib/landingPagesState";
 import { LANDING_LABELS } from "@/lib/landingPages";
 import { PageContainer, PageHeader } from "@/components/layout/PageContainer";
 import { JobTable } from "@/components/jobs/JobTable";
@@ -30,6 +30,12 @@ const BIHAR_ORG_LINKS = BIHAR_ORG_PAGES.map((org) => ({
   slug: org.slug,
   label: LANDING_LABELS[org.slug] ?? org.slug,
   href: `/bihar/${org.slug}`,
+}));
+
+const BIHAR_GUIDE_LINKS = BIHAR_GUIDE_PAGES.map((guide) => ({
+  slug: guide.slug,
+  label: "Bihar 12th Pass Jobs",
+  href: `/bihar/${guide.slug}`,
 }));
 
 /**
@@ -82,6 +88,17 @@ export default async function BiharHubPage({
             href={d.href}
             active={activeDept?.slug === d.slug}
             label={d.label}
+          />
+        ))}
+      </nav>
+
+      <nav aria-label="Bihar job guides" className="mb-4 flex flex-wrap gap-2">
+        {BIHAR_GUIDE_LINKS.map((guide) => (
+          <DepartmentChip
+            key={guide.slug}
+            href={guide.href}
+            active={false}
+            label={guide.label}
           />
         ))}
       </nav>
