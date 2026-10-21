@@ -184,6 +184,17 @@ Backfill note: `official_apply_url ← official_link` copied many site homepages
 - **Internal links:** `/bihar/12th-pass-jobs` added to the homepage quick links and footer Jobs column; Home Guard trending link now points at the hub.
 - **QA:** build clean (355 static pages), 56/56 tests, lint 0 errors / 17 warnings; local checks: `/` shows Latest Results + Latest Answer Keys, `/bihar` shows "34 vacancies", redirects return 308, future admit cards are noindex/Expected with no download, removed rows are 404 or redirected, sitemaps exclude unpublished rows.
 
+### 2026-10-21 Batch 1 trust cleanup (live DB)
+
+- **Batch 1 unpublished (16):** all 16 high-risk rows failed verification against current official notices or had no matching notification. Rows retained for audit with `verification_status='unverified'`, `source_verified=false`, `apply_link_verified=false`, unpublished, `status='closed'`, and a row-level `verification_note`.
+  - `bihar-jail-sepoy-2026`, `bihar-police-si-2026`, `bihar-police-clerk-2026`, `bihar-police-constable-2026`
+  - `bssc-inter-level-2026`, `bssc-graduate-level-2026`, `bihar-sap-2026`, `bihar-fireman-2026`
+  - `ssc-cgl-2026`, `ssc-chsl-2026`, `ssc-gd-2026`, `ibps-po-17`
+  - `sbi-po-2026`, `rrb-ntpc-2026`, `rrb-group-d-2026`, `upsc-cse-2027`
+- **Evidence:** CSBC's 16-06-2026 notice rebuts fake Jail Warder news; BPSSC Advt 09/2026 is 150 SI posts (09 Jul–09 Aug), not 3,000; SSC CGL/CHSL/GD notices exist but DB dates/vacancies and `/Advt/*.pdf` links do not match; IBPS has CRP PO/MT-XVI, not CRP 17; SBI PO 2026-27 is 1,500 posts (18 Jun–08 Jul); RRB 2026 NTPC is 5,236 posts across CEN 06/2026 + 07/2026; Group D is CEN 09/2025 with 22,195 posts; UPSC CSE 2027 is not yet notified.
+- **Fake URLs removed:** cleared `official_notification_url`, `notification_pdf_link`, and `official_apply_url` on rejected rows; kept an official root in `official_site_url` for audit.
+- **QA:** DB now has 1 verified published job; `jobs.xml` still 3 URLs; production pages are ISR-cached for up to 3 hours, so a deploy is required to publish the removals as 404s.
+
 ### Baseline commits before this task
 
 `c4c1adc` → `b155c9e` → `a29c36b` → `be0ae74` → `118cf95` (W4 adapters, Quick Publish, pipeline fixes, checkpoint).
@@ -223,6 +234,8 @@ Backfill note: `official_apply_url ← official_link` copied many site homepages
 | 2026-10-21 | Post-cleanup build | clean, 355 static pages; 56/56 tests; lint 0 errors / 17 warnings |
 | 2026-10-21 | Local verification | Latest Results/Answer Keys render; deled/BPSC/Home Guard rows absent; stage pages noindex + no download |
 | 2026-10-21 | Indexing policy | Unverified jobs noindex + out of `jobs.xml`; landing pages show verified jobs only and noindex below 10 verified open jobs; info/result/exam pages stay indexable |
+| 2026-10-21 | Batch 1 verification | 16/16 rows rejected; 0 verified; all 16 unpublished with audit notes |
+| 2026-10-21 | Post-Batch-1 DB | 1 verified published job; 16 unpublished; `jobs.xml` 3 URLs |
 
 ---
 
