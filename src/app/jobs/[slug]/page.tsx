@@ -591,13 +591,15 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
             },
             {
               label: "Last Verified",
-              value: job.link_last_checked_at
-                ? `${formatDate(job.link_last_checked_at)}${
-                    job.link_flagged
-                      ? " — apply link flagged for manual check"
-                      : " — official link reachable"
-                    }`
-                : "Not checked yet",
+              value: job.last_verified_at
+                ? `${formatDate(job.last_verified_at)} - checked against the official notice`
+                : job.link_last_checked_at
+                  ? `${formatDate(job.link_last_checked_at)}${
+                      job.link_flagged
+                        ? " - apply link flagged for manual check"
+                        : " - official link reachable"
+                      }`
+                  : "Not checked yet",
             },
             {
               label: "Page Last Updated",
