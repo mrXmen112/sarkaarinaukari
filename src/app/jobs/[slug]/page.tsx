@@ -566,6 +566,14 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
         <DetailTable
           caption="Where this information came from and when it was last checked"
           rows={[
+            ...(job.notice_number
+              ? [
+                  {
+                    label: "Notice Number",
+                    value: job.notice_number,
+                  },
+                ]
+              : []),
             {
               label: "Official Source",
               value: job.source_url ? (

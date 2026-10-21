@@ -122,6 +122,8 @@ export type Job = {
   pay_scale: string | null;
   how_to_apply: string[] | null;
   notification_pdf_link: string | null;
+  /** Official advertisement / CEN number (0024). */
+  notice_number: string | null;
   notification_date: string | null;
   application_start: string | null;
   application_end: string;
