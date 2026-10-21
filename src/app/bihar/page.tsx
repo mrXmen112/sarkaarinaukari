@@ -13,7 +13,7 @@ import { breadcrumbSchema } from "@/lib/seo";
 import { firstParam, formatIndianNumber } from "@/lib/utils";
 import { BIHAR_DEPARTMENTS } from "@/lib/site";
 
-export const revalidate = 1800; // 30 min
+export const revalidate = 300; // 5 min fallback; admin writes revalidate immediately
 
 export const metadata: Metadata = {
   title: "Bihar Sarkari Jobs 2026 — BPSC, BSSC, Bihar Police & TRE",

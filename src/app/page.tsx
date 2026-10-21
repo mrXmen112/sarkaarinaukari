@@ -21,7 +21,7 @@ import { BOARDS } from "@/lib/boards";
 import { HOMEPAGE_TARGET_JOBS, QUICK_LINKS, TRENDING_LINKS } from "@/lib/site";
 import { buildMeta } from "@/lib/seo";
 
-export const revalidate = 1800; // 30 min — listings change often
+export const revalidate = 300; // 5 min fallback; admin writes revalidate immediately
 
 export const metadata = buildMeta({
   kind: "page",
@@ -76,8 +76,8 @@ export default async function HomePage() {
             with dedicated coverage of Bihar government jobs (BPSC, BSSC, Bihar
             Police, Bihar TRE teacher recruitment and more). Find active
             vacancies, admit cards, results, answer keys, exam syllabus and
-            Sarkari Yojana schemes — verified against official sources and
-            updated daily.
+            Sarkari Yojana schemes — with a link to the official source on
+            every page, updated daily.
           </p>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-ink-muted" lang="hi">
             सरकारी नौकरी.ऑनलाइन पर पाएं केंद्र व राज्य सरकार की भर्तियां, बिहार

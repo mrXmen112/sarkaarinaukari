@@ -161,10 +161,9 @@ export default async function VerificationPage() {
         </dl>
         {verifiedCount === 0 ? (
           <p className="mt-3 rounded-sm border-2 border-saffron bg-saffron-bg px-3 py-2 text-sm text-navy">
-            <strong>0 jobs verified.</strong> Keep{" "}
-            <code>NEXT_PUBLIC_VERIFICATION_GATE</code> off until at least 25 are
-            verified — turning it on now would empty the listings, the homepage
-            and the job part of the sitemap.
+            <strong>0 jobs verified.</strong> The public site only shows
+            verified jobs, so the listings, homepage and job sitemap stay empty
+            until the first item is verified.
           </p>
         ) : null}
         <p className="mt-3 text-sm text-ink-muted">

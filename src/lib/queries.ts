@@ -34,35 +34,21 @@ const JOB_SELECT =
   "*, job_categories(id, name, slug, parent_category), syllabus(id, slug, exam_name)";
 
 /**
- * Phase 8A — public visibility gate.
+ * Phase 8A �?" public visibility gate.
  *
- * Only jobs a human has verified against an official notification appear in
- * listings, landing pages, the homepage, related-job blocks or the sitemap.
- * `getJobBySlug` deliberately does NOT apply this: an unverified job must still
- * render on a direct URL visit so the visitor sees the "Details being
- * verified" banner instead of a bare 404.
- *
- * DEPLOYMENT ORDER MATTERS. Until migration 0017 is applied the column does not
- * exist, the query errors, and `guard()` would return an empty list — which
- * would silently empty the homepage AND the sitemap. So the gate starts OFF and
- * is switched on with NEXT_PUBLIC_VERIFICATION_GATE=on in the same deploy that
- * runs the migration:
- *
- *   1. apply supabase/migrations/0017_phase8a_verification_status.sql
- *   2. set NEXT_PUBLIC_VERIFICATION_GATE=on in Vercel and redeploy
- *
- * Leave it off until step 1 has actually run.
+ * Only jobs a human has verified against an official notification may appear
+ * anywhere public: listings, landing pages, the homepage, related-job blocks,
+ * detail pages or the sitemap. This is not an environment toggle any more. A
+ * missing env var silently exposed all 97 unverified rows in production, so the
+ * rule is now unconditional.
  */
-export const VERIFICATION_GATE_ENABLED =
-  process.env.NEXT_PUBLIC_VERIFICATION_GATE === "on";
+export const VERIFICATION_GATE_ENABLED = true;
 
-/** Narrow a jobs builder to verified rows only, when the gate is on. */
+/** Narrow a jobs builder to verified rows only. */
 function verifiedOnly<T extends { eq: (column: string, value: string) => T }>(
   q: T,
 ): T {
-  return VERIFICATION_GATE_ENABLED
-    ? q.eq("verification_status", "verified")
-    : q;
+  return q.eq("verification_status", "verified");
 }
 
 /** True when a job is safe to show in public listings and the sitemap. */
@@ -212,6 +198,7 @@ export async function getJobBySlug(
     .select(JOB_SELECT)
     .eq("slug", slug)
     .eq("is_published", true)
+    .eq("verification_status", "verified")
     .maybeSingle();
   return (data as JobDetail | null) ?? null;
 }
@@ -612,6 +599,7 @@ export async function listAdmitCards(limit = 200): Promise<AdmitCardWithJob[]> {
       .select(UPDATE_JOB_SELECT)
       .eq("is_published", true)
       .eq("status", "released")
+      .lte("release_date", isoDatePlusDays(0))
       .order("release_date", { ascending: false, nullsFirst: false })
       .limit(limit);
     return (data ?? []) as AdmitCardWithJob[];
@@ -627,6 +615,8 @@ export async function getAdmitCardBySlug(
     .select(UPDATE_JOB_SELECT)
     .eq("slug", slug)
     .eq("is_published", true)
+    .eq("status", "released")
+    .lte("release_date", isoDatePlusDays(0))
     .maybeSingle();
   return (data as AdmitCardWithJob | null) ?? null;
 }
@@ -637,6 +627,8 @@ export async function getAllAdmitCardSlugs(): Promise<string[]> {
       .from("admit_cards")
       .select("slug")
       .eq("is_published", true)
+      .eq("status", "released")
+      .lte("release_date", isoDatePlusDays(0))
       .order("release_date", { ascending: false, nullsFirst: false });
     return (      (data ?? []) as Pick<AdmitCard, "slug">[]).map((d) => d.slug);
   });
@@ -674,6 +666,7 @@ export async function listResults(limit = 200): Promise<ResultWithJob[]> {
       .select(UPDATE_JOB_SELECT)
       .eq("is_published", true)
       .eq("status", "released")
+      .lte("result_date", isoDatePlusDays(0))
       .order("result_date", { ascending: false, nullsFirst: false })
       .limit(limit);
     return (data ?? []) as ResultWithJob[];
@@ -689,6 +682,8 @@ export async function getResultBySlug(
     .select(UPDATE_JOB_SELECT)
     .eq("slug", slug)
     .eq("is_published", true)
+    .eq("status", "released")
+    .lte("result_date", isoDatePlusDays(0))
     .maybeSingle();
   return (data as ResultWithJob | null) ?? null;
 }
@@ -699,6 +694,8 @@ export async function getAllResultSlugs(): Promise<string[]> {
       .from("results")
       .select("slug")
       .eq("is_published", true)
+      .eq("status", "released")
+      .lte("result_date", isoDatePlusDays(0))
       .order("result_date", { ascending: false, nullsFirst: false });
     return ((data ?? []) as Pick<ResultRow, "slug">[]).map((d) => d.slug);
   });
@@ -720,6 +717,7 @@ export async function listAnswerKeys(limit = 200): Promise<AnswerKeyWithJob[]> {
       .select(UPDATE_JOB_SELECT)
       .eq("is_published", true)
       .eq("status", "released")
+      .lte("release_date", isoDatePlusDays(0))
       .order("release_date", { ascending: false, nullsFirst: false })
       .limit(limit);
     return (data ?? []) as AnswerKeyWithJob[];
@@ -735,6 +733,8 @@ export async function getAnswerKeyBySlug(
     .select(UPDATE_JOB_SELECT)
     .eq("slug", slug)
     .eq("is_published", true)
+    .eq("status", "released")
+    .lte("release_date", isoDatePlusDays(0))
     .maybeSingle();
   return (data as AnswerKeyWithJob | null) ?? null;
 }
@@ -745,6 +745,8 @@ export async function getAllAnswerKeySlugs(): Promise<string[]> {
       .from("answer_keys")
       .select("slug")
       .eq("is_published", true)
+      .eq("status", "released")
+      .lte("release_date", isoDatePlusDays(0))
       .order("release_date", { ascending: false, nullsFirst: false });
     return ((data ?? []) as Pick<AnswerKey, "slug">[]).map((d) => d.slug);
   });
@@ -772,6 +774,7 @@ export async function getJobTimeline(jobId: string): Promise<JobTimeline> {
         .eq("job_id", jobId)
         .eq("is_published", true)
         .eq("status", "released")
+        .lte("release_date", isoDatePlusDays(0))
         .order("release_date", { ascending: false }),
       createStaticClient()
         .from("results")
@@ -779,6 +782,7 @@ export async function getJobTimeline(jobId: string): Promise<JobTimeline> {
         .eq("job_id", jobId)
         .eq("is_published", true)
         .eq("status", "released")
+        .lte("result_date", isoDatePlusDays(0))
         .order("result_date", { ascending: false, nullsFirst: false }),
       createStaticClient()
         .from("answer_keys")
@@ -786,6 +790,7 @@ export async function getJobTimeline(jobId: string): Promise<JobTimeline> {
         .eq("job_id", jobId)
         .eq("is_published", true)
         .eq("status", "released")
+        .lte("release_date", isoDatePlusDays(0))
         .order("release_date", { ascending: false, nullsFirst: false }),
     ]);
     return {

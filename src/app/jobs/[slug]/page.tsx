@@ -52,7 +52,7 @@ import { ShareButtons } from "@/components/ui/ShareButtons";
 export const revalidate = 10800; // 3 hours — job detail pages
 
 export async function generateStaticParams() {
-  const slugs = await getAllJobSlugs();
+  const slugs = await getAllJobSlugs(true);
   return slugs.map((slug) => ({ slug }));
 }
 
@@ -124,12 +124,7 @@ export async function generateMetadata({
     title,
     description,
     path: `/jobs/${slug}`,
-    // Phase 8A: a job nobody has checked against the official notification is
-    // kept out of the index once NEXT_PUBLIC_VERIFICATION_GATE=on. Until then it
-    // behaves exactly as it did before Phase 8A. This is the SAME function the
-    // sitemap uses (src/app/sitemap.ts), which is why it must not be computed
-    // here from verification_status directly — that produced 124 pages which the
-    // sitemap advertised while their own robots tag said noindex.
+    // Kept in sync with the job sitemap: only human-verified jobs are public.
     robots: robotsFor({
       kind: "job",
       verificationStatus: job.verification_status,
@@ -200,7 +195,6 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
   // Phase 8A — a bulk-seeded job we have not yet matched to an official
   // notification. It renders, but it is clearly labelled. Per the 2026-10 audit
   // this site does not emit JobPosting structured data at all.
-  const verified = job.verification_status === "verified";
   const audit = auditJob(job);
 
   const breadcrumbs = [
@@ -250,31 +244,6 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
 
       <ShareButtons title={job.title} url={url} />
 
-      {/* Phase 8A — "Details being verified" banner */}
-      {!verified ? (
-        <div
-          role="status"
-          className="mb-4 rounded-sm border-2 border-alert bg-alert-bg px-4 py-3"
-        >
-          <p className="text-sm font-bold text-alert">
-            <span className="lang-en">Details being verified</span>
-            <span className="lang-hi">विवरण सत्यापित किया जा रहा है</span>
-          </p>
-          <p className="mt-1 text-xs text-navy">
-            <span className="lang-en">
-              This listing has not yet been matched to a confirmed official
-              notification, so the dates and vacancy figures shown here may be
-              out of date. Please confirm everything on the recruiting body&apos;s
-              own website before applying.
-            </span>
-            <span className="lang-hi">
-              यह सूची अभी आधिकारिक अधिसूचना से मिलाई नहीं गई है, इसलिए यहाँ दी गई तारीखें
-              और पदों की संख्या पुरानी हो सकती हैं। आवेदन से पहले कृपया संबंधित
-              संस्थान की आधिकारिक वेबसाइट से सब कुछ जाँच लें।
-            </span>
-          </p>
-        </div>
-      ) : null}
 
       {audit.failsAudit ? (
         <div

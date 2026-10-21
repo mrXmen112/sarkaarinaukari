@@ -270,11 +270,13 @@ export default async function sitemap(props: {
       routes.push(...listingPaths);
 
       for (const table of ["admit_cards", "results", "answer_keys"]) {
+        const dateColumn = table === "results" ? "result_date" : "release_date";
         const { data } = await supabase
           .from(table)
           .select("slug")
           .eq("is_published", true)
           .eq("status", "released")
+          .lte(dateColumn, new Date().toISOString().slice(0, 10))
           .order("created_at", { ascending: false });
         for (const row of (data ?? []) as unknown as SlugRow[]) {
           routes.push({

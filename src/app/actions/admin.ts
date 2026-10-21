@@ -6,6 +6,10 @@ import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/admin";
 import { slugify } from "@/lib/utils";
 import { pingIndexNow } from "@/lib/indexNow";
+import {
+  revalidateJobSurfaces,
+  revalidateUpdateSurfaces,
+} from "@/lib/revalidatePublic";
 import type { QuizQuestion } from "@/types/database";
 
 export type AdminResult =
@@ -588,7 +592,7 @@ export async function createJob(input: JobInput): Promise<AdminResult> {
     await pingPublished(`/jobs/${payload.slug}`);
   }
   revalidatePath("/admin/jobs");
-  revalidatePath("/jobs", "layout");
+  revalidateJobSurfaces(String(payload.slug ?? ""));
   return { ok: true };
 }
 
@@ -605,7 +609,7 @@ export async function updateJob(
     .eq("id", id);
   if (error) return err(error.message);
   revalidatePath("/admin/jobs");
-  revalidatePath("/jobs", "layout");
+  revalidateJobSurfaces(built.payload?.slug ? String(built.payload.slug) : undefined);
   return { ok: true };
 }
 
@@ -614,7 +618,7 @@ export async function deleteJob(id: string): Promise<AdminResult> {
   const { error } = await supabase.from("jobs").delete().eq("id", id);
   if (error) return err(error.message);
   revalidatePath("/admin/jobs");
-  revalidatePath("/jobs", "layout");
+  revalidateJobSurfaces();
   return { ok: true };
 }
 
@@ -653,7 +657,7 @@ export async function createAdmitCard(input: JobLinkedInput & {
   });
   if (error) return err(error.message);
   revalidatePath("/admin/admit-cards");
-  revalidatePath("/admit-card", "layout");
+  revalidateUpdateSurfaces("admit-card", slugify(input.title.trim()));
   return { ok: true };
 }
 
@@ -680,7 +684,7 @@ export async function updateAdmitCard(
     .eq("id", id);
   if (error) return err(error.message);
   revalidatePath("/admin/admit-cards");
-  revalidatePath("/admit-card", "layout");
+  revalidateUpdateSurfaces("admit-card", slugify(input.title.trim()));
   return { ok: true };
 }
 
@@ -689,7 +693,7 @@ export async function deleteAdmitCard(id: string): Promise<AdminResult> {
   const { error } = await supabase.from("admit_cards").delete().eq("id", id);
   if (error) return err(error.message);
   revalidatePath("/admin/admit-cards");
-  revalidatePath("/admit-card", "layout");
+  revalidateUpdateSurfaces("admit-card");
   return { ok: true };
 }
 
@@ -714,7 +718,7 @@ export async function createResult(input: JobLinkedInput & {
   });
   if (error) return err(error.message);
   revalidatePath("/admin/results");
-  revalidatePath("/result", "layout");
+  revalidateUpdateSurfaces("result", slugify(input.title.trim()));
   return { ok: true };
 }
 
@@ -745,7 +749,7 @@ export async function updateResult(
     .eq("id", id);
   if (error) return err(error.message);
   revalidatePath("/admin/results");
-  revalidatePath("/result", "layout");
+  revalidateUpdateSurfaces("result", slugify(input.title.trim()));
   return { ok: true };
 }
 
@@ -754,7 +758,7 @@ export async function deleteResult(id: string): Promise<AdminResult> {
   const { error } = await supabase.from("results").delete().eq("id", id);
   if (error) return err(error.message);
   revalidatePath("/admin/results");
-  revalidatePath("/result", "layout");
+  revalidateUpdateSurfaces("result");
   return { ok: true };
 }
 
@@ -778,7 +782,7 @@ export async function createAnswerKey(input: JobLinkedInput & {
   });
   if (error) return err(error.message);
   revalidatePath("/admin/answer-keys");
-  revalidatePath("/answer-key", "layout");
+  revalidateUpdateSurfaces("answer-key", slugify(input.title.trim()));
   return { ok: true };
 }
 
@@ -808,7 +812,7 @@ export async function updateAnswerKey(
     .eq("id", id);
   if (error) return err(error.message);
   revalidatePath("/admin/answer-keys");
-  revalidatePath("/answer-key", "layout");
+  revalidateUpdateSurfaces("answer-key", slugify(input.title.trim()));
   return { ok: true };
 }
 
@@ -817,6 +821,6 @@ export async function deleteAnswerKey(id: string): Promise<AdminResult> {
   const { error } = await supabase.from("answer_keys").delete().eq("id", id);
   if (error) return err(error.message);
   revalidatePath("/admin/answer-keys");
-  revalidatePath("/answer-key", "layout");
+  revalidateUpdateSurfaces("answer-key");
   return { ok: true };
 }

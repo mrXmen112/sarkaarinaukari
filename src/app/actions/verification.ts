@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/admin";
 import { createAdminClient } from "@/lib/supabase/server";
+import { revalidateJobSurfaces } from "@/lib/revalidatePublic";
 
 /**
  * Phase 8A — the human verification queue.
@@ -92,7 +93,7 @@ export async function verifyJobAction(
   if (error) return fail(error.message);
 
   revalidatePath("/admin/verification");
-  revalidatePath("/jobs");
+  revalidateJobSurfaces();
   return { ok: true, message: "Job marked verified." };
 }
 
@@ -132,7 +133,7 @@ export async function setJobVerificationAction(
   if (error) return fail(error.message);
 
   revalidatePath("/admin/verification");
-  revalidatePath("/jobs");
+  revalidateJobSurfaces();
   return { ok: true, message: `Job set to ${status}.` };
 }
 
@@ -174,7 +175,7 @@ export async function bulkSetVerificationAction(
   const affected = typeof data === "number" ? data : ids.length;
 
   revalidatePath("/admin/verification");
-  revalidatePath("/jobs");
+  revalidateJobSurfaces();
   return {
     ok: true,
     message: `${affected} job${affected === 1 ? "" : "s"} set to ${newStatus}.`,
