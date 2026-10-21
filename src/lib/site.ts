@@ -56,12 +56,12 @@ export const QUICK_LINKS: { label: string; href: string; hint: string }[] = [
  */
 export const TRENDING_LINKS: NavItem[] = [
   { label: "Bihar 12th Pass Jobs", href: "/bihar/12th-pass-jobs" },
-  { label: "Bihar Jail Sepoy 2026", href: "/jobs/bihar-jail-sepoy-2026" },
-  { label: "Bihar Home Guard", href: "/bihar/bihar-home-guard" },
-  { label: "Bihar Police SI 2026", href: "/jobs/bihar-police-si-2026" },
-  { label: "BPSC 70th Exam", href: "/exams/bpsc-70th" },
   { label: "Bihar Police Jobs", href: "/bihar/bihar-police" },
+  { label: "Bihar Home Guard", href: "/bihar/bihar-home-guard" },
+  { label: "Bihar SSC Jobs", href: "/bihar/bssc" },
+  { label: "BPSC 70th Exam", href: "/exams/bpsc-70th" },
   { label: "Bihar TRE Jobs", href: "/bihar/bihar-tre" },
+  { label: "All Bihar Jobs", href: "/bihar" },
 ];
 
 /** Footer link columns. `labelHi`/`headingHi` render in the Hindi UI. */

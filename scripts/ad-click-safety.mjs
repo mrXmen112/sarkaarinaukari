@@ -30,7 +30,7 @@ const ORIGIN = new URL(BASE).origin;
 /** Hostnames that must never be referenced when their zone is disabled. */
 const MUST_BE_ABSENT = ["al5sm.com", "n6wxm.com"];
 
-const ROUTES = ["/", "/jobs", "/jobs/ssc-cgl-2026", "/exams", "/yojana"];
+const ROUTES = ["/", "/jobs", "/jobs/bihar-tre-4", "/exams", "/yojana"];
 
 /** Elements that legitimately leave the site — never click these. */
 const OFFSITE_HINT = /apply|official|notification|portal|download|check result/i;
