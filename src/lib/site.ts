@@ -46,7 +46,7 @@ export const QUICK_LINKS: { label: string; href: string; hint: string }[] = [
   { label: "Answer Key", href: "/answer-key", hint: "Provisional & final" },
   { label: "Syllabus", href: "/exams", hint: "Exam-wise syllabus" },
   { label: "Sarkari Yojana", href: "/yojana", hint: "Government schemes" },
-  { label: "Competitive Exams", href: "/exams", hint: "Prep & strategy" },
+  { label: "Bihar 12th Pass Jobs", href: "/bihar/12th-pass-jobs", hint: "Intermediate-level posts" },
 ];
 
 /**
@@ -57,7 +57,7 @@ export const QUICK_LINKS: { label: string; href: string; hint: string }[] = [
 export const TRENDING_LINKS: NavItem[] = [
   { label: "Bihar 12th Pass Jobs", href: "/bihar/12th-pass-jobs" },
   { label: "Bihar Jail Sepoy 2026", href: "/jobs/bihar-jail-sepoy-2026" },
-  { label: "Bihar Home Guard 2026", href: "/jobs/bihar-home-guard-2026" },
+  { label: "Bihar Home Guard", href: "/bihar/bihar-home-guard" },
   { label: "Bihar Police SI 2026", href: "/jobs/bihar-police-si-2026" },
   { label: "BPSC 70th Exam", href: "/exams/bpsc-70th" },
   { label: "Bihar Police Jobs", href: "/bihar/bihar-police" },
@@ -85,6 +85,7 @@ export const FOOTER_NAV: {
       { label: "Bihar Jobs", labelHi: "बिहार जॉब", href: "/bihar" },
       { label: "10th Pass Jobs", labelHi: "10th पास जॉब", href: "/jobs/10th-pass" },
       { label: "12th Pass Jobs", labelHi: "12th पास जॉब", href: "/jobs/12th-pass" },
+      { label: "Bihar 12th Pass Jobs", href: "/bihar/12th-pass-jobs" },
       { label: "Graduate Jobs", labelHi: "ग्रेजुएट जॉब", href: "/jobs/graduate" },
     ],
   },

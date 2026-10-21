@@ -51,7 +51,7 @@ export default async function BiharHubPage({
   const activeDept = BIHAR_DEPARTMENTS.find((d) => d.slug === department);
 
   const [{ jobs, total }, updates] = await Promise.all([
-    listJobs({ state: "bihar", department: activeDept?.slug, status: "all", sort: "newest" }),
+    listJobs({ state: "bihar", department: activeDept?.slug, status: "open", sort: "newest" }),
     listRecentUpdates(6),
   ]);
 
@@ -77,7 +77,7 @@ export default async function BiharHubPage({
       <PageHeader
         title={title}
         subtitle={subtitle}
-        meta={`Showing ${formatIndianNumber(total)} Bihar government vacancy${total === 1 ? "" : "ies"} · updated daily`}
+        meta={`Showing ${formatIndianNumber(total)} Bihar government vacanc${total === 1 ? "y" : "ies"} · updated daily`}
       />
 
       <nav aria-label="Bihar departments" className="mb-4 flex flex-wrap gap-2">

@@ -174,6 +174,16 @@ Backfill note: `official_apply_url ← official_link` copied many site homepages
 - **Docs:** this changelog, `NEEDS-MY-DECISION.md`, and `reports/top-15-proxy.md` (explicit Bihar-first proxy, not analytics).
 - **QA:** 52/52 tests at the P0/P1 checkpoint; after the SEO map: **56/56 tests**, lint 0 errors / 17 warnings, build 361 pages; local pages checked (released vs upcoming, verified-apply fallback, failing-job withholding, entrance exclusion, sitemap counts, metadata limits).
 
+### 2026-10-21 production cleanup (live-site report)
+
+- **Jobs unpublished (6):** `bpsc-70th-ccae` (70th prelims was held Dec 2024 / re-exam Jan 2025), `bihar-deled-2026` (entrance, dead official domain), `bihar-home-guard-2026` (no 16,000-post notice; 13,500 still proposed), `bihar-train-conductor-2026` (no BSRTC train-conductor notice), `indian-army-soldier-gd-2026` (no 60,000-post rally; Agniveer is separate), `bihar-tre-5-2026` (no TRE-5 notice; TRE 4.0 is current).
+- **Admit cards:** the four future rows (IBPS PO, Bihar TRE 4.0, BSSC Inter, RRB Group D) are now `upcoming`, noindex, no release timestamp, no download link, and point at the correct official portal. `bpsc-70th-prelims-admit-card` and the three unverifiable "released" rows are unpublished.
+- **Redirects:** added `bihar-deled-2026 → /jobs/bed`, `bpsc-70th-ccae → /bihar/bpsc`, `bihar-home-guard-2026 → /bihar/bihar-home-guard`, `bihar-tre-5-2026 → /bihar/bihar-tre`, `bihar-train-conductor-2026 → /bihar`, `indian-army-soldier-gd-2026 → /jobs/category/defence`.
+- **Results / answer keys:** removed fabricated deep paths, normalised old domains (`bpsc.bih.nic.in`, `bssc.bih.nic.in`), and kept only official roots (BSEB links unchanged).
+- **Bihar hub:** count and table now use the same `open` filter (34 rows), and the "vacancyies" pluralisation bug is fixed.
+- **Internal links:** `/bihar/12th-pass-jobs` added to the homepage quick links and footer Jobs column; Home Guard trending link now points at the hub.
+- **QA:** build clean (355 static pages), 56/56 tests, lint 0 errors / 17 warnings; local checks: `/` shows Latest Results + Latest Answer Keys, `/bihar` shows "34 vacancies", redirects return 308, future admit cards are noindex/Expected with no download, removed rows are 404 or redirected, sitemaps exclude unpublished rows.
+
 ### Baseline commits before this task
 
 `c4c1adc` → `b155c9e` → `a29c36b` → `be0ae74` → `118cf95` (W4 adapters, Quick Publish, pipeline fixes, checkpoint).
@@ -208,6 +218,10 @@ Backfill note: `official_apply_url ← official_link` copied many site homepages
 | 2026-10-20 | BSEB results | Class 12 released 23 Mar 2026 13:30 IST; Matric released 29 Mar 2026 13:15 IST |
 | 2026-10-20 | Link sweep (final) | 115 unique URLs; 51 OK, 64 unverified/blocked, 0 provably dead |
 | 2026-10-20 | Final build | clean, 364 static pages; TRE job/exam and both BSEB results indexable |
+| 2026-10-21 | Production cleanup | 6 jobs + 4 admit cards unpublished; 4 future admit cards Expected/noindex; 6 redirects added |
+| 2026-10-21 | Bihar hub | 34 jobs in both homepage link and hub count; "vacancies" spelling fixed |
+| 2026-10-21 | Post-cleanup build | clean, 355 static pages; 56/56 tests; lint 0 errors / 17 warnings |
+| 2026-10-21 | Local verification | Latest Results/Answer Keys render; deled/BPSC/Home Guard rows absent; stage pages noindex + no download |
 
 ---
 
