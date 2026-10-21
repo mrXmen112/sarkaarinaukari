@@ -695,7 +695,7 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
           {
             question: `Is ${job.title} ke liye age limit kya hai?`,
             answer: job.eligibility_age_min != null && job.eligibility_age_max != null
-              ? `${job.eligibility_age_min} – ${job.eligibility_age_max} years. Age relaxation is available for SC/ST, OBC, EWS, and PwBD categories as per government norms.`
+              ? `${job.eligibility_age_min} – ${job.eligibility_age_max} years. Category-wise age relaxation is as prescribed in the official advertisement.`
               : "Age limit is as per the official notification. Please check the official advertisement for category-wise age relaxation.",
           },
           {
@@ -705,13 +705,16 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
               return rows
                 ? `Application fee category-wise: ${rows
                     .map((r) => `${fmtCategoryLabel(r.key)}: ${formatRupees(r.value)}`)
-                    .join(", ")}. SC/ST/PwBD candidates are usually exempt.`
+                    .join(", ")}. Confirm any exemption or concession in the official advertisement.`
                 : "Application fee is as per the official notification. Category-wise details are available in the official advertisement.";
             })(),
           },
           {
             question: `Apply karne ki last date kab hai?`,
-            answer: `Last date to apply for ${job.title} is ${new Date(job.application_end).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}. Apply before the deadline on the official website.`,
+            answer:
+              job.status === "closed"
+                ? `The application window for ${job.title} closed on ${new Date(job.application_end).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}.`
+                : `Last date to apply for ${job.title} is ${new Date(job.application_end).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}. Apply before the deadline on the official website.`,
           },
           {
             question: "Selection process kya hai?",
