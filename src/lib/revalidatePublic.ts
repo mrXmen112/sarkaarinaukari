@@ -9,7 +9,9 @@ export function revalidateJobSurfaces(slug?: string | null): void {
   revalidatePath("/");
   revalidatePath("/bihar");
   revalidatePath("/jobs", "layout");
-  revalidatePath("/sitemap.xml");
+  revalidatePath("/sitemap-index");
+  revalidatePath("/sitemap/jobs.xml");
+  revalidatePath("/sitemap/updates.xml");
   if (slug) revalidatePath(`/jobs/${slug}`);
 }
 
@@ -24,6 +26,8 @@ export function revalidateUpdateSurfaces(
   revalidatePath("/");
   revalidatePath("/bihar");
   revalidatePath(`/${kind}`, "layout");
-  revalidatePath("/sitemap.xml");
+  revalidatePath("/sitemap-index");
+  revalidatePath("/sitemap/jobs.xml");
+  revalidatePath("/sitemap/updates.xml");
   if (slug) revalidatePath(`/${kind}/${slug}`);
 }

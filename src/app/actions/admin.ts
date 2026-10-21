@@ -615,10 +615,15 @@ export async function updateJob(
 
 export async function deleteJob(id: string): Promise<AdminResult> {
   const { supabase } = await requireAdmin();
+  const { data: existing } = await supabase
+    .from("jobs")
+    .select("slug")
+    .eq("id", id)
+    .maybeSingle();
   const { error } = await supabase.from("jobs").delete().eq("id", id);
   if (error) return err(error.message);
   revalidatePath("/admin/jobs");
-  revalidateJobSurfaces();
+  revalidateJobSurfaces(existing?.slug ?? undefined);
   return { ok: true };
 }
 
