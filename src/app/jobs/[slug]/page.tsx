@@ -94,7 +94,7 @@ export async function generateMetadata({
   const openTitleWithoutVacancy = `${seoName} ${year}: Apply ${lastDateShort}`;
   const title =
     job.status === "closed"
-      ? `${seoName} ${year} — Application Closed, Details`
+      ? `${seoName} ${year} - Closed`
       : openTitle.length <= SEO_TITLE_MAX
         ? openTitle
         : openTitleWithoutVacancy;
