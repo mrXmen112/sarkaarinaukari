@@ -193,6 +193,8 @@ Backfill note: `official_apply_url ← official_link` copied many site homepages
   - `sbi-po-2026`, `rrb-ntpc-2026`, `rrb-group-d-2026`, `upsc-cse-2027`
 - **Evidence:** CSBC's 16-06-2026 notice rebuts fake Jail Warder news; BPSSC Advt 09/2026 is 150 SI posts (09 Jul–09 Aug), not 3,000; SSC CGL/CHSL/GD notices exist but DB dates/vacancies and `/Advt/*.pdf` links do not match; IBPS has CRP PO/MT-XVI, not CRP 17; SBI PO 2026-27 is 1,500 posts (18 Jun–08 Jul); RRB 2026 NTPC is 5,236 posts across CEN 06/2026 + 07/2026; Group D is CEN 09/2025 with 22,195 posts; UPSC CSE 2027 is not yet notified.
 - **Fake URLs removed:** cleared `official_notification_url`, `notification_pdf_link`, and `official_apply_url` on rejected rows; kept an official root in `official_site_url` for audit.
+- **Legacy redirects repaired:** dedupe redirects that pointed at now-unpublished rows now go to live hubs: `bihar-jail-sepoy-2026-3 → /bihar/bihar-police`, `ibps-po-17-5 → /jobs/category/banking`, `ssc-gd-2026-0 → /jobs/category/police`.
+- **Homepage:** replaced the two removed-job trending links with `/bihar/bihar-police` and `/bihar/bssc`; all trending targets return 200.
 - **QA:** DB now has 1 verified published job; `jobs.xml` still 3 URLs; production pages are ISR-cached for up to 3 hours, so a deploy is required to publish the removals as 404s.
 
 ### Baseline commits before this task
