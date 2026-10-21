@@ -590,7 +590,33 @@ export type AdmitCardWithJob = AdmitCard & {
   jobs: Pick<Job, "id" | "title" | "slug"> | null;
 };
 
-const UPDATE_JOB_SELECT = "*, jobs(id, title, slug)";
+const UPDATE_JOB_SELECT =
+  "*, jobs(id, title, slug, verification_status, is_published)";
+
+/**
+ * A result / admit card / answer key may point at a job that is no longer
+ * public (unverified or unpublished). Never render a link to a page the gate
+ * will 404: drop the embed instead.
+ */
+function publicJobEmbed<T extends { jobs: unknown }>(row: T): T {
+  const job = row.jobs as
+    | (Pick<Job, "id" | "title" | "slug"> & {
+        verification_status?: string;
+        is_published?: boolean;
+      })
+    | null;
+  if (
+    !job ||
+    job.verification_status !== "verified" ||
+    job.is_published !== true
+  ) {
+    return { ...row, jobs: null };
+  }
+  return {
+    ...row,
+    jobs: { id: job.id, title: job.title, slug: job.slug },
+  };
+}
 
 export async function listAdmitCards(limit = 200): Promise<AdmitCardWithJob[]> {
   return guard(async () => {
@@ -602,7 +628,7 @@ export async function listAdmitCards(limit = 200): Promise<AdmitCardWithJob[]> {
       .lte("release_date", isoDatePlusDays(0))
       .order("release_date", { ascending: false, nullsFirst: false })
       .limit(limit);
-    return (data ?? []) as AdmitCardWithJob[];
+    return ((data ?? []) as AdmitCardWithJob[]).map(publicJobEmbed);
   });
 }
 
@@ -618,7 +644,7 @@ export async function getAdmitCardBySlug(
     .eq("status", "released")
     .lte("release_date", isoDatePlusDays(0))
     .maybeSingle();
-  return (data as AdmitCardWithJob | null) ?? null;
+  return data ? publicJobEmbed(data as AdmitCardWithJob) : null;
 }
 
 export async function getAllAdmitCardSlugs(): Promise<string[]> {
@@ -669,7 +695,7 @@ export async function listResults(limit = 200): Promise<ResultWithJob[]> {
       .lte("result_date", isoDatePlusDays(0))
       .order("result_date", { ascending: false, nullsFirst: false })
       .limit(limit);
-    return (data ?? []) as ResultWithJob[];
+    return ((data ?? []) as ResultWithJob[]).map(publicJobEmbed);
   });
 }
 
@@ -685,7 +711,7 @@ export async function getResultBySlug(
     .eq("status", "released")
     .lte("result_date", isoDatePlusDays(0))
     .maybeSingle();
-  return (data as ResultWithJob | null) ?? null;
+  return data ? publicJobEmbed(data as ResultWithJob) : null;
 }
 
 export async function getAllResultSlugs(): Promise<string[]> {
@@ -720,7 +746,7 @@ export async function listAnswerKeys(limit = 200): Promise<AnswerKeyWithJob[]> {
       .lte("release_date", isoDatePlusDays(0))
       .order("release_date", { ascending: false, nullsFirst: false })
       .limit(limit);
-    return (data ?? []) as AnswerKeyWithJob[];
+    return ((data ?? []) as AnswerKeyWithJob[]).map(publicJobEmbed);
   });
 }
 
@@ -736,7 +762,7 @@ export async function getAnswerKeyBySlug(
     .eq("status", "released")
     .lte("release_date", isoDatePlusDays(0))
     .maybeSingle();
-  return (data as AnswerKeyWithJob | null) ?? null;
+  return data ? publicJobEmbed(data as AnswerKeyWithJob) : null;
 }
 
 export async function getAllAnswerKeySlugs(): Promise<string[]> {
