@@ -184,6 +184,21 @@ export default async function ExamDetailPage({
         </p>
       </Panel>
 
+      {exam.official_link ? (
+        <Panel title="Official Source" className="mb-4">
+          <p className="text-sm">
+            <a
+              href={exam.official_link}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              className="font-semibold text-navy underline"
+            >
+              Open the official notice or website →
+            </a>
+          </p>
+        </Panel>
+      ) : null}
+
       <Panel title="Exam Pattern & Stages" className="mb-4">
         <div className="space-y-6">
           {(exam.exam_pattern ?? []).map((stage, i) => (
