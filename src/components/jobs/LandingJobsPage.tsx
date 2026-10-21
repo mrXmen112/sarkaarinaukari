@@ -40,12 +40,14 @@ export async function LandingJobsPage({
   const [open, closed] = await Promise.all([
     listJobs({
       ...config.filters,
+      verifiedOnly: true,
       status: "open",
       page: pageNumber,
       pageSize: PAGE_SIZE,
     }),
     listJobs({
       ...config.filters,
+      verifiedOnly: true,
       status: "recently_closed",
       page: 1,
       pageSize: 10,
@@ -166,11 +168,9 @@ export function landingMetadata(
   /**
    * Verified + open jobs this hub currently holds.
    *
-   * Phase 8A: a hub with fewer than MIN_VERIFIED_OPEN_JOBS verified open jobs is
-   * a near-empty page competing with /jobs for the same terms, so it goes
-   * noindex. Pass the count from `countVerifiedOpenJobs(config.filters)` —
-   * while the gate is off this makes no difference and the page stays indexable
-   * exactly as before.
+   * A hub with fewer than MIN_VERIFIED_OPEN_JOBS verified open jobs is a
+   * near-empty page competing with /jobs for the same terms, so it goes
+   * noindex. Pass the count from `countVerifiedOpenJobs(config.filters)`.
    */
   verifiedOpenJobs = MIN_VERIFIED_OPEN_JOBS,
 ) {

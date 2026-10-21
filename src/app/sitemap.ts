@@ -13,8 +13,9 @@ import {
   STATE_SLUGS,
 } from "@/lib/landingPagesState";
 import { BOARDS } from "@/lib/boards";
-import { VERIFICATION_GATE_ENABLED } from "@/lib/queries";
+import { countVerifiedOpenJobs } from "@/lib/queries";
 import {
+  MIN_VERIFIED_OPEN_JOBS,
   isIndexable,
   examContentChars,
   yojanaContentChars,
@@ -60,44 +61,51 @@ export default async function sitemap(props: {
   }
 
   // Landing pages (Phase 3): qualification + category + Bihar organisation.
+  // A hub is only advertised when it has >= 10 verified open jobs, matching
+  // the noindex rule applied by landingMetadata().
   if (id === "landing") {
-    const routes: MetadataRoute.Sitemap = [];
-    for (const page of QUALIFICATION_PAGES) {
-      routes.push({
-        url: `${base}/jobs/${page.slug}`,
-        changeFrequency: "daily",
+    const candidates = [
+      ...QUALIFICATION_PAGES.map((page) => ({
+        path: `/jobs/${page.slug}`,
+        filters: page.filters,
         priority: 0.7,
-      });
-    }
-    for (const page of CATEGORY_PAGES) {
-      routes.push({
-        url: `${base}/jobs/category/${page.slug}`,
-        changeFrequency: "daily",
+      })),
+      ...CATEGORY_PAGES.map((page) => ({
+        path: `/jobs/category/${page.slug}`,
+        filters: page.filters,
         priority: 0.7,
-      });
-    }
-    for (const page of BIHAR_ORG_PAGES) {
-      routes.push({
-        url: `${base}/bihar/${page.slug}`,
-        changeFrequency: "daily",
+      })),
+      ...BIHAR_ORG_PAGES.map((page) => ({
+        path: `/bihar/${page.slug}`,
+        filters: page.filters,
         priority: 0.8,
-      });
-    }
-    for (const page of BIHAR_GUIDE_PAGES) {
-      routes.push({
-        url: `${base}/bihar/${page.slug}`,
-        changeFrequency: "daily",
+      })),
+      ...BIHAR_GUIDE_PAGES.map((page) => ({
+        path: `/bihar/${page.slug}`,
+        filters: page.filters,
         priority: 0.8,
-      });
-    }
-    for (const state of STATE_SLUGS) {
-      routes.push({
-        url: `${base}/jobs/state/${state}`,
-        changeFrequency: "daily",
+      })),
+      ...STATE_SLUGS.map((state) => ({
+        path: `/jobs/state/${state}`,
+        filters: { state },
         priority: state === "bihar" ? 0.8 : 0.6,
-      });
-    }
-    return routes;
+      })),
+    ];
+
+    const routes = await Promise.all(
+      candidates.map(async (candidate) => {
+        const verifiedOpenJobs = await countVerifiedOpenJobs(candidate.filters);
+        if (verifiedOpenJobs < MIN_VERIFIED_OPEN_JOBS) return null;
+        return {
+          url: `${base}${candidate.path}`,
+          changeFrequency: "daily" as const,
+          priority: candidate.priority,
+        };
+      }),
+    );
+    return routes.filter(
+      (route): route is NonNullable<typeof route> => route !== null,
+    );
   }
 
   if (!isSupabaseConfigured) return [];
@@ -233,18 +241,14 @@ export default async function sitemap(props: {
         { url: `${base}/jobs`, changeFrequency: "daily", priority: 0.9 },
         { url: `${base}/jobs/archive`, changeFrequency: "weekly", priority: 0.5 },
       );
-      // Phase 8A: only human-verified jobs belong in the sitemap. Guarded by an
-      // env flag so this cannot empty the sitemap if migration 0017 has not been
-      // applied yet — set NEXT_PUBLIC_VERIFICATION_GATE=on only after running it.
-      const jobQuery = supabase
+      // Only human-verified job pages are indexable, so only they belong here.
+      const { data: jobs } = await supabase
         .from("jobs")
         .select(routeFor.jobs.columns)
         .eq("is_published", true)
-        .eq("type", "job");
-      const { data: jobs } = await (VERIFICATION_GATE_ENABLED
-        ? jobQuery.eq("verification_status", "verified")
-        : jobQuery
-      ).order("content_changed_at", { ascending: false, nullsFirst: false });
+        .eq("type", "job")
+        .eq("verification_status", "verified")
+        .order("content_changed_at", { ascending: false, nullsFirst: false });
       for (const row of (jobs ?? []) as unknown as SlugRow[]) {
         routes.push({
           url: `${base}/${tableForSlug.jobs}/${row.slug}`,

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import { VERIFICATION_GATE_ENABLED } from "@/lib/queries";
 import type { VerificationStatus } from "@/types/database";
 
 /**
@@ -87,17 +86,12 @@ export function isIndexable(subject: IndexableSubject): IndexVerdict {
   // Jobs are governed ENTIRELY by the Phase 8A gate and nothing else, and this
   // is checked FIRST so no content heuristic can contradict it.
   //
-  // While the gate is off, a published job is indexable exactly as it was
-  // before Phase 8A. Applying the content threshold here instead would noindex
-  // thin seeded jobs while the sitemap still advertised them — the precise
-  // contradiction this module exists to prevent.
-  //
-  // When the gate is on, verification_status is the single authority. Note it is
+  // verification_status is the single authority for job pages. It is
   // deliberately NOT link_last_checked_at: that is written by the automated link
   // checker and proves a URL resolves, not that a human matched the page to its
   // official notification.
   if (subject.kind === "job") {
-    if (VERIFICATION_GATE_ENABLED && subject.verificationStatus !== "verified") {
+    if (subject.verificationStatus !== "verified") {
       reasons.push(`not verified (${subject.verificationStatus ?? "null"})`);
     }
     return { indexable: reasons.length === 0, reasons };
@@ -135,18 +129,13 @@ export function robotsFor(subject: IndexableSubject): Metadata["robots"] {
 
 /**
  * A landing page is a hub for one slice of the catalogue ("Railway Jobs",
- * "12th Pass Jobs", "Bihar Jobs"). With the gate on, a hub holding fewer than
- * this many verified OPEN jobs is a near-empty page that competes with the
- * /jobs listing for the same terms, so it goes noindex.
- *
- * While the gate is off every landing page keeps its pre-Phase-8A behaviour,
- * which is the whole point of the flag: turning it on is one deploy that changes
- * the index surface, not a series of content migrations.
+ * "12th Pass Jobs", "Bihar Jobs"). A hub holding fewer than this many verified
+ * OPEN jobs is a near-empty page that competes with the /jobs listing for the
+ * same terms, so it goes noindex.
  */
-export const MIN_VERIFIED_OPEN_JOBS = 3;
+export const MIN_VERIFIED_OPEN_JOBS = 10;
 
 export function isLandingPageIndexable(verifiedOpenJobs: number): boolean {
-  if (!VERIFICATION_GATE_ENABLED) return true;
   return verifiedOpenJobs >= MIN_VERIFIED_OPEN_JOBS;
 }
 

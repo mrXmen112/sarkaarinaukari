@@ -12,7 +12,7 @@
  *   - the homepage lists getLatestJobs(8) -> verified + status=active +
  *     application_end >= today, newest 8
  *   - the closing ticker lists getClosingJobs(6)
- *   - a landing hub is indexable only with >= MIN_VERIFIED_OPEN_JOBS (3)
+ *   - a landing hub is indexable only with >= MIN_VERIFIED_OPEN_JOBS (10)
  *     verified OPEN jobs (active or upcoming)
  *
  * Because this models rather than reuses the code, treat it as a planning aid:
@@ -24,7 +24,7 @@
 import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 
-const MIN_VERIFIED_OPEN_JOBS = 3;
+const MIN_VERIFIED_OPEN_JOBS = 10;
 
 function loadEnv() {
   const raw = readFileSync(".env.local", "utf8");

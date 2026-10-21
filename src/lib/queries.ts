@@ -94,6 +94,8 @@ export type JobListFilters = {
   qualification?: string;
   /** Free-text search across post title and department. */
   q?: string;
+  /** Landing pages set this so only human-verified jobs render. */
+  verifiedOnly?: boolean;
   sort?: "newest" | "closing";
   page?: number;
   pageSize?: number;
@@ -113,6 +115,7 @@ export async function listJobs({
   status = "active",
   qualification,
   q,
+  verifiedOnly: verifiedOnlyFilter,
   sort = "newest",
   page = 1,
   pageSize = 25,
@@ -122,13 +125,15 @@ export async function listJobs({
 
   const cats = await listCategories();
 
-  let query = verifiedOnly(
-    createStaticClient()
-      .from("jobs")
-      .select(JOB_SELECT, { count: "exact" })
-      .eq("is_published", true)
-      .eq("type", "job"),
-  );
+  const effectiveVerifiedOnly = verifiedOnlyFilter ?? VERIFICATION_GATE_ENABLED;
+  let query = createStaticClient()
+    .from("jobs")
+    .select(JOB_SELECT, { count: "exact" })
+    .eq("is_published", true)
+    .eq("type", "job");
+  if (effectiveVerifiedOnly) {
+    query = query.eq("verification_status", "verified");
+  }
 
   if (status && status !== "all") {
     if (status === "recently_closed") {
@@ -358,11 +363,16 @@ export async function listCategories(): Promise<JobCategory[]> {
  * shows today.
  */
 export async function countVerifiedOpenJobs(
-  filters: Pick<JobListFilters, "categorySlug" | "state" | "qualification"> = {},
+  filters: JobListFilters = {},
 ): Promise<number> {
   if (!isSupabaseConfigured) return 0;
   try {
-    const { total } = await listJobs({ ...filters, status: "open", page: 1 });
+    const { total } = await listJobs({
+      ...filters,
+      verifiedOnly: true,
+      status: "open",
+      page: 1,
+    });
     return total ?? 0;
   } catch (err) {
     // Failing closed here would noindex a healthy page, so log and treat the
@@ -373,15 +383,17 @@ export async function countVerifiedOpenJobs(
 }
 
 /** Sitemap slugs — Phase 8A: unverified jobs must NOT be listed. */
-export async function getAllJobSlugs(): Promise<string[]> {
+export async function getAllJobSlugs(verifiedOnlyArg = false): Promise<string[]> {
   return guard(async () => {
-    const { data } = await verifiedOnly(
-      createStaticClient()
-        .from("jobs")
-        .select("slug")
-        .eq("is_published", true)
-        .eq("type", "job"),
-    ).order("created_at", { ascending: false });
+    let query = createStaticClient()
+      .from("jobs")
+      .select("slug")
+      .eq("is_published", true)
+      .eq("type", "job");
+    if (verifiedOnlyArg) {
+      query = query.eq("verification_status", "verified");
+    }
+    const { data } = await query.order("created_at", { ascending: false });
     return ((data ?? []) as Pick<Job, "slug">[]).map((d) => d.slug);
   });
 }

@@ -1,12 +1,15 @@
 import { LandingJobsPage, landingMetadata } from "@/components/jobs/LandingJobsPage";
 import { BIHAR_ORG_PAGES_BY_SLUG } from "@/lib/landingPagesState";
+import { countVerifiedOpenJobs } from "@/lib/queries";
 
 const CONFIG = BIHAR_ORG_PAGES_BY_SLUG["bihar-jal-nigam"];
 const PATH = "/bihar/bihar-jal-nigam";
 
 export const revalidate = 1800;
 
-export const metadata = landingMetadata(CONFIG, PATH);
+export async function generateMetadata() {
+  return landingMetadata(CONFIG, PATH, await countVerifiedOpenJobs(CONFIG.filters));
+}
 
 export default function Page() {
   return (

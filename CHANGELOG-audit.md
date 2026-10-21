@@ -222,6 +222,7 @@ Backfill note: `official_apply_url ← official_link` copied many site homepages
 | 2026-10-21 | Bihar hub | 34 jobs in both homepage link and hub count; "vacancies" spelling fixed |
 | 2026-10-21 | Post-cleanup build | clean, 355 static pages; 56/56 tests; lint 0 errors / 17 warnings |
 | 2026-10-21 | Local verification | Latest Results/Answer Keys render; deled/BPSC/Home Guard rows absent; stage pages noindex + no download |
+| 2026-10-21 | Indexing policy | Unverified jobs noindex + out of `jobs.xml`; landing pages show verified jobs only and noindex below 10 verified open jobs; info/result/exam pages stay indexable |
 
 ---
 
