@@ -249,3 +249,15 @@ Backfill note: `official_apply_url ← official_link` copied many site homepages
 4. **Review the 37 failing rows for real vacancy totals**, then decide whether any become verified. The other 86 unverified rows still need an official source before they can be verified.
 5. **Run `npm run submit:indexnow` after deploying** the new landing page; confirm the key file is live at `/<key>.txt`.
 6. **P2/P3:** sitemap split decision, closed-job retention, legacy redirects, nightly link sweep, admin data health.
+
+---
+
+## Batch 2 — verified recruitment pages (2026-10-21)
+
+- Corrected BPSC TRE 4.0 to Advertisement No. 15/2026: **32,388** posts, Advt 14/2026 cancelled, fee payment to 25.10.2026, application to 26.10.2026.
+- Published BTSC Advt 28/2026 (FEO, 231), 29/2026 (FSO, 139) and 27/2026 (TVO, 787) from the official BTSC PDFs.
+- Published BPSSC Advt 11/2026 (Company Commander, 65) and 09/2026 (SI Special Branch, 150) as closed pages sourced from the official PDFs.
+- Corrected RRB NTPC to CEN 06/2026: **3,548** posts, application 08.10.2026 to 06.11.2026. Unpublished the four unverified RRB/IBPS seed rows.
+- Added `jobs.notice_number` (migration 0024) and surfaced it in the job Source & Verification table.
+- Added `bpsc-72nd` exam page recording the 12.10.2026 postponement of the 25.10.2026 prelims; no new date is claimed.
+- `npm run build` clean; lint 0 errors (17 pre-existing warnings).
