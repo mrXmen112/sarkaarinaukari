@@ -79,7 +79,7 @@ export default async function ReviewQueuePage() {
       <Breadcrumbs items={[{ label: "Admin" }, { label: "Review Queue" }]} />
       <PageHeader
         title="Review Queue"
-        subtitle={`${list.length} entr${list.length === 1 ? "y" : "ies"} awaiting human review`}
+        subtitle={`${list.length} entr${list.length === 1 ? "y" : "ies"} manually queued — automated notices publish without this queue`}
       />
 
       <p className="mb-4 max-w-3xl text-sm text-ink-muted">

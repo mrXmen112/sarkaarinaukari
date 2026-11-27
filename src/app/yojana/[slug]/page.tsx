@@ -10,7 +10,8 @@ import {
   getAllYojanaSlugs,
   getYojanaBySlug,
 } from "@/lib/queries";
-import { articleSchema, breadcrumbSchema } from "@/lib/seo";
+import { articleSchema, breadcrumbSchema, buildMeta } from "@/lib/seo";
+import { yojanaCategoryLabel, yojanaLevelLabel } from "@/lib/yojana";
 import { SITE } from "@/lib/site";
 import { robotsFor, yojanaContentChars } from "@/lib/indexable";
 import { FAQSection } from "@/components/ui/FAQSection";
@@ -32,23 +33,18 @@ export async function generateMetadata({
   const yojana = await getYojanaBySlug(slug);
   if (!yojana) return { title: "Yojana Not Found" };
 
-  const title = `${yojana.title} — Benefits, Eligibility & How to Apply`;
-  return {
-    title,
+  // buildMeta gives this page the same absolute canonical, title/description
+  // limits and social tags as every other content template.
+  return buildMeta({
+    kind: "yojana",
+    title: `${yojana.title} — Benefits & Eligibility`,
     description: truncate(
       yojana.benefits_summary ??
-        `Detailed guide to the ${yojana.title} scheme — eligibility, benefits, documentsaine, and how to apply online.`,
+        `Official details for ${yojana.title}: eligibility, benefits, required documents and application procedure.`,
       158,
     ),
-    alternates: { canonical: `/yojana/${yojana.slug}` },
-    openGraph: {
-      type: "article",
-      title,
-      description: truncate(yojana.benefits_summary ?? "", 158),
-      url: `${SITE.url}/yojana/${yojana.slug}`,
-      publishedTime: yojana.updated_at,
-    },
-    // B4: shared with the sitemap via src/lib/indexable.ts.
+    path: `/yojana/${yojana.slug}`,
+    publishedTime: yojana.updated_at,
     robots: robotsFor({
       kind: "yojana",
       contentChars: yojanaContentChars(yojana),
@@ -56,7 +52,7 @@ export async function generateMetadata({
       lastVerifiedAt: yojana.last_verified_at,
       isPublished: yojana.is_published,
     }),
-  };
+  });
 }
 
 export default async function YojanaDetailPage({
@@ -117,11 +113,12 @@ export default async function YojanaDetailPage({
       <header className="mb-4 border-b-2 border-navy pb-3">
         <h1 className="text-2xl md:text-3xl">{yojana.title}</h1>
         <p className="mt-1 text-sm text-ink-muted">
-          {yojana.level === "central"
-            ? "Central Government Scheme"
-            : yojana.level === "state"
-              ? `State Government (${yojana.state ?? "—"})`
-              : "Government Scheme"}
+          {yojanaLevelLabel(yojana.level)}
+          {yojana.state ? ` · ${yojana.state.replace(/-/g, " ")}` : ""}
+          {" · "}
+          {yojanaCategoryLabel(yojana.category)}
+          {" · "}
+          <span className="capitalize">{yojana.availability_status}</span>
         </p>
       </header>
 
@@ -130,22 +127,22 @@ export default async function YojanaDetailPage({
           caption={`${yojana.title} scheme details`}
           rows={[
             { label: "Scheme Name", value: yojana.title },
+            { label: "Government Level", value: yojanaLevelLabel(yojana.level) },
             {
-              label: "Type",
-              value:
-                yojana.level === "central"
-                  ? "Central Government"
-                  : yojana.level === "state"
-                    ? `State Government (${yojana.state ?? "—"})`
-                    : "—",
+              label: "Applicable State / UT",
+              value: yojana.state ? yojana.state.replace(/-/g, " ") : "All India",
             },
+            { label: "Category", value: yojanaCategoryLabel(yojana.category) },
+            { label: "Availability", value: yojana.availability_status },
             {
               label: "Key Benefits",
               value: yojana.benefits_summary ?? "—",
             },
             {
-              label: "Last Updated",
-              value: formatDate(yojana.updated_at),
+              label: "Last Verified",
+              value: yojana.last_verified_at
+                ? formatDate(yojana.last_verified_at)
+                : "Not yet verified",
             },
           ]}
         />
@@ -167,8 +164,16 @@ export default async function YojanaDetailPage({
         </Panel>
       ) : null}
 
+      {yojana.required_documents ? (
+        <Panel title="Required Documents" className="mb-4">
+          <div className="whitespace-pre-line text-sm leading-relaxed">
+            {yojana.required_documents}
+          </div>
+        </Panel>
+      ) : null}
+
       {yojana.how_to_apply ? (
-        <Panel title="How to Apply" className="mb-4">
+        <Panel title="Application Procedure" className="mb-4">
           <div className="whitespace-pre-line text-sm leading-relaxed">
             {yojana.how_to_apply}
           </div>
@@ -177,10 +182,17 @@ export default async function YojanaDetailPage({
 
       <Panel title="Important Links" className="mb-4">
         <ul className="divide-y divide-rule">
+          {yojana.apply_url ? (
+            <ExternalLinkRow
+              href={yojana.apply_url}
+              label="Apply Online (Official)"
+              icon="globe"
+            />
+          ) : null}
           {yojana.official_link ? (
             <ExternalLinkRow
               href={yojana.official_link}
-              label="Official Website / Apply Online"
+              label="Official Scheme Page"
               icon="globe"
             />
           ) : null}

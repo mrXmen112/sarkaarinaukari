@@ -4,14 +4,15 @@
  * Each adapter implements:
  *   { SOURCE_NAME, listingUrl(source), extractItems(html, baseUrl) }
  *
- * UPSC and PIB are intentionally absent: both are bot-blocked (Akamai 403),
- * and RRB Patna's notice data sits behind a WAF-rejected endpoint, so those
- * three are handled as manual sources (pasted via Quick Publish).
+ * Sources whose `parser` is 'generic' use the conservative generic adapter.
+ * A few sensitive government portals (UPSC, PIB, RRB Patna) remain bot-blocked
+ * and must be supplied through Quick Publish until a permitted feed exists.
  */
 
 import * as csbc from "./csbc.mjs";
 import * as employmentnews from "./employmentnews.mjs";
 import * as ibps from "./ibps.mjs";
+import * as generic from "./generic.mjs";
 
 export const adapters = {
   [csbc.SOURCE_NAME]: csbc,
@@ -19,6 +20,7 @@ export const adapters = {
   [ibps.SOURCE_NAME]: ibps,
 };
 
-export function getAdapter(sourceName) {
-  return adapters[sourceName] ?? null;
+/** @param {string} sourceName @param {string | null} parser */
+export function getAdapter(sourceName, parser = null) {
+  return adapters[sourceName] ?? (parser === "generic" ? generic : null);
 }

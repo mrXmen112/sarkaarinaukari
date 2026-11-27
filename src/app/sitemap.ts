@@ -369,7 +369,8 @@ export default async function sitemap(props: {
     }
 
     return routes;
-  } catch {
+  } catch (error) {
+    console.error("[sitemap] generation failed:", error);
     return routes;
   }
 }

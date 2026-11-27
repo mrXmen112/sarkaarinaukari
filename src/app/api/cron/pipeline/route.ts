@@ -6,15 +6,18 @@ import { createStore } from "../../../../../scripts/scraper/lib/store.mjs";
 import { RateLimiter } from "../../../../../scripts/scraper/lib/rateLimit.mjs";
 import { runSource } from "../../../../../scripts/scraper/lib/scrape.mjs";
 import { runStructure } from "../../../../../scripts/scraper/lib/structure.mjs";
+import { runDeterministicStructure } from "../../../../../scripts/scraper/lib/deterministic.mjs";
 import { getAdapter } from "../../../../../scripts/scraper/sources/index.mjs";
+import { runAutoPublish } from "@/lib/automation";
 
 /**
  * Vacancy pipeline cron (Phase 1).
  *
  * One invocation does a bounded amount of work: scrape the active source that
- * was scraped longest ago (rotation), then structure a few unprocessed rows
- * into the human-review queue. NOTHING publishes automatically — publishing
- * happens in /admin/review-queue. Staging tables only.
+ * was scraped longest ago (rotation), structure a few unprocessed rows, then
+ * run the automated verifier. A notice that matches its registered official
+ * source and passes all field checks is published immediately; failures are
+ * recorded in import_errors for monitoring. No admin approval is required.
  *
  * Vercel Cron (Hobby: daily) hits this with Authorization: Bearer $CRON_SECRET.
  * For 30-60 min frequency use the Supabase pg_cron snippet from migration
@@ -36,6 +39,7 @@ export async function GET(req: NextRequest) {
   }
 
   let sourceId: string | null = null;
+  const errors: string[] = [];
 
   try {
     const { url, serviceKey } = loadEnv();
@@ -45,7 +49,7 @@ export async function GET(req: NextRequest) {
     // 1) Rotate through active sources that have a live adapter, oldest first.
     const sources = await store.listSources({ activeOnly: true });
     const candidates = sources
-      .filter((s: { name: string }) => getAdapter(s.name))
+      .filter((s: { name: string; parser: string | null }) => getAdapter(s.name, s.parser))
       .sort((a: { last_scraped_at: string | null }, b: { last_scraped_at: string | null }) =>
         String(a.last_scraped_at ?? "").localeCompare(String(b.last_scraped_at ?? "")),
       );
@@ -53,13 +57,15 @@ export async function GET(req: NextRequest) {
     let scrape = null;
     if (candidates.length > 0) {
       const source = candidates[0];
-      const adapter = getAdapter(source.name);
+      const adapter = getAdapter(source.name, source.parser);
       sourceId = source.id ?? null;
       scrape = await runSource({ store, source, adapter, limiter, limit: 5 });
     }
 
-    // 2) Structure a few unprocessed rows into pending_entries (needs LLM key).
+    // 2) Structure a few unprocessed rows. LLM extraction is preferred, but a
+    //    missing key / PDF parser falls back to the conservative extractor.
     let structure = null;
+    let structureMode: "llm" | "deterministic" | null = null;
     try {
       const llm = loadLLMEnv();
       let pdfParse = null;
@@ -70,6 +76,7 @@ export async function GET(req: NextRequest) {
         pdfParse = null;
       }
       if (pdfParse) {
+        structureMode = "llm";
         structure = await runStructure({
           store,
           limiter,
@@ -79,9 +86,25 @@ export async function GET(req: NextRequest) {
           limit: 3,
         } as Parameters<typeof runStructure>[0]);
       }
-    } catch {
-      // LLM_API_KEY absent or model error: staged rows simply wait for the
-      // next run. Never fatal — scraping already succeeded.
+    } catch (error) {
+      errors.push(`llm structure: ${error instanceof Error ? error.message : String(error)}`);
+    }
+    if (!structure) {
+      try {
+        structureMode = "deterministic";
+        structure = await runDeterministicStructure({ store, limit: 3 });
+      } catch (error) {
+        errors.push(`deterministic structure: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
+
+    // 3) Publish every staged entry that proves out against its official source.
+    //    Failures are persistently logged by runAutoPublish, not surfaced here.
+    let autoPublish = null;
+    try {
+      autoPublish = await runAutoPublish(10);
+    } catch (error) {
+      errors.push(`autopublish: ${error instanceof Error ? error.message : String(error)}`);
     }
 
     return Response.json({
@@ -94,6 +117,7 @@ export async function GET(req: NextRequest) {
             itemsNew: scrape.itemsNew,
           }
         : null,
+      structureMode,
       structure: structure
         ? {
             examined: structure.examined,
@@ -102,6 +126,15 @@ export async function GET(req: NextRequest) {
             failed: structure.failed,
           }
         : null,
+      autoPublish: autoPublish
+        ? {
+            examined: autoPublish.examined,
+            published: autoPublish.published,
+            failed: autoPublish.errors.length,
+            duplicates: autoPublish.duplicates,
+          }
+        : null,
+      errors,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);

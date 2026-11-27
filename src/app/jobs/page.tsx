@@ -44,6 +44,8 @@ export default async function JobsPage({
   const sp = await searchParams;
   const category = firstParam(sp.category);
   const state = firstParam(sp.state);
+  const centralOnly = firstParam(sp.central) === "1";
+  const stateJobsOnly = firstParam(sp.stateJobs) === "1";
   const status = firstParam(sp.status) ?? "active";
   const qualification = firstParam(sp.qualification);
   const q = firstParam(sp.q)?.trim() || undefined;
@@ -52,14 +54,29 @@ export default async function JobsPage({
     | "closing";
   const page = parsePage(sp.page);
 
-  const [categories, { jobs, total, totalPages }] = await Promise.all([
-    listCategories(),
-    listJobs({ categorySlug: category, state, status, qualification, q, sort, page }),
-  ]);
+  const [categories, { jobs, total, page: servedPage, totalPages }] =
+    await Promise.all([
+      listCategories(),
+      listJobs({
+        categorySlug: category,
+        state,
+        centralOnly,
+        stateJobsOnly,
+        status,
+        qualification,
+        q,
+        sort,
+        page,
+      }),
+    ]);
+  const firstRow = total === 0 ? 0 : (servedPage - 1) * PAGE_SIZE + 1;
+  const lastRow = total === 0 ? 0 : Math.min(total, firstRow + jobs.length - 1);
 
   const carriable = {
     category,
     state,
+    central: centralOnly ? "1" : undefined,
+    stateJobs: stateJobsOnly ? "1" : undefined,
     status: status === "active" ? undefined : status,
     qualification,
     sort,
@@ -76,7 +93,7 @@ export default async function JobsPage({
       <PageHeader
         title={`Sarkari Jobs — ${total > 0 ? formatIndianNumber(total) : "Latest"} Vacancies`}
         subtitle="Central & state government job notifications, updated daily."
-        meta={`Showing ${jobs.length} of ${formatIndianNumber(total)}${state ? ` in ${stateLabel(state)}` : ""}`}
+        meta={`Showing ${formatIndianNumber(firstRow)}–${formatIndianNumber(lastRow)} of ${formatIndianNumber(total)}${state ? ` in ${stateLabel(state)}` : ""}`}
       />
 
       <div className="mb-4 max-w-xl">
@@ -139,7 +156,7 @@ export default async function JobsPage({
       <JobTable
         jobs={jobs}
         caption="List of government job vacancies."
-        startIndex={(page - 1) * PAGE_SIZE}
+        startIndex={(servedPage - 1) * PAGE_SIZE}
         empty={
           <p>
             No jobs match these filters. Try widening{" "}
@@ -155,7 +172,7 @@ export default async function JobsPage({
       />
 
       <Pagination
-        page={page}
+        page={servedPage}
         totalPages={totalPages}
         basePath="/jobs"
         params={carriable}

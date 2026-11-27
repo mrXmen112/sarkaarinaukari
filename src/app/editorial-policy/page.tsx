@@ -10,7 +10,7 @@ import { breadcrumbSchema } from "@/lib/seo";
 export const metadata: Metadata = {
   title: { absolute: "Editorial & Data Verification Policy — How We Check Every Job" },
   description:
-    "How SarkaariNaukri.online collects and verifies government job information: official sources only, human review before publishing, link checking, corrections policy and how to report an error.",
+    "How SarkaariNaukri.online collects and verifies government job information: registered official sources, automated field validation and source cross-checking, link checking, corrections policy and how to report an error.",
   alternates: { canonical: "/editorial-policy" },
   robots: { index: true, follow: true },
 };
@@ -71,31 +71,46 @@ export default function EditorialPolicyPage() {
             2. How vacancies are collected
           </h2>
           <p>
-            Vacancies are collected two ways, and both end with a person
-            checking the result:
+            Automated collection is the default path for notices from registered
+            official sources; manual entry is used for sources that block
+            automated access.
           </p>
           <ul className="list-disc space-y-1.5 pl-5">
             <li>
-              <strong className="text-navy">Manual entry.</strong> An editor
-              opens the official notification, reads it, and fills in the post
-              name, department, vacancy, dates, eligibility, fee and official
-              links.
+              <strong className="text-navy">Automated publication.</strong> Our
+              collector reads the public listing pages of the recruiting bodies
+              in our source registry. Each notice is structured into a draft and
+              then checked automatically: the destination must be on that
+              source&apos;s registered official domain, the mandatory fields
+              (title, department, vacancy, eligibility and last date) must be
+              present and consistent, and the extracted values must be found in
+              the official notice text itself. A draft that passes all three
+              checks is published immediately with an{" "}
+              <code>auto:&lt;source&gt;</code> verification stamp.{" "}
+              <strong className="text-navy">
+                No administrator approval is required for a notice that passes.
+              </strong>
             </li>
             <li>
-              <strong className="text-navy">Automated collection.</strong> Our
-              scraper reads the public listing pages of recruiting bodies we
-              have registered, and an extraction step turns each notice into a
-              structured draft. Drafts{" "}
-              <strong className="text-navy">always go into a review queue</strong>{" "}
-              — nothing is published automatically. An editor reviews every
-              field, fixes what the extraction missed, and only then approves
-              it.
+              <strong className="text-navy">Automated processing errors.</strong>{" "}
+              A notice that fails any check is not published. It is recorded in
+              our import-error log with the reason, and the source is retried on
+              the next scheduled run. The manual review queue is used only for
+              entries an editor creates deliberately — it is not a gate on the
+              public publishing workflow.
+            </li>
+            <li>
+              <strong className="text-navy">Manual entry.</strong> An editor may
+              open an official notification that our collector cannot reach and
+              enter it directly; those rows still carry no verification stamp
+              until their source is confirmed.
             </li>
           </ul>
           <p>
             Fields the notification does not state are left blank and shown as
             &ldquo;Not notified&rdquo;. We do not estimate a date, a vacancy
-            count, or a fee that the notification does not give us.
+            count, or a fee that the notification does not give us, and we never
+            generate a notice to fill an empty category.
           </p>
         </section>
 
@@ -139,7 +154,7 @@ export default function EditorialPolicyPage() {
             >
               job listings
             </Link>
-            , and we review flagged links as part of the review queue.
+            , and failed links appear in the automated monitoring dashboard.
           </p>
         </section>
 
@@ -154,7 +169,7 @@ export default function EditorialPolicyPage() {
             Job pages are never deleted. Once the last date passes, the
             vacancy is marked closed, the Apply button is removed, and the page
             moves to a &ldquo;Recently Closed&rdquo; list for 30 days. After
-            roughly 90 days it moves to the archive, where it remains
+            30 days it moves to the archive, where it remains
             indexable with a link to similar open vacancies — because the same
             recruitment usually comes back, and a visitor looking for it today
             often needs it next year too.

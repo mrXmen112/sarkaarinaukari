@@ -9,6 +9,7 @@ import {
   type AdminResult,
 } from "@/app/actions/admin";
 import type { Yojana } from "@/types/database";
+import { YOJANA_CATEGORIES, YOJANA_LEVELS } from "@/lib/yojana";
 
 const initial: AdminResult = { ok: true };
 
@@ -22,12 +23,16 @@ export function YojanaForm({ yojana }: { yojana?: Yojana | null }) {
         title: String(formData.get("title") ?? ""),
         level: String(formData.get("level") ?? ""),
         state: String(formData.get("state") ?? ""),
+        category: String(formData.get("category") ?? ""),
         description: String(formData.get("description") ?? ""),
         benefits_summary: String(formData.get("benefits_summary") ?? ""),
         eligibility: String(formData.get("eligibility") ?? ""),
         benefits: String(formData.get("benefits") ?? ""),
         how_to_apply: String(formData.get("how_to_apply") ?? ""),
+        required_documents: String(formData.get("required_documents") ?? ""),
+        apply_url: String(formData.get("apply_url") ?? ""),
         official_link: String(formData.get("official_link") ?? ""),
+        availability_status: String(formData.get("availability_status") ?? "active"),
         is_published: formData.get("is_published") === "on",
       };
       const res = isEdit
@@ -59,19 +64,38 @@ export function YojanaForm({ yojana }: { yojana?: Yojana | null }) {
         <label className={labelCls}>
           Level
           <select name="level" className={fieldCls} defaultValue={yojana?.level ?? "central"}>
-            <option value="central">Central</option>
-            <option value="state">State</option>
+            {YOJANA_LEVELS.map((l) => (
+              <option key={l.value} value={l.value}>{l.label}</option>
+            ))}
           </select>
         </label>
         <label className={labelCls}>
-          State
+          State / UT slug
           <input
             name="state"
             type="text"
-            placeholder="e.g. bihar (leave blank for central)"
+            placeholder="e.g. bihar (blank = All India)"
             defaultValue={yojana?.state ?? ""}
             className={fieldCls}
           />
+        </label>
+        <label className={labelCls}>
+          Category
+          <select name="category" className={fieldCls} defaultValue={yojana?.category ?? ""}>
+            <option value="">General</option>
+            {YOJANA_CATEGORIES.map((c) => (
+              <option key={c.value} value={c.value}>{c.label}</option>
+            ))}
+          </select>
+        </label>
+        <label className={labelCls}>
+          Availability
+          <select name="availability_status" className={fieldCls} defaultValue={yojana?.availability_status ?? "active"}>
+            <option value="active">Active</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="closed">Closed</option>
+            <option value="unknown">Unknown</option>
+          </select>
         </label>
       </div>
 
@@ -126,11 +150,31 @@ export function YojanaForm({ yojana }: { yojana?: Yojana | null }) {
       </label>
 
       <label className={labelCls}>
+        Required documents
+        <textarea
+          name="required_documents"
+          rows={4}
+          defaultValue={yojana?.required_documents ?? ""}
+          className={fieldCls}
+        />
+      </label>
+
+      <label className={labelCls}>
         Official link
         <input
           name="official_link"
           type="url"
           defaultValue={yojana?.official_link ?? ""}
+          className={fieldCls}
+        />
+      </label>
+
+      <label className={labelCls}>
+        Application URL (official)
+        <input
+          name="apply_url"
+          type="url"
+          defaultValue={yojana?.apply_url ?? ""}
           className={fieldCls}
         />
       </label>

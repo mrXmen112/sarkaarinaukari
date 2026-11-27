@@ -10,6 +10,15 @@ Decisions that need the owner are tracked in `NEEDS-MY-DECISION.md`.
 
 ---
 
+## 0. Automated publishing & listing repair (2026-11-27)
+
+- **DB:** migration `0026_automated_publishing` (job provenance, `import_errors`, lifecycle `cancelled`/`result_declared` with IST status refresh, `auto_pending`/`auto_published`/`automated_error` staging states, Yojana directory fields, `mark_auto_verified` RPC); migration `0027_national_source_registry` (central/state/UT official portals + myScheme; all new sources inactive until tested).
+- **Automation:** scraper stages `auto_pending`; `src/lib/autoPublish.ts` checks official-domain provenance, mandatory fields and source-text cross-checks; `src/lib/automation.ts` publishes passing notices with an `auto:<source>` stamp and logs every failure to `import_errors`; deterministic fallback structuring works without an LLM key. IBPS is the one tested auto-publish source.
+- **Listings:** count-first, page-clamping `listJobs()`; shared `pageWindow()`; unified open/active date semantics; `/jobs`, state hubs and Yojana directory paginate with preserved filters; out-of-range pages no longer show an empty table next to a large total.
+- **Yojana:** `npm run sync:schemes` imports myScheme's official JSON API (218 records: central/state/UT, benefits, eligibility, documents, application procedure, official/apply URLs, verification stamp); filterable/paginated directory and richer detail pages; `/api/cron/schemes` + a daily Vercel cron keep it updated.
+- **SEO:** JobPosting restored for eligible active verified jobs; Yojana canonicals now absolute; prep sitemap includes verified Yojana rows; sitemap failures are logged.
+- **Verification:** 77 unit tests + 2 scraper tests + 44 HTTP flow checks; TypeScript clean, lint 0 errors, production build clean.
+
 ## 1. Baseline (before this audit)
 
 - `npm test` 56/56; lint 0 errors / 24 warnings; `npm run build` clean.

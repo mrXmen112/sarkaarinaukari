@@ -6,8 +6,10 @@
  *   (full PDF text extraction; garbled legacy-Hindi fonts are flagged).
  * - Builds the Section 5 prompt per target_type, calls the LLM, validates
  *   the JSON, derives confidence_flags, inserts pending_entries as
- *   pending_review, and marks the raw row processed ONLY on success.
- * - Failures leave the raw row unprocessed so a later run can retry.
+ *   auto_pending for the automated verifier, and marks the raw row processed
+ *   ONLY on success.
+ * - Failures are written to import_errors and leave the raw row unprocessed
+ *   so a later run can retry.
  *
  * Writes ONLY to pending_entries (+ processed flag on raw_scrapes).
  * NEVER touches jobs, admit_cards, results, answer_keys, yojana.
@@ -311,7 +313,19 @@ export async function runStructure({ store, limiter, pdfParse, llm, sourceId = n
       else out.created++;
     } catch (e) {
       out.failed++;
-      out.errors.push(`${row.id.slice(0, 8)}: ${String(e.message ?? e).slice(0, 200)}`);
+      const message = `${row.id.slice(0, 8)}: ${String(e.message ?? e).slice(0, 200)}`;
+      out.errors.push(message);
+      try {
+        await store.insertImportError({
+          sourceId: row.source_id ?? null,
+          rawScrapeId: row.id,
+          phase: "structure",
+          code: "structure_failed",
+          message,
+        });
+      } catch {
+        // Never let error logging stop the pipeline.
+      }
     }
   }
   return out;

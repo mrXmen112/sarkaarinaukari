@@ -1,8 +1,8 @@
 import { createStaticClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
 import { isoDatePlusDays } from "@/lib/date";
+import { pageWindow } from "@/lib/pagination";
 import { unslugify } from "@/lib/utils";
-import { MIN_VERIFIED_OPEN_JOBS } from "@/lib/indexable";
 import type {
   AdmitCard,
   AnswerKey,
@@ -17,6 +17,8 @@ import type {
   Syllabus,
   VerificationStatus,
   Yojana,
+  YojanaAvailability,
+  YojanaLevel,
 } from "@/types/database";
 
 /**
@@ -58,6 +60,28 @@ export function isPubliclyVisible(job: {
   return job.verification_status === "verified";
 }
 
+/**
+ * The PostgREST builder is heavily generic over its select string; a single
+ * structural type keeps the "count" and "rows" builders identical without
+ * leaking an `any` into the public query layer.
+ */
+type ListingQuery = {
+  eq(column: string, value: string | number | boolean | null): ListingQuery;
+  in(column: string, values: string[]): ListingQuery;
+  or(filters: string): ListingQuery;
+  is(column: string, value: boolean | null): ListingQuery;
+  not(column: string, operator: string, value: string | null): ListingQuery;
+  gte(column: string, value: string): ListingQuery;
+  lt(column: string, value: string): ListingQuery;
+  order(column: string, options: { ascending: boolean; nullsFirst?: boolean }): ListingQuery;
+  range(from: number, to: number): ListingQuery;
+  then: PromiseLike<{
+    data: unknown[] | null;
+    count: number | null;
+    error: { message: string } | null;
+  }>["then"];
+};
+
 type Result<T> = T[];
 
 async function guard<T>(fn: () => Promise<Result<T>>): Promise<Result<T>> {
@@ -73,6 +97,9 @@ async function guard<T>(fn: () => Promise<Result<T>>): Promise<Result<T>> {
 export type JobListFilters = {
   categorySlug?: string;
   state?: string;
+  /** Central bodies have state = null; state bodies have a state slug. */
+  centralOnly?: boolean;
+  stateJobsOnly?: boolean;
   /** Stable recruiting-body key, e.g. "bihar-police" (Bihar Hub chips). */
   department?: string;
   /** "active" | "upcoming" | "closed" | "recently_closed" | "open" | "all" */
@@ -97,6 +124,8 @@ export type JobListResult = {
 export async function listJobs({
   categorySlug,
   state,
+  centralOnly,
+  stateJobsOnly,
   department,
   status = "active",
   qualification,
@@ -106,86 +135,103 @@ export async function listJobs({
   page = 1,
   pageSize = 25,
 }: JobListFilters = {}): Promise<JobListResult> {
-  const empty: JobListResult = { jobs: [], total: 0, page, totalPages: 0 };
+  const empty: JobListResult = { jobs: [], total: 0, page: 1, totalPages: 1 };
   if (!isSupabaseConfigured) return empty;
 
   const cats = await listCategories();
+  if (categorySlug && !cats.some((c) => c.slug === categorySlug)) return empty;
 
   const effectiveVerifiedOnly = verifiedOnlyFilter ?? VERIFICATION_GATE_ENABLED;
-  let query = createStaticClient()
-    .from("jobs")
-    .select(JOB_SELECT, { count: "exact" })
-    .eq("is_published", true)
-    .eq("type", "job");
-  if (effectiveVerifiedOnly) {
-    query = query.eq("verification_status", "verified");
-  }
+  const today = isoDatePlusDays(0);
 
-  if (status && status !== "all") {
-    if (status === "recently_closed") {
-      // Jobs flipped to "closed" by refresh_job_statuses(), still fresh.
+  // The count and the rows MUST come from the same filters. Building the query
+  // twice from one function is deliberate — a hand-copied count query is how
+  // the header and the table drifted apart in the first place.
+  const build = (head: boolean) => {
+    let query = createStaticClient()
+      .from("jobs")
+      .select(head ? "id" : JOB_SELECT, { count: "exact", head })
+      .eq("is_published", true)
+      .eq("type", "job") as unknown as ListingQuery;
+    if (effectiveVerifiedOnly) {
+      query = query.eq("verification_status", "verified");
+    }
+
+    if (status && status !== "all") {
+      if (status === "recently_closed") {
+        query = query
+          .eq("status", "closed")
+          .lt("application_end", today)
+          .gte("application_end", isoDatePlusDays(-30));
+      } else if (status === "open" || status === "active") {
+        // A vacancy is actionable only while its application window is open.
+        query = query
+          .in("status", ["active", "upcoming"])
+          .gte("application_end", today);
+      } else {
+        query = query.eq("status", status as JobStatus);
+      }
+    }
+
+    if (categorySlug) {
+      const cat = cats.find((c) => c.slug === categorySlug);
+      if (!cat) return null;
+      query = query.eq("category_id", cat.id);
+    }
+    if (state) query = query.eq("state", state);
+    if (centralOnly) query = query.is("state", null);
+    if (stateJobsOnly) query = query.not("state", "is", null);
+    if (department) query = query.eq("department_slug", department);
+    if (qualification) {
+      const kw = qualificationKeywords(qualification);
+      if (kw.length) {
+        query = query.or(
+          kw.map((k) => `eligibility_education.ilike.%${k}%`).join(","),
+        );
+      }
+    }
+    if (q && q.trim()) {
+      // Escape PostgREST or() string syntax; match title and department.
+      const term = q.trim().replace(/[%,()]/g, " ").slice(0, 80);
+      query = query.or(`title.ilike.%${term}%,department.ilike.%${term}%`);
+    }
+
+    if (sort === "closing") {
       query = query
-        .eq("status", "closed")
-        .lt("application_end", isoDatePlusDays(0))
-        .gte("application_end", isoDatePlusDays(-30));
-    } else if (status === "open") {
-      // Everything a candidate can still act on: live now or announced.
-      query = query.in("status", ["active", "upcoming"]);
+        .gte("application_end", today)
+        .order("application_end", { ascending: true })
+        .order("slug", { ascending: true });
     } else {
-      query = query.eq("status", status as JobStatus);
+      query = query
+        .order("created_at", { ascending: false })
+        .order("slug", { ascending: true });
     }
-  }
-  if (status === "active") {
-    query = query.gte("application_end", isoDatePlusDays(0));
-  }
-  if (categorySlug) {
-    const cat = cats.find((c) => c.slug === categorySlug);
-    if (!cat) return empty;
-    query = query.eq("category_id", cat.id);
-  }
-  if (state) {
-    query = query.eq("state", state);
-  }
-  if (department) {
-    query = query.eq("department_slug", department);
-  }
-  if (qualification) {
-    const kw = qualificationKeywords(qualification);
-    if (kw.length) {
-      query = query.or(
-        kw.map((k) => `eligibility_education.ilike.%${k}%`).join(","),
-      );
-    }
-  }
-  if (q && q.trim()) {
-    // Escape PostgREST or() string syntax; match title and department.
-    const term = q.trim().replace(/[%,()]/g, " ").slice(0, 80);
-    query = query.or(
-      `title.ilike.%${term}%,department.ilike.%${term}%`,
-    );
-  }
+    return query;
+  };
 
-  if (sort === "closing") {
-    query = query
-      .gte("application_end", isoDatePlusDays(0))
-      .order("application_end", { ascending: true })
-      .order("slug", { ascending: true });
-  } else {
-    query = query
-      .order("created_at", { ascending: false })
-      .order("slug", { ascending: true });
+  const counted = await build(true);
+  if (!counted) return empty;
+  const { count, error: countError } = await counted;
+  if (countError) {
+    console.error("[queries] listJobs count failed:", countError.message);
+    return empty;
   }
+  const total = count ?? 0;
+  const window = pageWindow(page, total, pageSize);
+  if (total === 0) return { ...empty, total: 0 };
 
-  query = query.range((page - 1) * pageSize, page * pageSize - 1);
-
-  const { data, count } = await query;
-  const jobs = (data ?? []) as JobWithCategory[];
-  const total = count ?? jobs.length;
+  const rowsQuery = build(false);
+  if (!rowsQuery) return empty;
+  const { data, error } = await rowsQuery.range(window.start, window.end);
+  if (error) {
+    console.error("[queries] listJobs rows failed:", error.message);
+    return { jobs: [], total, page: window.page, totalPages: window.totalPages };
+  }
   return {
-    jobs,
+    jobs: (data ?? []) as JobWithCategory[],
     total,
-    page,
-    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+    page: window.page,
+    totalPages: window.totalPages,
   };
 }
 
@@ -196,10 +242,11 @@ export async function getJobBySlug(
   const { data } = await createStaticClient()
     .from("jobs")
     .select(JOB_SELECT)
-    .eq("slug", slug)
-    .eq("is_published", true)
-    .eq("verification_status", "verified")
-    .maybeSingle();
+     .eq("slug", slug)
+     .eq("is_published", true)
+     .eq("type", "job")
+     .eq("verification_status", "verified")
+     .maybeSingle();
   return (data as JobDetail | null) ?? null;
 }
 
@@ -214,9 +261,10 @@ export async function getRelatedJobs(
       .from("jobs")
       .select(JOB_SELECT)
       .eq("is_published", true)
-      .eq("type", "job")
-      .eq("status", "active")
-      .neq("slug", job.slug),
+       .eq("type", "job")
+       .in("status", ["active", "upcoming"])
+       .gte("application_end", isoDatePlusDays(0))
+       .neq("slug", job.slug),
   );
 
   if (job.category_id) {
@@ -234,9 +282,10 @@ export async function getRelatedJobs(
         .from("jobs")
         .select(JOB_SELECT)
         .eq("is_published", true)
-        .eq("type", "job")
-        .eq("status", "active")
-        .eq("state", job.state)
+         .eq("type", "job")
+         .in("status", ["active", "upcoming"])
+         .gte("application_end", isoDatePlusDays(0))
+         .eq("state", job.state)
         .not("slug", "in", `(${[...seen].join(",")})`),
     )
       .order("created_at", { ascending: false })
@@ -273,9 +322,9 @@ export async function getClosingJobs(limit = 8): Promise<JobWithCategory[]> {
         .from("jobs")
         .select(JOB_SELECT)
         .eq("is_published", true)
-        .eq("type", "job")
-        .eq("status", "active")
-        .gte("application_end", isoDatePlusDays(-1)),
+         .eq("type", "job")
+         .in("status", ["active", "upcoming"])
+         .gte("application_end", isoDatePlusDays(0)),
     )
       .order("application_end", { ascending: true })
       .limit(limit);
@@ -303,8 +352,8 @@ export async function getRecentlyClosedJobs(limit = 8): Promise<JobWithCategory[
 }
 
 /**
- * Archive listing (Phase 1): jobs closed for more than 90 days. Pages stay
- * live and indexable — we never delete vacancies.
+ * Archive listing: every closed vacancy older than 30 days. The 30–90 day gap
+ * used to leave closed jobs in no public list at all.
  */
 export async function listArchivedJobs(limit = 100): Promise<JobWithCategory[]> {
   return guard(async () => {
@@ -315,7 +364,7 @@ export async function listArchivedJobs(limit = 100): Promise<JobWithCategory[]> 
         .eq("is_published", true)
         .eq("type", "job")
         .eq("status", "closed")
-        .lt("application_end", isoDatePlusDays(-90)),
+        .lt("application_end", isoDatePlusDays(-30)),
     )
       .order("application_end", { ascending: false })
       .limit(limit);
@@ -362,15 +411,14 @@ export async function countVerifiedOpenJobs(
     });
     return total ?? 0;
   } catch (err) {
-    // Failing closed here would noindex a healthy page, so log and treat the
-    // page as indexable rather than silently shrinking the index.
+    // Fail closed: a broken query must never make an empty hub look indexable.
     console.error("[queries] countVerifiedOpenJobs threw:", err);
-    return MIN_VERIFIED_OPEN_JOBS;
+    return 0;
   }
 }
 
-/** Sitemap slugs — Phase 8A: unverified jobs must NOT be listed. */
-export async function getAllJobSlugs(verifiedOnlyArg = false): Promise<string[]> {
+/** Sitemap slugs — unverified jobs must NOT be listed. */
+export async function getAllJobSlugs(verifiedOnlyArg = true): Promise<string[]> {
   return guard(async () => {
     let query = createStaticClient()
       .from("jobs")
@@ -385,16 +433,70 @@ export async function getAllJobSlugs(verifiedOnlyArg = false): Promise<string[]>
   });
 }
 
-export async function listYojana(limit = 100): Promise<Yojana[]> {
-  return guard(async () => {
-    const { data } = await createStaticClient()
+export type YojanaFilters = {
+  level?: string;
+  state?: string;
+  category?: string;
+  availability?: string;
+  q?: string;
+  page?: number;
+  pageSize?: number;
+};
+
+export type YojanaListResult = {
+  schemes: Yojana[];
+  total: number;
+  page: number;
+  totalPages: number;
+};
+
+/** Filterable, paginated Sarkari Yojana directory. */
+export async function listYojana(
+  filters: YojanaFilters = {},
+): Promise<YojanaListResult> {
+  const empty: YojanaListResult = { schemes: [], total: 0, page: 1, totalPages: 1 };
+  if (!isSupabaseConfigured) return empty;
+
+  const build = (head: boolean) => {
+    let q = createStaticClient()
       .from("yojana")
-      .select("*")
-      .eq("is_published", true)
-      .order("created_at", { ascending: false })
-      .limit(limit);
-    return (data ?? []) as Yojana[];
-  });
+      .select(head ? "id" : "*", { count: "exact", head })
+      .eq("is_published", true) as unknown as ListingQuery;
+    if (filters.level) q = q.eq("level", filters.level as YojanaLevel);
+    if (filters.state) q = q.eq("state", filters.state);
+    if (filters.category) q = q.eq("category", filters.category);
+    if (filters.availability) {
+      q = q.eq("availability_status", filters.availability as YojanaAvailability);
+    }
+    if (filters.q?.trim()) {
+      const term = filters.q.trim().replace(/[%,()]/g, " ").slice(0, 80);
+      q = q.or(
+        `title.ilike.%${term}%,benefits_summary.ilike.%${term}%,eligibility.ilike.%${term}%`,
+      );
+    }
+    return q.order("last_verified_at", { ascending: false, nullsFirst: false })
+      .order("title", { ascending: true });
+  };
+
+  const { count, error: countError } = await build(true);
+  if (countError) {
+    console.error("[queries] listYojana count failed:", countError.message);
+    return empty;
+  }
+  const total = count ?? 0;
+  const window = pageWindow(filters.page ?? 1, total, filters.pageSize ?? 25);
+  if (total === 0) return empty;
+  const { data, error } = await build(false).range(window.start, window.end);
+  if (error) {
+    console.error("[queries] listYojana rows failed:", error.message);
+    return { ...empty, total, page: window.page, totalPages: window.totalPages };
+  }
+  return {
+    schemes: (data ?? []) as Yojana[],
+    total,
+    page: window.page,
+    totalPages: window.totalPages,
+  };
 }
 
 export async function getYojanaBySlug(slug: string): Promise<Yojana | null> {
@@ -572,11 +674,12 @@ export async function listJobsBySyllabus(
         .from("jobs")
         .select(JOB_SELECT)
         .eq("syllabus_id", syllabusId)
-        .eq("is_published", true)
-        .eq("status", "active"),
-    )
-      .order("created_at", { ascending: false })
-      .limit(limit);
+         .eq("is_published", true)
+         .in("status", ["active", "upcoming"])
+         .gte("application_end", isoDatePlusDays(0)),
+     )
+       .order("created_at", { ascending: false })
+       .limit(limit);
     return (data ?? []) as JobWithCategory[];
   });
 }

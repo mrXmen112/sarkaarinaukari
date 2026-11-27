@@ -47,9 +47,9 @@ export function SourceToggles({
             ? "rounded-sm bg-saffron px-2 py-1 text-xs font-bold text-navy disabled:opacity-50"
             : "rounded-sm border border-rule px-2 py-1 text-xs font-bold text-ink-muted disabled:opacity-50"
         }
-        title="Trusted sources may be auto-published by future tooling (approval stays manual for now)"
+        title="Only sources with auto-publish enabled can publish source-verified notices without an administrator"
       >
-        {autoPublish ? "Auto-publish" : "Manual review"}
+        {autoPublish ? "Auto-publish" : "Manual only"}
       </button>
       {message ? (
         <span className="text-xs text-ink-muted">{message}</span>

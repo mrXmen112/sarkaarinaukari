@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { LandingJobsPage, landingMetadata } from "@/components/jobs/LandingJobsPage";
 import { countVerifiedOpenJobs } from "@/lib/queries";
 import { STATE_SLUGS, buildStatePage } from "@/lib/landingPagesState";
+import { firstParam, parsePage } from "@/lib/utils";
 
 export const revalidate = 1800;
 
@@ -33,7 +34,7 @@ export default async function StateJobsPage({
 }: PageProps<"/jobs/state/[state]">) {
   const { state } = await params;
   const sp = await searchParams;
-  const pageNumber = Math.max(1, Number(sp.page) || 1);
+  const pageNumber = parsePage(firstParam(sp.page));
   const config = buildStatePage(state);
   if (!config) notFound();
 

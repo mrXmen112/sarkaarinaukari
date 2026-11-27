@@ -117,20 +117,18 @@ async function cmdLive(name, limit) {
     process.exitCode = 2;
     return;
   }
-  const adapter = getAdapter(name);
-  if (!adapter) {
-    console.error(
-      `ERROR: no live adapter for "${name}" yet (Phase B: CSBC only; more sources arrive in Phase G).`,
-    );
-    process.exitCode = 2;
-    return;
-  }
   const { url, serviceKey } = loadEnv();
   const store = createStore({ url, serviceKey });
   const rows = await store.listSources();
   const source = rows.find((r) => r.name === name);
   if (!source) {
     console.error(`ERROR: source "${name}" not found in scrape_sources.`);
+    process.exitCode = 2;
+    return;
+  }
+  const adapter = getAdapter(name, source.parser);
+  if (!adapter) {
+    console.error(`ERROR: no adapter for "${name}" (parser=${source.parser ?? "none"}).`);
     process.exitCode = 2;
     return;
   }

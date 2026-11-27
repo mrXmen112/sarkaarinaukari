@@ -12,18 +12,24 @@ import { SEARCH_PLACEHOLDER } from "@/lib/i18n";
  * One input only (a second name="q" would submit twice); the placeholder is
  * swapped by the language switcher.
  */
-export function SearchBox() {
+export function SearchBox({
+  action = "/jobs",
+  includeStatus = true,
+}: {
+  action?: string;
+  includeStatus?: boolean;
+} = {}) {
   const params = useSearchParams();
   const initial = params.get("q") ?? "";
 
   return (
     <form
-      action="/jobs"
+      action={action}
       method="get"
       role="search"
       className="flex items-center gap-2"
     >
-      <input type="hidden" name="status" value="all" />
+      {includeStatus ? <input type="hidden" name="status" value="all" /> : null}
       <input
         type="search"
         name="q"

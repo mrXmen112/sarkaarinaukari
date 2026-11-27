@@ -252,31 +252,52 @@ function toNumber(value: FormDataEntryValue | null): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-export async function createYojana(input: {
+type YojanaInput = {
   title: string;
   level: string;
   state: string;
+  category: string;
   description: string;
   benefits_summary: string;
   eligibility: string;
   benefits: string;
   how_to_apply: string;
+  required_documents: string;
+  apply_url: string;
   official_link: string;
+  availability_status: string;
   is_published: boolean;
-}): Promise<AdminResult> {
+};
+
+function yojanaLevel(level: string): "central" | "state" | "ut" | null {
+  return level === "state" || level === "central" || level === "ut" ? level : null;
+}
+
+function yojanaAvailability(
+  value: string,
+): "active" | "closed" | "upcoming" | "unknown" {
+  return value === "closed" || value === "upcoming" || value === "unknown"
+    ? value
+    : "active";
+}
+
+export async function createYojana(input: YojanaInput): Promise<AdminResult> {
   const { supabase } = await requireAdmin();
-  const level = input.level === "state" ? "state" : input.level === "central" ? "central" : null;
   const { error } = await supabase.from("yojana").insert({
     title: input.title,
     slug: slugify(input.title),
-    level,
+    level: yojanaLevel(input.level),
     state: input.state || null,
+    category: input.category || null,
     description: input.description || null,
     benefits_summary: input.benefits_summary || null,
     eligibility: input.eligibility || null,
     benefits: input.benefits || null,
     how_to_apply: input.how_to_apply || null,
+    required_documents: input.required_documents || null,
+    apply_url: input.apply_url || null,
     official_link: input.official_link || null,
+    availability_status: yojanaAvailability(input.availability_status),
     is_published: input.is_published,
   });
   if (error) return err(error.message);
@@ -287,34 +308,26 @@ export async function createYojana(input: {
 
 export async function updateYojana(
   id: string,
-  input: {
-    title: string;
-    level: string;
-    state: string;
-    description: string;
-    benefits_summary: string;
-    eligibility: string;
-    benefits: string;
-    how_to_apply: string;
-    official_link: string;
-    is_published: boolean;
-  },
+  input: YojanaInput,
 ): Promise<AdminResult> {
   const { supabase } = await requireAdmin();
-  const level = input.level === "state" ? "state" : input.level === "central" ? "central" : null;
+  // The slug is the public URL: never recompute it when a title is edited.
   const { error } = await supabase
     .from("yojana")
     .update({
       title: input.title,
-      slug: slugify(input.title),
-      level,
+      level: yojanaLevel(input.level),
       state: input.state || null,
+      category: input.category || null,
       description: input.description || null,
       benefits_summary: input.benefits_summary || null,
       eligibility: input.eligibility || null,
       benefits: input.benefits || null,
       how_to_apply: input.how_to_apply || null,
+      required_documents: input.required_documents || null,
+      apply_url: input.apply_url || null,
       official_link: input.official_link || null,
+      availability_status: yojanaAvailability(input.availability_status),
       is_published: input.is_published,
     })
     .eq("id", id);
