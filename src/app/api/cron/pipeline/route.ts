@@ -1,5 +1,10 @@
 import type { NextRequest } from "next/server";
 import { createRequire } from "node:module";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import path from "node:path";
+
+const runProcess = promisify(execFile);
 
 import { loadEnv, loadLLMEnv, MIN_DELAY_MS } from "../../../../../scripts/scraper/lib/config.mjs";
 import { createStore } from "../../../../../scripts/scraper/lib/store.mjs";
@@ -98,7 +103,23 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // 3) Publish every staged entry that proves out against its official source.
+    // 3) Bounded official-notice import from the source-specific adapters.
+    //    Kept inside this cron so the plan only needs two scheduled jobs.
+    let officialImport = null;
+    try {
+      const script = path.join(process.cwd(), "scripts", "scraper", "import-official.mjs");
+      const { stdout } = await runProcess(process.execPath, [script, "--limit=3"], {
+        cwd: process.cwd(),
+        timeout: 20_000,
+        maxBuffer: 1024 * 1024,
+        env: process.env,
+      });
+      officialImport = stdout.trim().slice(-1500);
+    } catch (error) {
+      errors.push(`official import: ${error instanceof Error ? error.message.slice(0, 200) : String(error)}`);
+    }
+
+    // 4) Publish every staged entry that proves out against its official source.
     //    Failures are persistently logged by runAutoPublish, not surfaced here.
     let autoPublish = null;
     try {
@@ -126,6 +147,7 @@ export async function GET(req: NextRequest) {
             failed: structure.failed,
           }
         : null,
+      officialImport,
       autoPublish: autoPublish
         ? {
             examined: autoPublish.examined,

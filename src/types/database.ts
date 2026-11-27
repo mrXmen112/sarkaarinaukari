@@ -408,6 +408,8 @@ export type ScrapeSource = {
   parser: string | null;
   allowed_domains: string[];
   source_group: "central" | "state" | "ut" | null;
+  consecutive_failures: number;
+  last_error: string | null;
   robots_txt_checked_at: string | null;
   last_scraped_at: string | null;
   created_at: string;
@@ -643,6 +645,10 @@ export type Database = {
       };
       mark_auto_verified: {
         Args: { p_job_id: string; p_source: string; p_note?: string | null };
+        Returns: undefined;
+      };
+      increment_source_failure: {
+        Args: { p_source_id: string; p_error: string };
         Returns: undefined;
       };
     };

@@ -11,6 +11,7 @@ const NAV = [
   { href: "/admin/verification", label: "Verification" },
   { href: "/admin/review-queue", label: "Review Queue" },
   { href: "/admin/quick-publish", label: "Quick Publish" },
+  { href: "/admin/quick-import", label: "Quick Import" },
   { href: "/admin/jobs", label: "Jobs" },
   { href: "/admin/current-affairs", label: "Current Affairs" },
   { href: "/admin/quizzes", label: "Quizzes" },

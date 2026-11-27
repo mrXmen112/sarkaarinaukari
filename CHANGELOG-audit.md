@@ -27,6 +27,14 @@ Decisions that need the owner are tracked in `NEEDS-MY-DECISION.md`.
 - **Automation:** `/api/cron/import` and a Vercel cron entry run the importer; dashboard now shows discovered/imported/published/rejected/duplicate/expired counts; `autoPublish` validation allows genuine notices with unstated figures to keep those fields `null`.
 - **Verification:** tsc clean, 77 + 2 tests pass, 53/53 HTTP flow checks, cron endpoints exercised, production build clean.
 
+## 0c. Phase 2 coverage expansion (2026-11-27)
+
+- **New verified imports:** CSIR R&A/02/2026 (4 posts, deadline 21 Dec), Bihar Vidhan Sabha 01/2026 JSA (27 Nov) and 02/2026 Office Attendant (6 Dec), APHC 118/2026 Civil Judge (119 posts, extended to 30 Nov). Every value was cross-checked against the fetched official page/PDF text; Employment News is unreachable and logged as `source_fetch_failed`.
+- **Source registry:** migration `0029` adds the missing Lakshadweep UT source, registers the four new sources and adds source failure counters; migration `0030` adds `increment_source_failure()`. `0031`-style dedupe fix: multi-post advertisements dedupe by post-specific slug, not advertisement number.
+- **Quick Import fallback:** `/admin/quick-import` for blocked portals (UPSC/SSC/RRB). It still cross-checks all fields against the official source text or a pasted official excerpt before auto-publishing.
+- **Cron consolidation:** Vercel crons reduced from four to two; official-notice import is inside `/api/cron/pipeline`, scheme sync inside `/api/cron/maintenance`.
+- **DB state:** 168 jobs total, 46 verified published, **12 open under Asia/Kolkata**, 96 closed, 39 auto-published; 71 registry sources (8 UT entries), 12 tested, 10 auto-publish enabled.
+
 ## 1. Baseline (before this audit)
 
 - `npm test` 56/56; lint 0 errors / 24 warnings; `npm run build` clean.

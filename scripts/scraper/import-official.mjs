@@ -89,6 +89,100 @@ function validate(draft, source, text) {
 
 /* --------------------------- source adapters --------------------------- */
 const adapters = {
+  async csir() {
+    const listing = 'https://recruitment.csir.res.in/';
+    const html = await (await fetch(listing, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(30000) })).text();
+    const pageText = strip(html);
+    const chunks = pageText.split(/Recruitment of\s+/i).slice(1);
+    const applyLinks = [...html.matchAll(/href=["']([^"']+)["'][^>]*>\s*Apply online for the post of\s+([^<]+)/gi)]
+      .map(m => ({ url: new URL(m[1], listing).toString(), post: strip(m[2]) }));
+    const items = [];
+    for (const chunk of chunks) {
+      const post = chunk.split('(')[0].trim();
+      const title = post.length >= 8 ? post : `${post} Recruitment`;
+      if (post.length < 5) continue;
+      const end = parseDate(pick(chunk, [/Last Date\s+(\d{1,2}\.\d{1,2}\.\d{4})/i]));
+      const start = parseDate(pick(chunk, [/Online Application Start Date\s+(\d{1,2}\.\d{1,2}\.\d{4})/i]));
+      const link = applyLinks.find(l => l.post.toLowerCase().includes(post.toLowerCase().split(' ')[0]));
+      let detailText = '';
+      if (link) {
+        try { await sleep(200); detailText = await fetchText(link.url); } catch {}
+      }
+      items.push({
+        source: 'CSIR Recruitment', baseUrl: listing, allowedDomains: ['csir.res.in'],
+        state: null, category: 'central', department: 'Council of Scientific & Industrial Research (CSIR)',
+        title, notice_number: 'R&A/02/2026', application_start: start, application_end: end,
+        vacancy_total: Number(pick(detailText, [/Total\s*=\s*(\d+)\s*posts/i]) || 0) || null,
+        eligibility_education: pick(detailText, [/Educational Qualification\s*:?\s*([^.]{10,180}\.)/i]),
+        pay_scale: pick(detailText, [/Pay Matrix Level[^)]*\(([^)]+)\)/i]),
+        official_link: listing, pdf: null, apply: link?.url ?? null,
+        text: `${pageText} ${detailText}`,
+      });
+    }
+    return items;
+  },
+
+  async biharVidhanSabha() {
+    const noticePage = 'https://vidhansabha.bihar.gov.in/Recruitment%20Notice.html';
+    const advertPage = 'https://vidhansabha.bihar.gov.in/Recruitment%20Advertisment.html';
+    const portal = 'https://blasrecruit.in/';
+    const [noticeHtml, advertHtml, portalHtml] = await Promise.all([
+      fetch(noticePage, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(30000) }).then(r => r.text()),
+      fetch(advertPage, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(30000) }).then(r => r.text()),
+      fetch(portal, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(30000) }).then(r => r.text()),
+    ]);
+    const advertText = strip(noticeHtml) + ' ' + strip(advertHtml);
+    const portalText = strip(portalHtml);
+    const pdfs = [...advertHtml.matchAll(/href=["']([^"']+\.pdf[^"']*)["']/gi)].map(m => new URL(m[1], advertPage).toString());
+    const items = [];
+    const deadlines = {};
+    const deadlineRe = /Last date to apply online[^0-9]{0,100}(\d{2}\.\d{2}\.\d{4})[\s\S]{0,700}?Adv\.?\s*No\.?\s*-\s*(\d{2}\/\d{4})/gi;
+    let dm;
+    while ((dm = deadlineRe.exec(portalText)) !== null) deadlines[dm[2]] = dm[1];
+    for (const number of ['01/2026', '02/2026']) {
+      const post = number === '01/2026' ? 'Junior Secretariat Assistant' : 'Office Attendant';
+      const sectionIndex = portalText.indexOf(`Adv. No. - ${number}`);
+      const section = sectionIndex >= 0 ? portalText.slice(Math.max(0, sectionIndex - 900), sectionIndex + 200) : '';
+      const end = parseDate(deadlines[number]);
+      const start = parseDate(pick(section, [/starting date[^0-9]{0,80}(\d{2}\.\d{2}\.\d{4})/i]));
+      const pdf = pdfs.find(p => p.includes(number.slice(0, 2)) && p.includes('2026'));
+      items.push({
+        source: 'Bihar Vidhan Sabha Recruitment', baseUrl: noticePage,
+        allowedDomains: ['vidhansabha.bihar.gov.in', 'blasrecruit.in'],
+        state: 'bihar', category: 'state', department: 'Bihar Vidhan Sabha Secretariat',
+        title: post, notice_number: number, application_start: start, application_end: end,
+        official_link: noticePage, pdf: pdf ?? null, apply: portal,
+        text: `${advertText} ${portalText}`,
+      });
+    }
+    return items;
+  },
+
+  async aphc() {
+    const listing = 'https://aphc.gov.in/recruitment.php?page=1&search=civil';
+    const html = await (await fetch(listing, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(30000) })).text();
+    const text = strip(html);
+    const apply = html.match(/href="(https:\/\/[^"]*EForms[^"]*)"/i)?.[1] ?? null;
+    const pdf = html.match(/href="([^"]*notification_[^"]+\.pdf)"/i)?.[1];
+    const number = pick(text, [/Notification No\.?\s*([0-9]+\/2026)/i]);
+    if (!number || !text.includes('119')) return [];
+    return [{
+      source: 'Andhra Pradesh High Court', baseUrl: 'https://aphc.gov.in/', allowedDomains: ['aphc.gov.in', 'aphc.ap.gov.in'],
+      state: 'andhra-pradesh', category: 'judiciary', department: 'High Court of Andhra Pradesh',
+      title: 'Civil Judge (Junior Division) Recruitment 2026',
+      notice_number: number, vacancy_total: 119,
+      application_end: parseDate(pick(text, [/till\s+(\d{2}\.\d{2}\.\d{4})/i])),
+      official_link: listing, pdf: pdf ? new URL(pdf, listing).toString() : null, apply,
+      text,
+    }];
+  },
+
+  async employmentNews() {
+    const url = 'https://employmentnews.gov.in/newemp/AllJobs.aspx?k=All';
+    await fetch(url, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(20000) });
+    return [];
+  },
+
   async isro() {
     const listing = 'https://www.isro.gov.in/Careers.html';
     const html = await (await fetch(listing, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(30000) })).text();
@@ -280,13 +374,53 @@ async function main() {
   const headers = { apikey: serviceKey, Authorization: `Bearer ${serviceKey}`, 'Content-Type': 'application/json' };
   const args = process.argv.slice(2).find(a => a.startsWith('--limit='));
   const perSource = Math.max(1, Math.min(30, Number(args?.split('=')[1] ?? 12)));
+  const onlyArg = process.argv.slice(2).find(a => a.startsWith('--only='));
+  const only = onlyArg ? new Set(onlyArg.split('=')[1].split(',')) : null;
   let discovered = 0, published = 0, rejected = 0, duplicates = 0;
   const failures = [];
 
+  const registryName = (key) => ({
+    employmentNews: "Employment News",
+    biharVidhanSabha: "Bihar Vidhan Sabha Recruitment",
+    aphc: "Andhra Pradesh High Court",
+    csir: "CSIR Recruitment",
+    isro: "ISRO Recruitment",
+    barc: "BARC Recruitment",
+    btsc: "BTSC Recruitment",
+    tgpsc: "TGPSC Recruitment",
+    uppsc: "UPPSC Recruitment",
+    keralapsc: "Kerala PSC Recruitment",
+  })[key] ?? key;
+  const sourceByName = async (sourceName) => {
+    const r = await fetch(`${base}/rest/v1/scrape_sources?select=id&name=eq.${encodeURIComponent(sourceName)}`, { headers });
+    const a = await r.json().catch(() => []);
+    return Array.isArray(a) && a.length ? a[0].id : null;
+  };
+
   for (const [name, adapter] of Object.entries(adapters)) {
+    if (only && !only.has(name)) continue;
     let items = [];
-    try { items = (await adapter()).slice(0, perSource); }
-    catch (e) { failures.push(`${name}: adapter failed ${String(e.message).slice(0, 120)}`); continue; }
+    try {
+      items = (await adapter()).slice(0, perSource);
+      await fetch(`${base}/rest/v1/scrape_sources?name=eq.${encodeURIComponent(registryName(name))}`, {
+        method: 'PATCH', headers,
+        body: JSON.stringify({ consecutive_failures: 0, last_error: null, last_scraped_at: new Date().toISOString() }),
+      }).catch(() => {});
+    } catch (e) {
+      const message = String(e.message).slice(0, 300);
+      failures.push(`${name}: adapter failed ${message}`);
+      await fetch(`${base}/rest/v1/import_errors`, {
+        method: 'POST', headers,
+        body: JSON.stringify({ phase: 'scrape', code: 'source_fetch_failed', message: `${name}: ${message}`, details: { adapter: name } }),
+      }).catch(() => {});
+      const sid = await sourceByName(registryName(name));
+      if (sid) {
+        await fetch(`${base}/rest/v1/rpc/increment_source_failure`, {
+          method: 'POST', headers, body: JSON.stringify({ p_source_id: sid, p_error: message }),
+        }).catch(() => {});
+      }
+      continue;
+    }
     discovered += items.length;
     for (const item of items) {
       const draft = {
@@ -302,7 +436,9 @@ async function main() {
         continue;
       }
       const slug = slugify(`${draft.title}-${draft.notice_number ?? ''}`);
-      const exists = await fetch(`${base}/rest/v1/jobs?select=slug&or=(slug.eq.${slug},notice_number.eq.${encodeURIComponent(draft.notice_number ?? 'none')})`, { headers });
+      // One advertisement can contain several distinct posts (CSIR R&A/02/2026
+      // has four), so the stable identity is the post-specific slug.
+      const exists = await fetch(`${base}/rest/v1/jobs?select=slug&slug=eq.${encodeURIComponent(slug)}`, { headers });
       const existing = await exists.json();
       if (Array.isArray(existing) && existing.length) { duplicates++; continue; }
 

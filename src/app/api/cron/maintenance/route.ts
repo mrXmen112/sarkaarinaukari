@@ -1,4 +1,9 @@
 import type { NextRequest } from "next/server";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import path from "node:path";
+
+const runProcess = promisify(execFile);
 
 import { createAdminClient } from "@/lib/supabase/server";
 import { runLinkCheck } from "@/lib/linkCheck";
@@ -52,8 +57,25 @@ export async function GET(req: NextRequest) {
     linkCheck = { error: message };
   }
 
+  // Bounded scheme sync, consolidated here so the hosting plan only needs
+  // two scheduled jobs.
+  let schemeSync = null;
+  try {
+    const script = path.join(process.cwd(), "scripts", "scraper", "myscheme-sync.mjs");
+    const { stdout } = await runProcess(process.execPath, [script, "--limit=50"], {
+      cwd: process.cwd(),
+      timeout: 20_000,
+      maxBuffer: 1024 * 1024,
+      env: process.env,
+    });
+    schemeSync = stdout.trim().slice(-800);
+  } catch (error) {
+    schemeSync = `failed: ${error instanceof Error ? error.message.slice(0, 200) : String(error)}`;
+  }
+
   return Response.json({
     ok: true,
+    schemeSync,
     jobStatusesRefreshed: !refreshError,
     refreshError: refreshError?.message ?? null,
     linkCheck,
