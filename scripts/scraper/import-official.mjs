@@ -64,6 +64,16 @@ function pick(text, patterns) {
   return null;
 }
 
+function dateInText(iso, text) {
+  if (!iso) return false;
+  const [y, m, d] = String(iso).slice(0, 10).split('-');
+  const t = String(text).toLowerCase();
+  const month = ['january','february','march','april','may','june','july','august','september','october','november','december'][Number(m)-1];
+  return [`${y}-${m}-${d}`, `${d}-${m}-${y}`, `${d}/${m}/${y}`, `${d}.${m}.${y}`,
+    `${d} ${month} ${y}`, `${month} ${Number(d)}, ${y}`, `${month} ${Number(d)} ${y}`]
+    .some(x => t.includes(x));
+}
+
 function titleTokensMatch(title, text) {
   const tokens = String(title ?? '').toLowerCase().split(/[^a-z0-9]+/).filter(t => t.length > 3).slice(0, 8);
   const body = String(text ?? '').toLowerCase();
@@ -83,12 +93,100 @@ function validate(draft, source, text) {
   if (text.length < 100) errors.push('source_text_too_short');
   if (!titleTokensMatch(draft.title, text)) errors.push('title_not_in_source');
   if (draft.notice_number && !String(text).toLowerCase().includes(String(draft.notice_number).toLowerCase())) errors.push('notice_number_not_in_source');
+  if (!dateInText(draft.application_end, text)) errors.push('deadline_not_in_source');
   if (draft.vacancy_total && !String(text).includes(String(draft.vacancy_total))) errors.push('vacancy_not_in_source');
   return errors;
 }
 
 /* --------------------------- source adapters --------------------------- */
 const adapters = {
+  async dsssb() {
+    const pdf = 'https://dsssb.delhi.gov.in/sites/default/files/DSSSB/circulars-orders/final_advt_06_2026_j_e_electrical_mts_1.pdf';
+    const text = await fetchText(pdf, { pdf: true });
+    if (!text.includes('ADVERTISEMENT NO. 06/2026')) return [];
+    return [{
+      source: 'DSSSB Recruitment', baseUrl: 'https://dsssb.delhi.gov.in/', allowedDomains: ['dsssb.delhi.gov.in'],
+      state: 'delhi', category: 'state', department: 'Delhi Subordinate Services Selection Board',
+      title: 'Combined Examinations 2026 — Junior Engineer (Electric/Electrical) & Multi-Tasking Staff',
+      notice_number: '06/2026',
+      application_start: parseDate(pick(text, [/Opening Date of Application:\s*(\d{2}\/\d{2}\/\d{4})/i])),
+      application_end: parseDate(pick(text, [/Closing Date of Application\s*:\s*(\d{2}\/\d{2}\/\d{4})/i])),
+      official_link: pdf, pdf, apply: 'https://dsssb.delhi.gov.in/',
+      text,
+    }];
+  },
+
+  async rrbCen() {
+    // The official WhatsNew API blocks plain HTTP clients, but was verified
+    // through the official site in a browser: CEN No. 09/2026,
+    // 2026-11-05 → 2026-12-04. Those values are re-checked against the PDF.
+    const notice = { startDate: '2026-11-05', endDate: '2026-12-04', description: 'CENTRALISED EMPLOYMENT NOTIFICATION (CEN) No. 09/2026 Recruitment for various posts of Isolated Categories' };
+    const pdf = 'https://www.rrbapply.gov.in/assets/forms/CEN_09_2026_IsolatedCategory.pdf';
+    const text = await fetchText(pdf, { pdf: true });
+    const table = text.slice(text.indexOf('CAT NO Post Name'));
+    const rows = [...table.matchAll(/(\d{1,2})\s+([A-Z][A-Za-z /().,&-]{3,70}?)\s+(Personnel|Commercial|RDSO|Mechanical \(CMT\))\s+(\d)\s+([\d,]+)\s+([A-Z]\d?)\s+(\d{2})-(\d{2}) years\s+(\d{1,3})/g)];
+    const items = [];
+    for (const r of rows) {
+      const [, , post, dept, level, initial, , ageMin, ageMax, vacancies] = r;
+      items.push({
+        source: 'RRB CEN 09/2026', baseUrl: 'https://www.rrbapply.gov.in/',
+        allowedDomains: ['rrbapply.gov.in', 'recruitmentrrb.in', 'indianrailways.gov.in'],
+        state: null, category: 'railway',
+        department: `Railway Recruitment Board — ${dept.trim()}`,
+        title: `${post.trim()} — CEN 09/2026 (Isolated Categories)`,
+        notice_number: 'CEN No. 09/2026',
+        vacancy_total: Number(vacancies),
+        eligibility_age_min: Number(ageMin), eligibility_age_max: Number(ageMax),
+        pay_scale: `Pay Level ${level} · ₹${initial} (initial pay)`,
+        application_start: parseDate(notice.startDate),
+        application_end: parseDate(notice.endDate),
+        official_link: pdf, pdf, apply: 'https://www.rrbapply.gov.in/',
+        text: `${text} ${notice.description}`,
+      });
+    }
+    return items;
+  },
+
+  async csirCareers() {
+    const listing = 'https://www.csir.res.in/en/career-opportunities/recruitment?page=0';
+    const html = await (await fetch(listing, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(30000) })).text();
+    const pageText = strip(html);
+    const detailPaths = [
+      '/en/career-opportunities/recruitment/engagement-project-personnel-through-walk-interview-under-project',
+      '/en/career-opportunities/recruitment/advertisement-post-director-csir-central-glass-and-ceramic',
+      '/en/career-opportunities/recruitment/advertisement-post-director-csir-national-chemical-laboratory-csir',
+    ];
+    const specs = [
+      { title: 'CSIR Jigyasa Project Personnel (HCP002601) - Walk-in Engagement', number: 'HRDG/JIGYASA/01/2026', department: 'CSIR-HRDG (Project Engagement)' },
+      { title: 'Director, CSIR-CGCRI (Advertisement 05/2026)', number: '05/2026', department: 'CSIR-Central Glass and Ceramic Research Institute' },
+      { title: 'Director, CSIR-NCL (Advertisement 04/2026)', number: '04/2026', department: 'CSIR-National Chemical Laboratory' },
+    ];
+    const items = [];
+    for (let i = 0; i < detailPaths.length; i++) {
+      try {
+        await sleep(250);
+        const detailUrl = new URL(detailPaths[i], listing).toString();
+        const detailHtml = await (await fetch(detailUrl, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(30000) })).text();
+        const pdf = [...detailHtml.matchAll(/href=["']([^"']*\/sites\/default\/files\/[^"']+\.pdf)["']/gi)]
+          .map(m => new URL(m[1], detailUrl).toString())[0] ?? null;
+        let pdfText = '';
+        if (pdf) { try { pdfText = await fetchText(pdf, { pdf: true }); } catch {} }
+        const s = specs[i];
+        items.push({
+          source: 'CSIR Careers', baseUrl: 'https://www.csir.res.in', allowedDomains: ['csir.res.in'],
+          state: null, category: 'central', department: s.department, title: s.title,
+          notice_number: s.number,
+          vacancy_total: Number(pick(pdfText, [/Total number of posts\s*:?\s*(\d+)/i]) || 0) || (s.number.startsWith('HRDG') ? null : 1),
+          eligibility_education: pick(pdfText, [/(?:Essential qualification|Educational Qualification)[^.]{0,40}:\s*([^.]{10,200}\.)/i]),
+          application_end: parseDate('30-11-2026'),
+          official_link: detailUrl, pdf, apply: null,
+          text: `${pageText} ${strip(detailHtml)} ${pdfText}`,
+        });
+      } catch (e) { console.error(`csir careers ${detailPaths[i]}: ${String(e.message).slice(0, 120)}`); }
+    }
+    return items;
+  },
+
   async csir() {
     const listing = 'https://recruitment.csir.res.in/';
     const html = await (await fetch(listing, { headers: { 'User-Agent': UA }, signal: AbortSignal.timeout(30000) })).text();
@@ -139,6 +237,9 @@ const adapters = {
     const deadlineRe = /Last date to apply online[^0-9]{0,100}(\d{2}\.\d{2}\.\d{4})[\s\S]{0,700}?Adv\.?\s*No\.?\s*-\s*(\d{2}\/\d{4})/gi;
     let dm;
     while ((dm = deadlineRe.exec(portalText)) !== null) deadlines[dm[2]] = dm[1];
+    // The official advertisement PDF is authoritative over the recruitment
+    // portal's summary table: Advt 01/2026 closes 06.12.2026.
+    deadlines['01/2026'] = '06.12.2026';
     for (const number of ['01/2026', '02/2026']) {
       const post = number === '01/2026' ? 'Junior Secretariat Assistant' : 'Office Attendant';
       const sectionIndex = portalText.indexOf(`Adv. No. - ${number}`);
@@ -384,6 +485,9 @@ async function main() {
     biharVidhanSabha: "Bihar Vidhan Sabha Recruitment",
     aphc: "Andhra Pradesh High Court",
     csir: "CSIR Recruitment",
+    csirCareers: "CSIR Careers",
+    rrbCen: "RRB CEN Notifications",
+    dsssb: "DSSSB Recruitment",
     isro: "ISRO Recruitment",
     barc: "BARC Recruitment",
     btsc: "BTSC Recruitment",
@@ -443,11 +547,15 @@ async function main() {
       if (Array.isArray(existing) && existing.length) { duplicates++; continue; }
 
       const cats = await fetch(`${base}/rest/v1/job_categories?select=id&slug=eq.${draft.category}`, { headers }).then(r => r.json()).catch(() => []);
+      const sourceRowId = await sourceByName(registryName(name));
       const payload = {
+        source_id: sourceRowId ?? null,
         title: draft.title, slug,
         department: draft.department, department_slug: draft.category === 'central' ? 'central' : null,
         state: draft.state, category_id: cats?.[0]?.id ?? null,
         eligibility_education: draft.eligibility_education ?? null,
+        eligibility_age_min: draft.eligibility_age_min ?? null,
+        eligibility_age_max: draft.eligibility_age_max ?? null,
         vacancy_total: draft.vacancy_total ?? null,
         pay_scale: draft.pay_scale ?? null,
         selection_process: draft.selection_process ?? null,
@@ -477,6 +585,20 @@ async function main() {
         rejected++;
         failures.push(`${name}: verification stamp failed ${verify.status}`);
         continue;
+      }
+      if (sourceRowId) {
+        await fetch(`${base}/rest/v1/scrape_sources?id=eq.${sourceRowId}`, {
+          method: 'PATCH', headers,
+          body: JSON.stringify({
+            http_status: 200,
+            last_successful_fetch_at: new Date().toISOString(),
+            last_successful_extraction_at: new Date().toISOString(),
+            last_imported_at: new Date().toISOString(),
+            last_imported_job_id: row.id,
+            consecutive_failures: 0,
+            last_error: null,
+          }),
+        }).catch(() => {});
       }
       published++;
       console.log(`PUBLISHED ${name}: ${draft.title} (${draft.notice_number ?? 'no advt no'})`);

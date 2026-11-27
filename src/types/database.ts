@@ -410,6 +410,12 @@ export type ScrapeSource = {
   source_group: "central" | "state" | "ut" | null;
   consecutive_failures: number;
   last_error: string | null;
+  source_type: "recruitment" | "scheme" | "news" | "aggregator";
+  http_status: number | null;
+  last_successful_fetch_at: string | null;
+  last_successful_extraction_at: string | null;
+  last_imported_at: string | null;
+  last_imported_job_id: string | null;
   robots_txt_checked_at: string | null;
   last_scraped_at: string | null;
   created_at: string;

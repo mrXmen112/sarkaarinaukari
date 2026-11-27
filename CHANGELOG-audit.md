@@ -35,6 +35,15 @@ Decisions that need the owner are tracked in `NEEDS-MY-DECISION.md`.
 - **Cron consolidation:** Vercel crons reduced from four to two; official-notice import is inside `/api/cron/pipeline`, scheme sync inside `/api/cron/maintenance`.
 - **DB state:** 168 jobs total, 46 verified published, **12 open under Asia/Kolkata**, 96 closed, 39 auto-published; 71 registry sources (8 UT entries), 12 tested, 10 auto-publish enabled.
 
+## 0d. Phase 3 national coverage expansion (2026-11-27)
+
+- **Data correction:** BVS JSA Advt 01/2026 last date corrected to 06.12.2026 from the official advertisement PDF; status and countdown follow the corrected IST deadline.
+- **New verified imports (+11):** CSIR Jigyasa project engagement (HCP002601), CSIR-CGCRI Director (05/2026), CSIR-NCL Director (04/2026); RRB CEN 09/2026 isolated categories — 7 post-specific jobs totalling 191 vacancies, parsed from the official CEN PDF and cross-checked against the official WhatsNew API values; DSSSB Advt 06/2026 (Delhi UT).
+- **Source discovery metadata:** migrations `0031`/`0032` add source type, HTTP status, last successful fetch/extraction/import fields and register CSIR Careers, RRB CEN and DSSSB as tested active sources.
+- **Importer hardening:** deadline is now cross-checked against source text; multi-post advertisement dedupe is per post; source failure counters and `last_error` are recorded.
+- **DB audit:** 179 job rows — 154 published, 25 unpublished; 83 published active (57 verified; **23 publicly open under IST**), 71 published expired, 0 cancelled, 97 published-but-hidden pending evidence, 15 manual review entries, 3 automated-error entries, 153 import errors.
+- **Verification:** 77 unit + 2 scraper tests pass; tsc clean; lint 0 errors; build clean.
+
 ## 1. Baseline (before this audit)
 
 - `npm test` 56/56; lint 0 errors / 24 warnings; `npm run build` clean.
