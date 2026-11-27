@@ -13,6 +13,7 @@ import {
 } from "@/lib/indexable";
 import { breadcrumbSchema, buildMeta, faqSchema } from "@/lib/seo";
 import { PAGE_SIZE, SITE } from "@/lib/site";
+import { buildQuery } from "@/lib/utils";
 import type { LandingPage } from "@/lib/landingPages";
 import { T } from "@/components/i18n/T";
 
@@ -53,10 +54,23 @@ export async function LandingJobsPage({
       pageSize: 10,
     }),
   ]);
-  const { jobs, total, totalPages } = open;
+  const { jobs, total, totalPages, page: servedPage } = open;
   const closedJobs = closed.jobs;
   const showClosed = total < 5 && closedJobs.length > 0;
 
+  // These hubs are statically generated; a ?page=N on the hub itself would
+  // serve the cached first page. Send pagination to /jobs with the same filters
+  // so page 2+ always renders a real, filtered result set.
+  const listingParams = {
+    category: config.filters.categorySlug,
+    state: config.filters.state,
+    department: config.filters.department,
+    qualification: config.filters.qualification,
+    q: config.filters.q,
+    status: "active",
+  };
+  const firstRow = total === 0 ? 0 : (servedPage - 1) * PAGE_SIZE + 1;
+  const lastRow = Math.min(total, firstRow + jobs.length - 1);
   const url = `${SITE.url}${path}`;
 
   return (
@@ -78,8 +92,9 @@ export async function LandingJobsPage({
           ))}
         </div>
         <p className="mt-3 text-xs text-ink-faint">
-          Showing <strong className="text-navy">{total}</strong> open{" "}
-          {total === 1 ? "vacancy" : "vacancies"} on this page.{" "}
+          Showing <strong className="text-navy">{firstRow}–{lastRow}</strong> of{" "}
+          <strong className="text-navy">{total}</strong> open{" "}
+          {total === 1 ? "vacancy" : "vacancies"}.{" "}
           <Link
             href="/jobs"
             className="font-semibold text-navy underline decoration-navy/30 underline-offset-2 hover:decoration-navy"
@@ -98,17 +113,28 @@ export async function LandingJobsPage({
           <JobTable
             jobs={jobs}
             caption={`Current government vacancies — ${config.h1}`}
-            startIndex={(pageNumber - 1) * PAGE_SIZE}
+            startIndex={(servedPage - 1) * PAGE_SIZE}
             empty="No current vacancies match this category right now. Vacancies open in cycles — bookmark this page or browse all latest jobs."
           />
         </div>
       </section>
 
+      {totalPages > 1 ? (
+        <p className="mt-2 text-xs text-ink-muted">
+          <Link
+            href={`/jobs${buildQuery(listingParams)}`}
+            className="font-semibold text-navy underline decoration-navy/30 underline-offset-2 hover:decoration-navy"
+          >
+            View all {total} vacancies with these filters →
+          </Link>
+        </p>
+      ) : null}
+
       <Pagination
-        page={pageNumber}
+        page={servedPage}
         totalPages={totalPages}
-        basePath={path}
-        params={{}}
+        basePath="/jobs"
+        params={listingParams}
       />
 
       {showClosed ? (

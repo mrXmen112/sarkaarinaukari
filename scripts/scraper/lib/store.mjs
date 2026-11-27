@@ -70,7 +70,11 @@ export function createStore({ url, serviceKey }) {
       return check(res, "listUnprocessed");
     },
 
-    /** Insert one human-review row. NEVER writes to live tables. */
+    /**
+     * Insert one staged entry for AUTOMATED processing. No administrator
+     * approval is needed: the runner verifies it or logs an error. The manual
+     * review queue is reserved for entries an admin creates explicitly.
+     */
     async insertPendingEntry({ rawScrapeId, targetType, structuredData, confidenceFlags }) {
       const res = await fetch(`${base}/rest/v1/pending_entries`, {
         method: "POST",
@@ -80,10 +84,28 @@ export function createStore({ url, serviceKey }) {
           target_type: targetType,
           structured_data: structuredData,
           confidence_flags: confidenceFlags,
-          status: "pending_review",
+          status: "auto_pending",
         }),
       });
       return check(res, "insertPendingEntry");
+    },
+
+    /** Persistent record of a failed import / validation step. */
+    async insertImportError({ sourceId = null, pendingEntryId = null, rawScrapeId = null, phase, code, message, details = {} }) {
+      const res = await fetch(`${base}/rest/v1/import_errors`, {
+        method: "POST",
+        headers: h(),
+        body: JSON.stringify({
+          source_id: sourceId,
+          pending_entry_id: pendingEntryId,
+          raw_scrape_id: rawScrapeId,
+          phase,
+          code,
+          message: String(message).slice(0, 2000),
+          details,
+        }),
+      });
+      return check(res, "insertImportError");
     },
 
     /** Mark a raw scrape as consumed by the structurer (only on success). */

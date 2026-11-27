@@ -21,6 +21,7 @@ import { formatDate } from "@/lib/date";
 import { resolveSlug } from "@/lib/slugRedirects";
 import { robotsFor } from "@/lib/indexable";
 import { auditJob } from "@/lib/jobAudit";
+import { jobPostingSchema } from "@/lib/jobPosting";
 import { CATEGORY_PAGES_BY_SLUG } from "@/lib/landingPages";
 import { STATE_SLUGS } from "@/lib/landingPagesState";
 import { categoryLabel as fmtCategoryLabel, formatIndianNumber, formatRupees } from "@/lib/utils";
@@ -234,6 +235,9 @@ export default async function JobDetailPage({ params }: PageProps<"/jobs/[slug]"
       <JsonLd
         data={breadcrumbSchema(breadcrumbs.filter((b) => b.name !== job.title))}
       />
+      {jobPostingSchema(job, { withheld: audit.failsAudit }) ? (
+        <JsonLd data={jobPostingSchema(job, { withheld: audit.failsAudit })!} />
+      ) : null}
 
       <Breadcrumbs
         items={[

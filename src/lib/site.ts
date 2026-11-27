@@ -189,6 +189,16 @@ export const STATES: { label: string; value: string }[] = [
   { label: "Uttar Pradesh", value: "uttar-pradesh" },
   { label: "Uttarakhand", value: "uttarakhand" },
   { label: "West Bengal", value: "west-bengal" },
+  // Union Territories (7 after the 2019 DNH & DD merger).
+  { label: "Andaman & Nicobar Islands", value: "andaman-and-nicobar" },
+  { label: "Chandigarh", value: "chandigarh" },
+  {
+    label: "Dadra & Nagar Haveli and Daman & Diu",
+    value: "dadra-and-nagar-haveli-and-daman-and-diu",
+  },
+  { label: "Jammu & Kashmir", value: "jammu-and-kashmir" },
+  { label: "Ladakh", value: "ladakh" },
+  { label: "Puducherry", value: "puducherry" },
 ];
 
 /** Qualification levels, used by filters and the profile form. */
@@ -218,6 +228,8 @@ export const JOB_STATUSES: { label: string; value: string }[] = [
   { label: "Upcoming", value: "upcoming" },
   { label: "Closed", value: "closed" },
   { label: "Recently Closed", value: "recently_closed" },
+  { label: "Cancelled", value: "cancelled" },
+  { label: "Result Declared", value: "result_declared" },
 ];
 
 /** Revalidation windows (seconds) — see Section 5, ISR requirement. */

@@ -6,6 +6,10 @@ import { PageContainer, Panel } from "@/components/layout/PageContainer";
 import { RecentlyClosedSection } from "@/components/jobs/RecentlyClosedSection";
 import { BrokenLinkReport } from "@/components/jobs/BrokenLinkReport";
 import { HomeStages } from "@/components/updates/HomeStages";
+import {
+  HomeJobSections,
+  type HomeSection,
+} from "@/components/jobs/HomeJobSections";
 import { isSupabaseConfigured } from "@/lib/env";
 import {
   getClosingJobs,
@@ -16,6 +20,8 @@ import {
   listExams,
   listJobs,
   listResults,
+  listYojana,
+  type JobListResult,
 } from "@/lib/queries";
 import { BOARDS } from "@/lib/boards";
 import { HOMEPAGE_TARGET_JOBS, QUICK_LINKS, TRENDING_LINKS } from "@/lib/site";
@@ -36,17 +42,75 @@ export const metadata = buildMeta({
  * configured; a clear setup panel otherwise so the page never breaks.
  */
 export default async function HomePage() {
-  const [latest, closing, recentlyClosed, bihar, admits, results, keys, exams] =
-    await Promise.all([
-      getLatestJobs(8),
-      getClosingJobs(6),
-      getRecentlyClosedJobs(6),
-      listJobs({ state: "bihar", status: "open", pageSize: 6 }),
-      listAdmitCards(5),
-      listResults(5),
-      listAnswerKeys(5),
-      listExams(8),
-    ]);
+  const [
+    latest,
+    closing,
+    recentlyClosed,
+    central,
+    stateJobs,
+    bihar,
+    railway,
+    banking,
+    defence,
+    teaching,
+    class10,
+    class12,
+    graduate,
+    schemes,
+    admits,
+    results,
+    keys,
+    exams,
+  ] = await Promise.all([
+    getLatestJobs(10),
+    getClosingJobs(6),
+    getRecentlyClosedJobs(6),
+    listJobs({ centralOnly: true, status: "active", pageSize: 10 }),
+    listJobs({ stateJobsOnly: true, status: "active", pageSize: 10 }),
+    listJobs({ state: "bihar", status: "active", pageSize: 10 }),
+    listJobs({ q: "Railway", status: "active", pageSize: 10 }),
+    listJobs({ q: "Bank", status: "active", pageSize: 10 }),
+    listJobs({ categorySlug: "defence", status: "active", pageSize: 10 }),
+    listJobs({ categorySlug: "teaching", status: "active", pageSize: 10 }),
+    listJobs({ qualification: "10th", status: "active", pageSize: 10 }),
+    listJobs({ qualification: "12th", status: "active", pageSize: 10 }),
+    listJobs({ qualification: "graduate", status: "active", pageSize: 10 }),
+    listYojana({ pageSize: 10 }),
+    listAdmitCards(5),
+    listResults(5),
+    listAnswerKeys(5),
+    listExams(8),
+  ]);
+
+  const jobItems = (result: JobListResult) =>
+    result.jobs.map((job) => ({
+      title: job.title,
+      href: `/jobs/${job.slug}`,
+      meta: job.department ?? job.state ?? null,
+    }));
+
+  const sections: HomeSection[] = [
+    { id: "central", title: "Latest Central Government Jobs", viewAll: "/jobs?central=1", items: jobItems(central) },
+    { id: "state", title: "Latest State Government Jobs", viewAll: "/jobs?stateJobs=1", items: jobItems(stateJobs) },
+    { id: "bihar", title: "Latest Bihar Jobs", viewAll: "/jobs?state=bihar", items: jobItems(bihar) },
+    { id: "railway", title: "Railway Jobs", viewAll: "/jobs?q=Railway", items: jobItems(railway) },
+    { id: "banking", title: "Banking Jobs", viewAll: "/jobs?q=Bank", items: jobItems(banking) },
+    { id: "defence", title: "Defence Jobs", viewAll: "/jobs/category/defence", items: jobItems(defence) },
+    { id: "teaching", title: "Teaching Jobs", viewAll: "/jobs/category/teaching", items: jobItems(teaching) },
+    { id: "10th", title: "10th Pass Jobs", viewAll: "/jobs/10th-pass", items: jobItems(class10) },
+    { id: "12th", title: "12th Pass Jobs", viewAll: "/jobs/12th-pass", items: jobItems(class12) },
+    { id: "graduate", title: "Graduate Jobs", viewAll: "/jobs/graduate", items: jobItems(graduate) },
+    {
+      id: "yojana",
+      title: "Latest Sarkari Yojana",
+      viewAll: "/yojana",
+      items: schemes.schemes.map((s) => ({
+        title: s.title,
+        href: `/yojana/${s.slug}`,
+        meta: s.benefits_summary,
+      })),
+    },
+  ];
 
   const notices = closing.map((job) => ({
     label: job.title,
@@ -166,6 +230,8 @@ export default async function HomePage() {
             </div>
           </section>
         ) : null}
+
+        <HomeJobSections sections={sections} />
 
         <HomeStages
           admitCards={admits.map((item) => ({

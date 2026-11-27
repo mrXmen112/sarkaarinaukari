@@ -58,6 +58,7 @@ export type SeoPageKind =
   | "result"
   | "answer-key"
   | "exam"
+  | "yojana"
   | "landing"
   | "page";
 

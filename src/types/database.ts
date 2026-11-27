@@ -14,7 +14,12 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
-export type JobStatus = "active" | "closed" | "upcoming";
+export type JobStatus =
+  | "active"
+  | "closed"
+  | "upcoming"
+  | "cancelled"
+  | "result_declared";
 /** Audit 2026-10 (migration 0023). Non-job rows must not enter job counts/lists. */
 export type JobType = "job" | "entrance" | "admission" | "scholarship";
 /** Audit 2026-10 (migration 0023). Admit cards, results and answer keys. */
@@ -23,7 +28,20 @@ export type StageStatus = "upcoming" | "released";
 export type VerificationStatus = "verified" | "unverified" | "needs_review";
 export type SocialCategory = "general" | "obc" | "sc" | "st" | "ews";
 export type AnswerKeyType = "provisional" | "final";
-export type YojanaLevel = "central" | "state";
+export type YojanaLevel = "central" | "state" | "ut";
+export type YojanaAvailability = "active" | "closed" | "upcoming" | "unknown";
+export type YojanaCategory =
+  | "women_welfare"
+  | "farmer_welfare"
+  | "student_scholarship"
+  | "employment"
+  | "business_startup"
+  | "housing"
+  | "healthcare"
+  | "pension"
+  | "education"
+  | "social_welfare"
+  | "sc_st_obc_welfare";
 export type AppliedStatus =
   | "applied"
   | "admit_card_downloaded"
@@ -172,6 +190,11 @@ export type Job = {
   content_changed_at: string | null;
   created_at: string;
   updated_at: string;
+  /** Provenance for automated publishing (migration 0026). */
+  source_id: string | null;
+  raw_scrape_id: string | null;
+  pending_entry_id: string | null;
+  auto_published: boolean;
 };
 
 /** A job row joined with its category — the shape listings actually use. */
@@ -248,6 +271,12 @@ export type Yojana = {
   official_link: string | null;
   /** Human verification stamp (migration 0020). NULL = unverified. */
   last_verified_at: string | null;
+  /** Directory fields (migration 0026). */
+  category: YojanaCategory | string | null;
+  apply_url: string | null;
+  required_documents: string | null;
+  availability_status: YojanaAvailability;
+  source_url: string | null;
   is_published: boolean;
   created_at: string;
   updated_at: string;
@@ -362,7 +391,10 @@ export type ReviewStatus =
   | "pending_review"
   | "approved"
   | "rejected"
-  | "needs_edit";
+  | "needs_edit"
+  | "auto_pending"
+  | "auto_published"
+  | "automated_error";
 
 export type ScrapeSource = {
   id: string;
@@ -371,9 +403,11 @@ export type ScrapeSource = {
   target_type: ScrapeTargetType;
   scrape_frequency_hours: number;
   is_active: boolean;
-  /** Trusted-source switch: when true, future tooling may auto-publish. */
+  /** Trusted-source switch: only these sources may be auto-published. */
   auto_publish: boolean;
   parser: string | null;
+  allowed_domains: string[];
+  source_group: "central" | "state" | "ut" | null;
   robots_txt_checked_at: string | null;
   last_scraped_at: string | null;
   created_at: string;
@@ -427,7 +461,25 @@ export type ScrapeLog = {
   status: "success" | "partial" | "failed" | null;
   items_found: number;
   items_new: number;
+  items_updated: number;
+  items_duplicate: number;
+  items_failed: number;
+  phase: string;
   error_message: string | null;
+};
+
+export type ImportError = {
+  id: string;
+  source_id: string | null;
+  pending_entry_id: string | null;
+  raw_scrape_id: string | null;
+  phase: "scrape" | "structure" | "validate" | "publish";
+  severity: "error" | "warning";
+  code: string;
+  message: string;
+  details: Json;
+  created_at: string;
+  resolved_at: string | null;
 };
 
 /* ------------------------------------------------------------------ */
@@ -568,6 +620,7 @@ export type Database = {
       raw_scrapes: Table<RawScrape, []>;
       pending_entries: Table<PendingEntry, []>;
       scrape_logs: Table<ScrapeLog, []>;
+      import_errors: Table<ImportError, []>;
       site_settings: Table<SiteSetting, []>;
       archived_jobs: Table<Job, []>;
       slug_redirects: Table<SlugRedirect, []>;
@@ -587,6 +640,10 @@ export type Database = {
           approver?: string | null;
         };
         Returns: number;
+      };
+      mark_auto_verified: {
+        Args: { p_job_id: string; p_source: string; p_note?: string | null };
+        Returns: undefined;
       };
     };
     Enums: Record<string, never>;
