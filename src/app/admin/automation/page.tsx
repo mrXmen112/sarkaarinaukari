@@ -29,7 +29,7 @@ export default async function AutomationPage() {
   const db = createAdminClient();
   const since = isoDatePlusDays(-1);
 
-  const [sources, logs, errors, published, expired, pending] = await Promise.all([
+  const [sources, logs, errors, errorsTotal, published, publishedTotal, expired, pending] = await Promise.all([
     db
       .from("scrape_sources")
       .select("id, name, is_active, auto_publish, source_group, last_scraped_at")
@@ -44,11 +44,16 @@ export default async function AutomationPage() {
       .select("id, created_at, phase, code, message, source_id")
       .order("created_at", { ascending: false })
       .limit(30),
+    db.from("import_errors").select("id", { count: "exact", head: true }),
     db
       .from("jobs")
       .select("id", { count: "exact", head: true })
       .eq("auto_published", true)
       .gte("created_at", since),
+    db
+      .from("jobs")
+      .select("id", { count: "exact", head: true })
+      .eq("auto_published", true),
     db
       .from("jobs")
       .select("id", { count: "exact", head: true })
@@ -82,18 +87,16 @@ export default async function AutomationPage() {
           value={successful ? new Date(successful.run_at).toLocaleString("en-IN") : "Never"}
         />
         <Metric label="Active sources" value={`${activeSources} / ${sourceRows.length}`} />
+        <Metric label="Sources awaiting verification" value={sourceRows.length - activeSources} />
+        <Metric label="Jobs discovered" value={logRows.reduce((n, l) => n + (l.items_found ?? 0), 0)} />
+        <Metric label="New jobs imported" value={logRows.reduce((n, l) => n + (l.items_new ?? 0), 0)} />
+        <Metric label="Jobs published" value={publishedTotal.count ?? 0} />
         <Metric label="New jobs (24h)" value={published.count ?? 0} />
         <Metric label="Pending automated" value={pending.count ?? 0} />
         <Metric label="Expired notices" value={expired.count ?? 0} />
-        <Metric
-          label="Duplicates skipped"
-          value={duplicates}
-        />
-        <Metric
-          label="Failed source requests"
-          value={logRows.filter((l) => l.status === "failed").length}
-        />
-        <Metric label="Validation errors" value={errorRows.length} />
+        <Metric label="Duplicates skipped" value={duplicates} />
+        <Metric label="Failed source requests" value={logRows.filter((l) => l.status === "failed").length} />
+        <Metric label="Jobs rejected by validation" value={errorsTotal.count ?? 0} />
       </div>
 
       <Panel title="Import & validation errors" className="mb-5">

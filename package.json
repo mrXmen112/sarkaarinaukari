@@ -23,7 +23,9 @@
     "db:inventory": "node scripts/db-inventory.mjs",
     "export:unverified": "node scripts/export-unverified.mjs",
     "scraper": "node scripts/scraper/run.mjs",
-    "sync:schemes": "node scripts/scraper/myscheme-sync.mjs"
+    "sync:schemes": "node scripts/scraper/myscheme-sync.mjs",
+    "import:official": "node scripts/scraper/import-official.mjs",
+    "verify:existing": "node scripts/scraper/verify-existing.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

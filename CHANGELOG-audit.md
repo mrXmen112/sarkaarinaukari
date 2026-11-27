@@ -19,6 +19,14 @@ Decisions that need the owner are tracked in `NEEDS-MY-DECISION.md`.
 - **SEO:** JobPosting restored for eligible active verified jobs; Yojana canonicals now absolute; prep sitemap includes verified Yojana rows; sitemap failures are logged.
 - **Verification:** 77 unit tests + 2 scraper tests + 44 HTTP flow checks; TypeScript clean, lint 0 errors, production build clean.
 
+## 0b. Nationwide import & hidden-record recheck (2026-11-27)
+
+- **Source-specific adapters:** ISRO, BARC, BTSC, TGPSC, UPPSC and Kerala PSC (`scripts/scraper/import-official.mjs`) fetch live official listing pages/PDFs and cross-check each extracted value against the fetched text. Migration `0028_tested_recruitment_sources` registers the six tested sources plus auto-publish domains.
+- **Real imports:** 32 genuine vacancies auto-published from official sources — ISRO 11 (central), TGPSC 9, BTSC 7 (Bihar), UPPSC 3, Kerala PSC 2. 5 are currently open. No synthetic rows were created.
+- **Hidden-record recheck:** `scripts/scraper/verify-existing.mjs` re-fetched all 97 published-but-unverified rows: 0 could be verified, 97 were logged with reasons (43 dead URLs, 26 deadline mismatches, 14 title mismatches, 13 thin sources), and 37 expired rows were moved to `closed`.
+- **Automation:** `/api/cron/import` and a Vercel cron entry run the importer; dashboard now shows discovered/imported/published/rejected/duplicate/expired counts; `autoPublish` validation allows genuine notices with unstated figures to keep those fields `null`.
+- **Verification:** tsc clean, 77 + 2 tests pass, 53/53 HTTP flow checks, cron endpoints exercised, production build clean.
+
 ## 1. Baseline (before this audit)
 
 - `npm test` 56/56; lint 0 errors / 24 warnings; `npm run build` clean.

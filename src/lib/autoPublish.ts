@@ -136,7 +136,6 @@ export function validateRequiredFields(draft: AutoPublishDraft): Assessment {
 
   requireText("title", 8);
   requireText("department", 2);
-  requireText("eligibility_education", 3);
   requireText("application_end", 8);
   if (!hostnameOf(draft.official_link ?? null)) {
     errors.push({ code: "invalid_official_link", message: "official_link is not a valid HTTP(S) URL" });
@@ -144,9 +143,14 @@ export function validateRequiredFields(draft: AutoPublishDraft): Assessment {
   if (draft.type && draft.type !== "job") {
     errors.push({ code: "not_a_job", message: `type=${draft.type} is not a recruitment vacancy` });
   }
-  const total = Number(draft.vacancy_total);
-  if (!Number.isFinite(total) || total <= 0) {
-    errors.push({ code: "missing_vacancy_total", message: "vacancy_total must be a positive number stated in the notice" });
+  // Vacancy, eligibility, fee and salary are OPTIONAL: a genuine notice may
+  // not state them. They must be null rather than guessed. If present they
+  // are cross-checked against the source text below.
+  if (draft.vacancy_total !== null && draft.vacancy_total !== undefined && draft.vacancy_total !== "") {
+    const total = Number(draft.vacancy_total);
+    if (!Number.isFinite(total) || total <= 0) {
+      errors.push({ code: "invalid_vacancy_total", message: "vacancy_total must be a positive number" });
+    }
   }
   const end = String(draft.application_end ?? "").slice(0, 10);
   const start = draft.application_start ? String(draft.application_start).slice(0, 10) : null;

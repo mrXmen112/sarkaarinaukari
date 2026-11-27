@@ -43,12 +43,11 @@ test("a registered official domain is trusted; an unrelated one is not", () => {
   assert.equal(isTrustedOfficialUrl("https://ssc.gov.in/x", { ...SOURCE, auto_publish: false }), false);
 });
 
-test("mandatory fields are enforced", () => {
+test("mandatory fields are enforced; optional figures may stay null", () => {
   const result = validateRequiredFields({ ...DRAFT, vacancy_total: null, title: "" });
   assert.equal(result.ok, false);
-  const codes = result.errors.map((e) => e.code);
-  assert.ok(codes.includes("missing_title"));
-  assert.ok(codes.includes("missing_vacancy_total"));
+  assert.ok(result.errors.some((e) => e.code === "missing_title"));
+  assert.equal(validateRequiredFields({ ...DRAFT, vacancy_total: null, eligibility_education: null }).ok, true);
 });
 
 test("a broken application window is rejected", () => {
