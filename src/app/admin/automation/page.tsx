@@ -29,7 +29,7 @@ export default async function AutomationPage() {
   const db = createAdminClient();
   const since = isoDatePlusDays(-1);
 
-  const [sources, logs, errors, errorsTotal, published, publishedTotal, expired, pending] = await Promise.all([
+  const [sources, logs, errors, errorsTotal, published, publishedTotal, expired, pending, upcoming, upcomingScheduled, upcomingExpected, upcomingExams] = await Promise.all([
     db
       .from("scrape_sources")
       .select("id, name, is_active, auto_publish, source_group, last_scraped_at")
@@ -63,6 +63,10 @@ export default async function AutomationPage() {
       .from("pending_entries")
       .select("status", { count: "exact", head: true })
       .eq("status", "auto_pending"),
+    db.from("upcoming_recruitments").select("id", { count: "exact", head: true }).eq("is_published", true),
+    db.from("upcoming_recruitments").select("id", { count: "exact", head: true }).eq("status", "notification_scheduled"),
+    db.from("upcoming_recruitments").select("id", { count: "exact", head: true }).eq("status", "notification_expected"),
+    db.from("upcoming_recruitments").select("id", { count: "exact", head: true }).eq("status", "examination_scheduled"),
   ]);
 
   const logRows = logs.data ?? [];
@@ -97,6 +101,10 @@ export default async function AutomationPage() {
         <Metric label="Duplicates skipped" value={duplicates} />
         <Metric label="Failed source requests" value={logRows.filter((l) => l.status === "failed").length} />
         <Metric label="Jobs rejected by validation" value={errorsTotal.count ?? 0} />
+        <Metric label="Upcoming records" value={upcoming.count ?? 0} />
+        <Metric label="Notification scheduled" value={upcomingScheduled.count ?? 0} />
+        <Metric label="Notification expected" value={upcomingExpected.count ?? 0} />
+        <Metric label="Future exams" value={upcomingExams.count ?? 0} />
       </div>
 
       <Panel title="Import & validation errors" className="mb-5">

@@ -57,6 +57,21 @@ export async function GET(req: NextRequest) {
     linkCheck = { error: message };
   }
 
+  // Official recruitment-calendar sync (UPSC and future calendars).
+  let calendarSync = null;
+  try {
+    const script = path.join(process.cwd(), "scripts", "scraper", "sync-calendars.mjs");
+    const { stdout } = await runProcess(process.execPath, [script], {
+      cwd: process.cwd(),
+      timeout: 20_000,
+      maxBuffer: 1024 * 1024,
+      env: process.env,
+    });
+    calendarSync = stdout.trim().slice(-800);
+  } catch (error) {
+    calendarSync = `failed: ${error instanceof Error ? error.message.slice(0, 200) : String(error)}`;
+  }
+
   // Bounded scheme sync, consolidated here so the hosting plan only needs
   // two scheduled jobs.
   let schemeSync = null;
@@ -75,6 +90,7 @@ export async function GET(req: NextRequest) {
 
   return Response.json({
     ok: true,
+    calendarSync,
     schemeSync,
     jobStatusesRefreshed: !refreshError,
     refreshError: refreshError?.message ?? null,

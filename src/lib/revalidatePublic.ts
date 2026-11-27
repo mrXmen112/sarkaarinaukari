@@ -14,6 +14,7 @@ export function revalidateJobSurfaces(slug?: string | null): void {
   revalidatePath("/sitemap/updates.xml");
   revalidatePath("/sitemap/landing.xml");
   revalidatePath("/sitemap/prep.xml");
+  revalidatePath("/sitemap/upcoming.xml");
   revalidatePath("/jobs", "layout");
   revalidatePath("/yojana", "layout");
   if (slug) revalidatePath(`/jobs/${slug}`);

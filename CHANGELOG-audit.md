@@ -44,6 +44,15 @@ Decisions that need the owner are tracked in `NEEDS-MY-DECISION.md`.
 - **DB audit:** 179 job rows — 154 published, 25 unpublished; 83 published active (57 verified; **23 publicly open under IST**), 71 published expired, 0 cancelled, 97 published-but-hidden pending evidence, 15 manual review entries, 3 automated-error entries, 153 import errors.
 - **Verification:** 77 unit + 2 scraper tests pass; tsc clean; lint 0 errors; build clean.
 
+## 0e. Coming Soon / Expected / Upcoming Exams (2026-11-27)
+
+- **DB:** migration `0033_upcoming_recruitments` adds a dedicated table with eight explicit statuses, confidence level, official URLs, IST dates, dedupe key and public read policy.
+- **Verified UPSC imports (+10):** NDA I 2027, CDS I 2027, CSE Prelim 2027, IFS Prelim 2027, IES/ISS 2027, CAPF AC 2027, CMS 2027, CBI DSP LDCE 2027 (departmental restriction shown), plus Engineering Services Prelim 2027 and Geo-Scientist Prelim 2027 as examination_scheduled. Every date was checked verbatim against UPSC's official Annual Calendar 2027 PDF.
+- **Frontend:** four disjoint sections — `/jobs`, `/jobs/coming-soon`, `/jobs/expected`, `/exams/upcoming` — with filters, IST countdowns, no fake apply buttons, and a dedicated detail route for scheduled recruitments. Homepage now surfaces all four.
+- **Automation:** `npm run sync:calendars` re-verifies and upserts by dedupe key; scheduled inside the existing maintenance cron. Automation dashboard shows upcoming counts.
+- **SEO:** new indexable `/sitemap/upcoming.xml` section; no JobPosting markup on future-calendar pages.
+- **Verification:** 79 unit + 2 scraper tests, tsc clean, lint 0 errors, build clean; local routes 200 with 8 / 0 / 2 entries respectively.
+
 ## 1. Baseline (before this audit)
 
 - `npm test` 56/56; lint 0 errors / 24 warnings; `npm run build` clean.

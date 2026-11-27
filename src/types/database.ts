@@ -30,6 +30,42 @@ export type SocialCategory = "general" | "obc" | "sc" | "st" | "ews";
 export type AnswerKeyType = "provisional" | "final";
 export type YojanaLevel = "central" | "state" | "ut";
 export type YojanaAvailability = "active" | "closed" | "upcoming" | "unknown";
+
+export type UpcomingStatus =
+  | "application_open"
+  | "notification_scheduled"
+  | "notification_expected"
+  | "application_opening_soon"
+  | "examination_scheduled"
+  | "application_closed"
+  | "cancelled"
+  | "result_declared";
+
+export type UpcomingRecruitment = {
+  id: string;
+  slug: string;
+  dedupe_key: string;
+  title: string;
+  organization: string;
+  level: "central" | "state" | "ut";
+  state: string | null;
+  category: string | null;
+  status: UpcomingStatus;
+  date_confidence: "confirmed" | "tentative";
+  notification_date: string | null;
+  application_start: string | null;
+  application_end: string | null;
+  exam_date: string | null;
+  calendar_url: string | null;
+  notification_url: string | null;
+  apply_url: string | null;
+  source_url: string;
+  eligibility_note: string | null;
+  last_verified_at: string;
+  is_published: boolean;
+  created_at: string;
+  updated_at: string;
+};
 export type YojanaCategory =
   | "women_welfare"
   | "farmer_welfare"
@@ -623,6 +659,7 @@ export type Database = {
           },
         ]
       >;
+      upcoming_recruitments: Table<UpcomingRecruitment, []>;
       admin_users: Table<{ user_id: string; created_at: string }, []>;
       scrape_sources: Table<ScrapeSource, []>;
       raw_scrapes: Table<RawScrape, []>;

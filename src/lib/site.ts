@@ -47,6 +47,9 @@ export const QUICK_LINKS: { label: string; href: string; hint: string }[] = [
   { label: "Syllabus", href: "/exams", hint: "Exam-wise syllabus" },
   { label: "Sarkari Yojana", href: "/yojana", hint: "Government schemes" },
   { label: "Bihar 12th Pass Jobs", href: "/bihar/12th-pass-jobs", hint: "Intermediate-level posts" },
+  { label: "Coming Soon", href: "/jobs/coming-soon", hint: "Confirmed future notifications" },
+  { label: "Expected Jobs", href: "/jobs/expected", hint: "Official tentative calendars" },
+  { label: "Upcoming Exams", href: "/exams/upcoming", hint: "Advertised, exam ahead" },
 ];
 
 /**
@@ -87,6 +90,8 @@ export const FOOTER_NAV: {
       { label: "12th Pass Jobs", labelHi: "12th पास जॉब", href: "/jobs/12th-pass" },
       { label: "Bihar 12th Pass Jobs", href: "/bihar/12th-pass-jobs" },
       { label: "Graduate Jobs", labelHi: "ग्रेजुएट जॉब", href: "/jobs/graduate" },
+      { label: "Coming Soon Jobs", href: "/jobs/coming-soon" },
+      { label: "Expected Jobs", href: "/jobs/expected" },
     ],
   },
   {

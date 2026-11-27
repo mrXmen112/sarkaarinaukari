@@ -26,7 +26,7 @@ import {
  * index served at /sitemap.xml. Split by section so listings stay fast and
  * lastmod stays accurate per content type.
  */
-const SITEMAP_SECTIONS = ["static", "landing", "jobs", "updates", "prep"] as const;
+const SITEMAP_SECTIONS = ["static", "landing", "jobs", "updates", "prep", "upcoming"] as const;
 
 export async function generateSitemaps() {
   return SITEMAP_SECTIONS.map((id) => ({ id }));
@@ -106,6 +106,24 @@ export default async function sitemap(props: {
     return routes.filter(
       (route): route is NonNullable<typeof route> => route !== null,
     );
+  }
+
+  // Officially scheduled / expected recruitment and future-exam pages. These
+  // are real, unique pages; no JobPosting markup is emitted for them.
+  if (id === "upcoming") {
+    if (!isSupabaseConfigured) return [];
+    const { getAllUpcomingSlugs } = await import("@/lib/upcoming");
+    const slugs = await getAllUpcomingSlugs();
+    return [
+      { url: `${base}/jobs/coming-soon`, changeFrequency: "daily" as const, priority: 0.8 },
+      { url: `${base}/jobs/expected`, changeFrequency: "daily" as const, priority: 0.6 },
+      { url: `${base}/exams/upcoming`, changeFrequency: "daily" as const, priority: 0.7 },
+      ...slugs.map((slug) => ({
+        url: `${base}/jobs/coming-soon/${slug}`,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      })),
+    ];
   }
 
   if (!isSupabaseConfigured) return [];

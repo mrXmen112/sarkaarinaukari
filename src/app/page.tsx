@@ -11,6 +11,7 @@ import {
   type HomeSection,
 } from "@/components/jobs/HomeJobSections";
 import { isSupabaseConfigured } from "@/lib/env";
+import { formatDate } from "@/lib/date";
 import {
   getClosingJobs,
   getLatestJobs,
@@ -23,6 +24,12 @@ import {
   listYojana,
   type JobListResult,
 } from "@/lib/queries";
+import {
+  COMING_SOON_STATUSES,
+  EXPECTED_STATUSES,
+  UPCOMING_EXAM_STATUSES,
+  listUpcoming,
+} from "@/lib/upcoming";
 import { BOARDS } from "@/lib/boards";
 import { HOMEPAGE_TARGET_JOBS, QUICK_LINKS, TRENDING_LINKS } from "@/lib/site";
 import { buildMeta } from "@/lib/seo";
@@ -57,6 +64,9 @@ export default async function HomePage() {
     class12,
     graduate,
     schemes,
+    comingSoon,
+    expected,
+    futureExams,
     admits,
     results,
     keys,
@@ -76,6 +86,9 @@ export default async function HomePage() {
     listJobs({ qualification: "12th", status: "active", pageSize: 10 }),
     listJobs({ qualification: "graduate", status: "active", pageSize: 10 }),
     listYojana({ pageSize: 10 }),
+    listUpcoming({ statuses: COMING_SOON_STATUSES, pageSize: 10 }),
+    listUpcoming({ statuses: EXPECTED_STATUSES, pageSize: 10 }),
+    listUpcoming({ statuses: UPCOMING_EXAM_STATUSES, pageSize: 10 }),
     listAdmitCards(5),
     listResults(5),
     listAnswerKeys(5),
@@ -108,6 +121,36 @@ export default async function HomePage() {
         title: s.title,
         href: `/yojana/${s.slug}`,
         meta: s.benefits_summary,
+      })),
+    },
+    {
+      id: "coming-soon",
+      title: "Coming Soon Jobs",
+      viewAll: "/jobs/coming-soon",
+      items: comingSoon.rows.map((r) => ({
+        title: r.title,
+        href: `/jobs/coming-soon/${r.slug}`,
+        meta: `Notification ${r.notification_date ? formatDate(r.notification_date) : "awaited"} · ${r.date_confidence}`,
+      })),
+    },
+    {
+      id: "expected",
+      title: "Expected Government Jobs",
+      viewAll: "/jobs/expected",
+      items: expected.rows.map((r) => ({
+        title: r.title,
+        href: `/jobs/coming-soon/${r.slug}`,
+        meta: `${r.date_confidence} dates · detailed notification awaited`,
+      })),
+    },
+    {
+      id: "upcoming-exams",
+      title: "Upcoming Government Exams",
+      viewAll: "/exams/upcoming",
+      items: futureExams.rows.map((r) => ({
+        title: r.title,
+        href: `/jobs/coming-soon/${r.slug}`,
+        meta: r.exam_date ? `Exam ${formatDate(r.exam_date)}` : null,
       })),
     },
   ];
